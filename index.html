@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VinTransCBM - Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <nav id="tab-nav">
+            <button class="tab-button active" data-tab="cbm-calculator">📊 Tính Toán</button>
+            <button class="tab-button" data-tab="history">📋 Lịch Sử</button>
+        </nav>
+
+        <main id="content">
+            <!-- Tab Tính CBM -->
+            <div id="cbm-calculator" class="tab-content active">
+                <div id="cbm-main-content">
+                    <div id="groups-display"></div>
+                    <div id="totals-display"><p>Chưa có lô hàng nào.</p></div>
+                </div>
+                <div id="cbm-controls">
+                    <div id="cbm-actions">
+                        <button id="btn-back1">Quay Lại</button>
+                        <button id="btn-back2">Biến Trước</button>
+                        <button id="btn-reset">Xóa Tất Cả</button>
+                    </div>
+                    <div id="cbm-input-group">
+                         <input type="number" id="cbm-input" placeholder="Nhập Số...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Lịch sử -->
+            <div id="history" class="tab-content">
+                <div class="history-container">
+                    <div id="history-list">
+                        <p>Chưa có lịch sử.</p>
+                    </div>
+                    <div class="history-controls">
+                        <button id="clear-history-button">Xóa Lịch Sử</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

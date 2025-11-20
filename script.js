@@ -49,16 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const slideMenuItems = $$('.slide-menu-item');
 
     // --- PROVINCE CHECKER STATE ---
-    // Example list from Android project - expanded for better coverage
-    const provinceList = [
-        "ha noi", "da nang", "hai phong", "can tho", "ho chi minh",
-        "lai chau", "lao cai", "bac kan", "cao bang", "lang son", "tuyen quang", "thai nguyen", "phu tho",
-        "bac giang", "quang ninh", "dien bien", "son la", "hoa binh", "thanh hoa", "nghe an", "ha tinh",
-        "quang binh", "quang tri", "thua thien hue", "quang nam", "quang ngai", "binh dinh", "phu yen",
-        "khanh hoa", "ninh thuan", "binh thuan", "kon tum", "gia lai", "dak lak", "dak nong", "lam dong",
-        "binh phuoc", "tay ninh", "binh duong", "dong nai", "ba ria - vung tau", "long an", "tien giang",
-        "ben tre", "tra vinh", "soc trang", "bac lieu", "ca mau", "kien giang", "an giang", "dong thap",
-        "vinh long", "hau giang"
+    // Danh sách 32 tỉnh HÀNG BAY (từ Android app)
+    const hangBayProvinces = [
+        "ha noi", "son la", "quang binh", "cao bang", "quang tri", "hue",
+        "da nang", "quang nam", "quang ngai", "ha giang", "bac kan", "tuyen quang",
+        "lao cai", "dien bien", "lai chau", "thai binh", "ha nam", "nam dinh",
+        "ninh binh", "thanh hoa", "yen bai", "hoa binh", "thai nguyen", "lang son",
+        "quang ninh", "bac giang", "phu tho", "vinh phuc", "bac ninh", "hai duong",
+        "hai phong", "hung yen"
+    ];
+    
+    // Danh sách đầy đủ 63 tỉnh thành Việt Nam (để check "Không tìm thấy")
+    const allProvinces = [
+        "ha noi", "ho chi minh", "da nang", "hai phong", "can tho",
+        "an giang", "ba ria vung tau", "bac giang", "bac kan", "bac lieu", "bac ninh",
+        "ben tre", "binh dinh", "binh duong", "binh phuoc", "binh thuan",
+        "ca mau", "cao bang", "dak lak", "dak nong", "dien bien", "dong nai", "dong thap",
+        "gia lai", "ha giang", "ha nam", "ha tinh", "hai duong", "hau giang", "hoa binh", "hung yen",
+        "khanh hoa", "kien giang", "kon tum", "lai chau", "lam dong", "lang son", "lao cai",
+        "long an", "nam dinh", "nghe an", "ninh binh", "ninh thuan",
+        "phu tho", "phu yen", "quang binh", "quang nam", "quang ngai", "quang ninh", "quang tri",
+        "soc trang", "son la", "tay ninh", "thai binh", "thai nguyen", "thanh hoa",
+        "thua thien hue", "tien giang", "tra vinh", "tuyen quang",
+        "vinh long", "vinh phuc", "yen bai"
     ];
 
     // --- HAMBURGER MENU STATE ---
@@ -363,22 +376,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const found = provinceList.includes(inputProvince);
         let resultText = '';
         let resultClass = '';
 
-        if (found) {
-            // Logic: Hà Nội, Đà Nẵng, Hải Phòng, HCM = Hàng Bay
-            if (["ha noi", "da nang", "hai phong", "ho chi minh"].includes(inputProvince)) {
-                resultText = '✈️ Hàng Bay';
-                resultClass = 'hang-bay';
-            } else {
-                resultText = '🚛 Hàng Bộ';
-                resultClass = 'hang-bo';
-            }
-        } else {
+        // Kiểm tra xem tỉnh có trong danh sách 63 tỉnh không
+        if (!allProvinces.includes(inputProvince)) {
+            // Không có trong danh sách → Không tìm thấy
             resultText = '❓ Không tìm thấy';
             resultClass = '';
+        } else if (hangBayProvinces.includes(inputProvince)) {
+            // Có trong danh sách 32 tỉnh Hàng Bay
+            resultText = '✈️ Hàng Bay';
+            resultClass = 'hang-bay';
+        } else {
+            // Có trong 63 tỉnh nhưng không phải Hàng Bay → Hàng Bộ
+            resultText = '🚛 Hàng Bộ';
+            resultClass = 'hang-bo';
         }
 
         // Get current time

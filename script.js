@@ -68,15 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNCTIONS ---
     
     // --- HAMBURGER MENU FUNCTIONS ---
-    const showHamburgerMenu = () => {
-        if (hamburgerMenu) {
-            hamburgerMenu.classList.remove('hidden');
-            clearTimeout(hideMenuTimer);
-            hideMenuTimer = setTimeout(() => {
-                if (!slideMenu.classList.contains('open')) {
-                    hamburgerMenu.classList.add('hidden');
-                }
-            }, MENU_HIDE_DELAY);
+    const toggleHamburgerVisibility = () => {
+        if (hamburgerMenu && !slideMenu.classList.contains('open')) {
+            hamburgerMenu.classList.toggle('hidden');
         }
     };
 
@@ -84,8 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slideMenu && menuOverlay) {
             slideMenu.classList.add('open');
             menuOverlay.classList.add('visible');
-            clearTimeout(hideMenuTimer);
-            hamburgerMenu.classList.remove('hidden');
+            // Keep hamburger visible when menu is open
+            if (hamburgerMenu) {
+                hamburgerMenu.classList.remove('hidden');
+            }
         }
     };
 
@@ -93,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slideMenu && menuOverlay) {
             slideMenu.classList.remove('open');
             menuOverlay.classList.remove('visible');
-            showHamburgerMenu(); // Restart hide timer
+            // Hide hamburger after closing menu
+            if (hamburgerMenu) {
+                hamburgerMenu.classList.add('hidden');
+            }
         }
     };
 
@@ -441,10 +440,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
-    // Hamburger menu
+    // Hamburger menu - Click to toggle visibility and open menu
     if (hamburgerMenu) {
-        hamburgerMenu.addEventListener('click', openSlideMenu);
+        hamburgerMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (hamburgerMenu.classList.contains('hidden')) {
+                // If hidden, show it first
+                hamburgerMenu.classList.remove('hidden');
+            } else {
+                // If visible, open the menu
+                openSlideMenu();
+            }
+        });
     }
+    
+    // Click anywhere on screen to show hamburger (but not open menu)
+    document.addEventListener('click', (e) => {
+        // Only show hamburger if it's hidden and menu is not open
+        if (hamburgerMenu && hamburgerMenu.classList.contains('hidden') && !slideMenu.classList.contains('open')) {
+            hamburgerMenu.classList.remove('hidden');
+        }
+    });
+    
     if (closeMenuBtn) {
         closeMenuBtn.addEventListener('click', closeSlideMenu);
     }
@@ -454,11 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
     slideMenuItems.forEach(item => {
         item.addEventListener('click', () => handleSlideMenuItemClick(item.dataset.tab));
     });
-    
-    // Activity listeners to show hamburger menu
-    document.addEventListener('touchstart', showHamburgerMenu);
-    document.addEventListener('mousemove', showHamburgerMenu);
-    document.addEventListener('keydown', showHamburgerMenu);
     
     // Sidebar navigation
     sidebarNavItems.forEach(item => {
@@ -644,9 +656,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCBM();
     renderHistory();
     
-    // Start hamburger menu auto-hide timer
+    // Start with hamburger hidden
     if (hamburgerMenu) {
-        showHamburgerMenu();
+        hamburgerMenu.classList.add('hidden');
     }
     
     cbmInput.focus();

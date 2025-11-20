@@ -84,13 +84,13 @@ body {
     display: none;
 }
 
-/* Main Content - Full height on mobile (minus bottom nav) */
+/* Main Content - Full height on mobile */
 .main-content {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     padding: var(--spacing-md);
-    padding-bottom: calc(var(--spacing-md) + 72px); /* Space for bottom nav */
+    padding-top: 72px; /* Space for hamburger button */
     scroll-behavior: smooth;
 }
 
@@ -242,60 +242,9 @@ body {
     pointer-events: all;
 }
 
-/* Bottom Navigation - Visible on mobile only */
+/* Bottom Navigation - REMOVED (using hamburger menu instead) */
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: var(--spacing-xs) 0;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-    z-index: 100;
-}
-
-.bottom-nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    border: none;
-    background: transparent;
-    color: var(--on-surface-variant);
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    transition: all var(--transition-fast);
-    font-family: var(--font-family);
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.bottom-nav-icon {
-    font-size: 24px;
-    transition: transform var(--transition-fast);
-}
-
-.bottom-nav-text {
-    font-size: 11px;
-}
-
-.bottom-nav-item.active {
-    color: var(--primary);
-}
-
-.bottom-nav-item.active .bottom-nav-icon {
-    transform: scale(1.1);
-}
-
-.bottom-nav-item:active {
-    transform: scale(0.95);
+    display: none;
 }
 
 /* ========================

@@ -80,24 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCTIONS ---
     
-    // --- SECURITY FUNCTIONS ---
-    // Sanitize input để ngăn XSS
-    const sanitizeInput = (str) => {
-        if (typeof str !== 'string') return '';
-        // Loại bỏ các ký tự đặc biệt nguy hiểm
-        return str
-            .replace(/[<>\"']/g, '') // Loại bỏ <, >, ", '
-            .replace(/javascript:/gi, '') // Loại bỏ javascript:
-            .replace(/on\w+=/gi, '') // Loại bỏ onclick=, onerror=, etc.
-            .trim();
-    };
-    
-    const sanitizeNumber = (str) => {
-        if (typeof str !== 'string') return '';
-        // Chỉ cho phép số, dấu chấm, dấu phẩy
-        return str.replace(/[^0-9.,]/g, '');
-    };
-    
     // --- HAMBURGER MENU FUNCTIONS ---
     const startHideTimer = () => {
         clearTimeout(hideMenuTimer);
@@ -291,9 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const handleCBMInput = () => {
-        const rawValue = sanitizeNumber(cbmInput.value);
-        if (!rawValue) return;
-        const value = parseFloat(rawValue);
+        const value = parseFloat(cbmInput.value);
         if (isNaN(value) || value <= 0) {
             cbmInput.style.animation = 'shake 0.5s';
             setTimeout(()=> cbmInput.style.animation = '', 500);
@@ -403,9 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkProvince = () => {
-        const sanitizedInput = sanitizeInput(provinceInput.value);
-        const inputProvince = removeAccents(sanitizedInput.toLowerCase()).trim();
-        const originalName = sanitizedInput.trim();
+        const inputProvince = removeAccents(provinceInput.value.toLowerCase()).trim();
+        const originalName = provinceInput.value.trim();
 
         if (inputProvince === "") {
             return;
@@ -669,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const searchByDate = () => {
-        const searchDate = sanitizeInput(searchHistoryInput.value).trim();
+        const searchDate = searchHistoryInput.value.trim();
         if (!searchDate) {
             alert('Vui lòng nhập ngày tìm kiếm (dd/MM/yyyy)');
             return;

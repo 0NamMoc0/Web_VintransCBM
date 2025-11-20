@@ -1,4 +1,44 @@
+// Chrome Android & Edge PC compatibility check
 document.addEventListener('DOMContentLoaded', () => {
+    // Detect Edge browser
+    const isEdge = /edg/i.test(navigator.userAgent);
+    const isChromeAndroid = /chrome/i.test(navigator.userAgent) && /android/i.test(navigator.userAgent);
+    
+    console.log('Browser detected:', {
+        isEdge: isEdge,
+        isChromeAndroid: isChromeAndroid,
+        userAgent: navigator.userAgent
+    });
+    
+    // Check if localStorage is available (Chrome Android Data Saver issue)
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        console.log('LocalStorage available');
+    } catch (e) {
+        console.warn('LocalStorage not available, using memory fallback:', e);
+        window.localStorage = {
+            data: {},
+            getItem: function(key) { return this.data[key] || null; },
+            setItem: function(key, value) { this.data[key] = value; },
+            removeItem: function(key) { delete this.data[key]; },
+            clear: function() { this.data = {}; }
+        };
+    }
+    
+    // Edge-specific fixes
+    if (isEdge) {
+        console.log('Applying Edge-specific fixes...');
+        // Disable certain animations that might cause freezing
+        document.documentElement.style.setProperty('--transition-fast', '0ms');
+        document.documentElement.style.setProperty('--transition-base', '0ms');
+        
+        // Add error handling for Edge
+        window.addEventListener('error', function(e) {
+            console.error('Edge JavaScript error:', e.error);
+        });
+    }
+    
     // --- UTILS ---
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => document.querySelectorAll(selector);

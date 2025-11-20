@@ -163,52 +163,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return JSON.stringify(entry);
     };
     
-    const renderHistory = async () => {
-        // Hiển thị loading
-        historyListDiv.innerHTML = '<p>⏳ Đang tải lịch sử...</p>';
-        
-        try {
-            // Load từ cloud trước
-            const cloudHistory = await loadFromCloud();
-            history = cloudHistory;
-            
-            if (history.length === 0) {
-                historyListDiv.innerHTML = '<p>📋 LỊCH SỬ TÍNH TOÁN:\n\nChưa có dữ liệu tính toán nào.</p>';
-                pageInfoSpan.textContent = 'Trang 1/1';
-                prevPageBtn.disabled = true;
-                nextPageBtn.disabled = true;
-                return;
-            }
-            
-            // Tính toán phân trang
-            totalPages = Math.ceil(history.length / itemsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, history.length);
-            
-            let html = `<div class="history-header">📋 LỊCH SỬ TÍNH TOÁN</div>`;
-            html += `<div class="history-stats">📊 Hiển thị ${startIndex + 1}-${endIndex} trên tổng ${history.length} mục</div>`;
-            
-            // Hiển thị các mục trong trang hiện tại
-            for (let i = startIndex; i < endIndex; i++) {
-                const formattedEntry = formatHistoryEntry(history[i]);
-                html += `<div class="history-item">${formattedEntry.replace(/\n/g, '<br>')}</div>`;
-            }
-            
-            historyListDiv.innerHTML = html;
-            
-            // Cập nhật thông tin trang
-            pageInfoSpan.textContent = `Trang ${currentPage}/${totalPages}`;
-            prevPageBtn.disabled = currentPage <= 1;
-            nextPageBtn.disabled = currentPage >= totalPages;
-            
-            // Cuộn lên đầu
-            historyListDiv.scrollTop = 0;
-        } catch (error) {
-            console.error('Lỗi render history:', error);
-            historyListDiv.innerHTML = '<p>❌ Lỗi tải lịch sử. Vui lòng thử lại.</p>';
+    const renderHistory = () => {
+        if (history.length === 0) {
+            historyListDiv.innerHTML = '<p>📋 LỊCH SỬ TÍNH TOÁN:\n\nChưa có dữ liệu tính toán nào.</p>';
+            pageInfoSpan.textContent = 'Trang 1/1';
+            prevPageBtn.disabled = true;
+            nextPageBtn.disabled = true;
+            return;
         }
+        
+        // Tính toán phân trang
+        totalPages = Math.ceil(history.length / itemsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, history.length);
+        
+        let html = `<div class="history-header">📋 LỊCH SỬ TÍNH TOÁN</div>`;
+        html += `<div class="history-stats">📊 Hiển thị ${startIndex + 1}-${endIndex} trên tổng ${history.length} mục</div>`;
+        
+        // Hiển thị các mục trong trang hiện tại
+        for (let i = startIndex; i < endIndex; i++) {
+            const formattedEntry = formatHistoryEntry(history[i]);
+            html += `<div class="history-item">${formattedEntry.replace(/\n/g, '<br>')}</div>`;
+        }
+        
+        historyListDiv.innerHTML = html;
+        
+        // Cập nhật thông tin trang
+        pageInfoSpan.textContent = `Trang ${currentPage}/${totalPages}`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+        
+        // Cuộn lên đầu
+        historyListDiv.scrollTop = 0;
     };
 
     const switchTab = (tabName) => {
@@ -302,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
     };
     
-    const handleCBMInput = async () => {
+    const handleCBMInput = () => {
         const rawValue = sanitizeNumber(cbmInput.value);
         if (!rawValue) return;
         const value = parseFloat(rawValue);
@@ -319,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cbmCurrentIndex > 4) {
             const newGroup = { groupNumber: cbmCurrentGroup, nums: [...cbmBuffer] };
             completedGroups.push(newGroup);
-            await saveGroupToHistory(newGroup);
+            saveGroupToHistory(newGroup);
             
             cbmCurrentGroup++;
             cbmBuffer = [0, 0, 0, 0];
@@ -334,92 +322,17 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmInput.focus();
     };
 
-    const saveToCloud = async (entry) => {
-        try {
-            const response = await fetch('/.netlify/functions/history', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(entry)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            console.log('Đã lưu lên cloud:', result);
-            return result;
-        } catch (error) {
-            console.error('Lỗi khi lưu lên cloud:', error);
-            // Fallback: lưu vào localStorage nếu cloud lỗi
-            saveState();
-            throw error;
-        }
-    };
-
-    const loadFromCloud = async () => {
-        try {
-            const response = await fetch('/.netlify/functions/history?limit=200');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            return result.data || [];
-        } catch (error) {
-            console.error('Lỗi khi lấy từ cloud:', error);
-            // Fallback: lấy từ localStorage nếu cloud lỗi
-            return JSON.parse(localStorage.getItem('vinTransCBMHistory') || '[]');
-        }
-    };
-
-    const deleteFromCloud = async (month = null, all = false) => {
-        try {
-            const params = new URLSearchParams();
-            if (month) params.append('month', month);
-            if (all) params.append('all', 'true');
-            
-            const response = await fetch(`/.netlify/functions/history?${params}`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            console.log('Đã xóa trên cloud:', result);
-            return result;
-        } catch (error) {
-            console.error('Lỗi khi xóa trên cloud:', error);
-            throw error;
-        }
-    };
-
     const saveState = () => {
         localStorage.setItem('vinTransCBMHistory', JSON.stringify(history));
         localStorage.setItem('vinTransCBMGroups', JSON.stringify(completedGroups));
     };
-
-    const addToHistory = async (entry) => {
-        // Thêm vào mảng local ngay lập tức
+    
+    const addToHistory = (entry) => {
         history.push(entry);
-        
-        // Lưu lên cloud (async)
-        try {
-            await saveToCloud(entry);
-        } catch (error) {
-            console.warn('Cloud save failed, using localStorage only:', error.message);
-        }
-        
-        // Luôn lưu local backup
         saveState();
     };
     
-    const saveGroupToHistory = async (group) => {
+    const saveGroupToHistory = (group) => {
         const [v1, v2, v3, v4] = group.nums;
         const cbm = ((v1 * v2 * v3 * v4) / 3000.0) / 333.0;
         const kgDuongBo = ((v1 * v2 * v3) / 4000.0) * v4;
@@ -434,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputs: { v1, v2, v3, v4 },
             calculatedOutputs: { cbm, kgDuongBo, kgVinEco, kgCpn, kgHoaToc }
         };
-        await addToHistory(historyEntry);
+        addToHistory(historyEntry);
     };
 
     const handleBack1 = () => {
@@ -489,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
     };
 
-    const checkProvince = async () => {
+    const checkProvince = () => {
         const sanitizedInput = sanitizeInput(provinceInput.value);
         const inputProvince = removeAccents(sanitizedInput.toLowerCase()).trim();
         const originalName = sanitizedInput.trim();
@@ -554,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             province: originalName,
             result: resultText
         };
-        await addToHistory(historyEntry);
+        addToHistory(historyEntry);
 
         // Clear input
         provinceInput.value = '';
@@ -622,41 +535,41 @@ document.addEventListener('DOMContentLoaded', () => {
     btnReset.addEventListener('click', handleReset);
     
     // --- HISTORY EVENT LISTENERS ---
-    clearHistoryBtn.addEventListener('click', async () => {
-        await showClearHistoryOptions();
+    clearHistoryBtn.addEventListener('click', () => {
+        showClearHistoryOptions();
     });
     
-    prevPageBtn.addEventListener('click', async () => {
+    prevPageBtn.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            await renderHistory();
+            renderHistory();
         }
     });
     
-    nextPageBtn.addEventListener('click', async () => {
+    nextPageBtn.addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
-            await renderHistory();
+            renderHistory();
         }
     });
     
-    searchHistoryInput.addEventListener('keyup', async (e) => {
+    searchHistoryInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
-            await searchByDate();
+            searchByDate();
         }
     });
     
-    clearSearchBtn.addEventListener('click', async () => {
+    clearSearchBtn.addEventListener('click', () => {
         searchHistoryInput.value = '';
         currentPage = 1;
-        await renderHistory();
+        renderHistory();
     });
     
     provinceInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkProvince(); });
     btnClearProvince.addEventListener('click', clearProvinceResults);
     
     // --- HISTORY HELPER FUNCTIONS ---
-    const showClearHistoryOptions = async () => {
+    const showClearHistoryOptions = () => {
         const options = ['Xóa tất cả', 'Xóa theo tháng', 'Hủy'];
         const choice = prompt('Chọn phương thức xóa:\n1. Xóa tất cả\n2. Xóa theo tháng\n3. Hủy\n\nNhập số (1-3):');
         
@@ -666,15 +579,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 completedGroups = [];
                 currentPage = 1;
                 saveState();
-                await renderHistory();
+                renderHistory();
                 alert('Đã xóa toàn bộ lịch sử');
             }
         } else if (choice === '2') {
-            await showMonthSelectionDialog();
+            showMonthSelectionDialog();
         }
     };
     
-    const showMonthSelectionDialog = async () => {
+    const showMonthSelectionDialog = () => {
         if (history.length === 0) {
             alert('Lịch sử trống');
             return;
@@ -751,11 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         currentPage = 1;
         saveState();
-        await renderHistory();
+        renderHistory();
         alert(`Đã xóa lịch sử tháng ${monthYear}`);
     };
     
-    const searchByDate = async () => {
+    const searchByDate = () => {
         const searchDate = sanitizeInput(searchHistoryInput.value).trim();
         if (!searchDate) {
             alert('Vui lòng nhập ngày tìm kiếm (dd/MM/yyyy)');
@@ -780,7 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (foundIndex !== -1) {
             const targetPage = Math.floor(foundIndex / itemsPerPage) + 1;
             currentPage = targetPage;
-            await renderHistory();
+            renderHistory();
             alert(`Đã tìm thấy nhóm ngày ${searchDate} (trang ${targetPage})`);
         } else {
             alert(`Không tìm thấy nhóm nào vào ngày ${searchDate}`);
@@ -789,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INIT ---
     renderCBM();
-    renderHistory(); // Không cần await ở init vì không blocking
+    renderHistory();
     
     // Start with hamburger hidden
     if (hamburgerMenu) {

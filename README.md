@@ -1,14 +1,8 @@
-# VinTransCBM - Web Version 2.0
+# VinTransCBM - Web Version
 
 ## 📋 Giới thiệu
 
-**VinTransCBM** là ứng dụng web tính toán CBM (Cubic Meter) và trọng lượng vận chuyển cho ngành logistics. Phiên bản 2.0 này đã được nâng cấp với **lưu trữ đám mây (MongoDB Atlas)**, cho phép đồng bộ lịch sử giữa web và Android app.
-
-### 🆕 Phiên bản 2.0 - Cloud Sync
-- ☁️ **Lưu trữ đám mây**: Lịch sử được lưu trên MongoDB Atlas
-- 🔄 **Đồng bộ tự động**: Web và Android cùng xem một lịch sử
-- 🔒 **Bảo mật**: Dữ liệu được mã hóa và bảo vệ
-- 📱 **Truy cập mọi nơi**: Xem lịch sử từ bất kỳ thiết bị nào
+**VinTransCBM** là ứng dụng web tính toán CBM (Cubic Meter) và trọng lượng vận chuyển cho ngành logistics. Phiên bản web này đã được đồng bộ chức năng với Android app, bao gồm đầy đủ tính năng phân trang, tìm kiếm và quản lý lịch sử nâng cao.
 
 ## ✨ Tính năng chính
 
@@ -223,44 +217,10 @@ Permissions-Policy: geolocation=(), camera=()
 ### Báo cáo lỗ hổng
 Xem [SECURITY.md](SECURITY.md) để biết cách báo cáo security issues.
 
-## 🚀 Deploy lên Netlify với MongoDB Atlas
-
-### Bước 1: Chuẩn bị MongoDB Atlas
-1. Tạo tài khoản miễn phí tại [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Tạo cluster mới (chọn M0 - Free tier)
-3. Tạo database user với quyền `readWriteAnyDatabase`
-4. Cấu hình Network Access: cho phép `0.0.0.0/0` (tất cả IP)
-5. Lấy connection string từ **Connect → Drivers**
-
-### Bước 2: Deploy lên Netlify
-1. Push code lên GitHub
-2. Đăng nhập [Netlify](https://netlify.com)
-3. **New site from Git** → chọn repo GitHub
-4. Build settings để mặc định (static site)
-5. Deploy site
-
-### Bước 3: Cấu hình Environment Variables
-1. Vào **Site settings → Build & deploy → Environment variables**
-2. Thêm 2 biến:
-   - `MONGODB_URI` = connection string từ MongoDB Atlas
-   - `DB_NAME` = `vintranscbm`
-3. Save và redeploy site
-
-### Bước 4: Cài đặt Dependencies
-```bash
-npm install
-```
-
-### Kiểm tra hoạt động
-- Mở site trên Netlify URL
-- Tính toán một nhóm CBM
-- Chuyển sang tab Lịch Sử → nếu thấy dữ liệu = thành công!
-- Mở Console (F12) để xem log kết nối cloud
-
 ## 📞 Hỗ trợ
 
 - **Version**: 2.0.0
-- **Platform**: Web (HTML/CSS/JS) + Netlify Functions + MongoDB Atlas
+- **Platform**: Web (HTML/CSS/JS)
 - **License**: Private
 - **Security Audit**: 2024-11-20
 

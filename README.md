@@ -189,11 +189,40 @@ open index.html
 # Right-click → Open with Live Server
 ```
 
+## 🔒 Bảo mật
+
+### Security Features
+- ✅ **HTTPS Only**: Force HTTPS với HSTS
+- ✅ **Security Headers**: CSP, X-Frame-Options, etc.
+- ✅ **Input Sanitization**: Tất cả inputs được sanitize
+- ✅ **XSS Protection**: Content Security Policy active
+- ✅ **No Sensitive Data**: LocalStorage chỉ lưu calculations
+- ✅ **Private Repository**: Code không public
+
+### Security Headers (Netlify)
+```
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'
+Strict-Transport-Security: max-age=63072000
+X-Content-Type-Options: nosniff
+Permissions-Policy: geolocation=(), camera=()
+```
+
+### Best Practices
+- ❌ **Không nhập** thông tin nhạy cảm (passwords, credit cards)
+- ✅ **Sử dụng HTTPS** (tự động redirect)
+- ✅ **Clear cache** thường xuyên
+- ✅ **Update browser** lên phiên bản mới nhất
+
+### Báo cáo lỗ hổng
+Xem [SECURITY.md](SECURITY.md) để biết cách báo cáo security issues.
+
 ## 📞 Hỗ trợ
 
-- **Version**: 2.0
+- **Version**: 2.0.0
 - **Platform**: Web (HTML/CSS/JS)
 - **License**: Private
+- **Security Audit**: 2024-11-20
 
 ---
 

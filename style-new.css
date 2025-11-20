@@ -90,42 +90,58 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     padding: var(--spacing-md);
-    padding-top: 72px; /* Space for hamburger button */
+    padding-top: var(--spacing-md); /* Hamburger is transparent, no space needed */
     scroll-behavior: smooth;
 }
 
 /* Hamburger Menu - Mobile only */
 .hamburger-menu {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    width: 48px;
-    height: 48px;
-    background: var(--surface);
+    top: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
     border: none;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+    border-radius: 6px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 6px;
-    padding: 12px;
+    gap: 3px;
+    padding: 0;
     cursor: pointer;
     z-index: 1000;
     transition: all var(--transition-base);
 }
 
-.hamburger-menu span {
-    width: 24px;
-    height: 3px;
-    background: var(--on-surface);
-    border-radius: 2px;
-    transition: all var(--transition-base);
+/* Tăng vùng click cho hamburger */
+.hamburger-menu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
 }
 
-.hamburger-menu:active {
-    transform: scale(0.95);
+.hamburger-menu:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.hamburger-menu span {
+    width: 16px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 1px;
+    transition: all var(--transition-fast);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.hamburger-menu:active span {
+    background: rgba(255, 255, 255, 1);
+    transform: scaleX(1.1);
 }
 
 .hamburger-menu.hidden {

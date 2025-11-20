@@ -81,9 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNCTIONS ---
     
     // --- HAMBURGER MENU FUNCTIONS ---
-    const toggleHamburgerVisibility = () => {
-        if (hamburgerMenu && !slideMenu.classList.contains('open')) {
-            hamburgerMenu.classList.toggle('hidden');
+    const startHideTimer = () => {
+        clearTimeout(hideMenuTimer);
+        hideMenuTimer = setTimeout(() => {
+            if (hamburgerMenu && !slideMenu.classList.contains('open')) {
+                hamburgerMenu.classList.add('hidden');
+            }
+        }, MENU_HIDE_DELAY);
+    };
+
+    const showHamburger = () => {
+        if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('hidden');
+            startHideTimer();
         }
     };
 
@@ -91,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slideMenu && menuOverlay) {
             slideMenu.classList.add('open');
             menuOverlay.classList.add('visible');
+            clearTimeout(hideMenuTimer);
             // Keep hamburger visible when menu is open
             if (hamburgerMenu) {
                 hamburgerMenu.classList.remove('hidden');
@@ -102,10 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slideMenu && menuOverlay) {
             slideMenu.classList.remove('open');
             menuOverlay.classList.remove('visible');
-            // Hide hamburger after closing menu
-            if (hamburgerMenu) {
-                hamburgerMenu.classList.add('hidden');
-            }
+            // Start hide timer after closing menu
+            startHideTimer();
         }
     };
 
@@ -251,9 +260,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         groupsDisplay.innerHTML = groupHtml || '<p class="empty-message">Chưa có lô hàng nào.</p>';
 
-        if (isNewGroup) {
-            mainContent.scrollTop = mainContent.scrollHeight;
-        }
+        // Auto-scroll to show current input after every render (Mobile & PC)
+        setTimeout(() => {
+            if (mainContent) {
+                // Smooth scroll to bottom
+                mainContent.scrollTo({
+                    top: mainContent.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }, 50);
     };
     
     const handleCBMInput = () => {
@@ -453,25 +469,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
-    // Hamburger menu - Click to toggle visibility and open menu
+    // Hamburger menu - Click to open menu
     if (hamburgerMenu) {
         hamburgerMenu.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (hamburgerMenu.classList.contains('hidden')) {
-                // If hidden, show it first
-                hamburgerMenu.classList.remove('hidden');
-            } else {
-                // If visible, open the menu
-                openSlideMenu();
-            }
+            openSlideMenu();
         });
     }
     
-    // Click anywhere on screen to show hamburger (but not open menu)
+    // Click anywhere on screen to show hamburger and restart timer
     document.addEventListener('click', (e) => {
-        // Only show hamburger if it's hidden and menu is not open
-        if (hamburgerMenu && hamburgerMenu.classList.contains('hidden') && !slideMenu.classList.contains('open')) {
-            hamburgerMenu.classList.remove('hidden');
+        if (hamburgerMenu && !slideMenu.classList.contains('open')) {
+            showHamburger();
+        }
+    });
+    
+    // Touch/move events to show hamburger
+    document.addEventListener('touchstart', () => {
+        if (hamburgerMenu && !slideMenu.classList.contains('open')) {
+            showHamburger();
         }
     });
     

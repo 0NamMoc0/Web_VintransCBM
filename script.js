@@ -622,8 +622,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnReset.addEventListener('click', handleReset);
     
     // --- HISTORY EVENT LISTENERS ---
-    clearHistoryBtn.addEventListener('click', () => {
-        showClearHistoryOptions();
+    clearHistoryBtn.addEventListener('click', async () => {
+        await showClearHistoryOptions();
     });
     
     prevPageBtn.addEventListener('click', async () => {
@@ -640,9 +640,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    searchHistoryInput.addEventListener('keyup', (e) => {
+    searchHistoryInput.addEventListener('keyup', async (e) => {
         if (e.key === 'Enter') {
-            searchByDate();
+            await searchByDate();
         }
     });
     
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClearProvince.addEventListener('click', clearProvinceResults);
     
     // --- HISTORY HELPER FUNCTIONS ---
-    const showClearHistoryOptions = () => {
+    const showClearHistoryOptions = async () => {
         const options = ['Xóa tất cả', 'Xóa theo tháng', 'Hủy'];
         const choice = prompt('Chọn phương thức xóa:\n1. Xóa tất cả\n2. Xóa theo tháng\n3. Hủy\n\nNhập số (1-3):');
         
@@ -670,11 +670,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Đã xóa toàn bộ lịch sử');
             }
         } else if (choice === '2') {
-            showMonthSelectionDialog();
+            await showMonthSelectionDialog();
         }
     };
     
-    const showMonthSelectionDialog = () => {
+    const showMonthSelectionDialog = async () => {
         if (history.length === 0) {
             alert('Lịch sử trống');
             return;
@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`Đã xóa lịch sử tháng ${monthYear}`);
     };
     
-    const searchByDate = () => {
+    const searchByDate = async () => {
         const searchDate = sanitizeInput(searchHistoryInput.value).trim();
         if (!searchDate) {
             alert('Vui lòng nhập ngày tìm kiếm (dd/MM/yyyy)');

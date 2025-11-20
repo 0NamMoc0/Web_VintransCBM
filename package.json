@@ -3,16 +3,12 @@
   "version": "2.0.0",
   "description": "VinTrans CBM Calculator with cloud history sync",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "netlify-dev": "netlify dev"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["cbm", "calculator", "logistics", "mongodb", "netlify-functions"],
   "author": "NamMoc",
   "license": "ISC",
   "dependencies": {
     "mongodb": "^6.3.0"
-  },
-  "devDependencies": {
-    "netlify-cli": "^17.0.0"
   }
 }

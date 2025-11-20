@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const provinceInput = $('#province-input');
     const provinceResultDiv = $('#province-result');
     const btnClearProvince = $('#btn-clear-province');
+    // Hamburger menu DOM elements
+    const hamburgerMenu = $('#hamburger-menu');
+    const slideMenu = $('#slide-menu');
+    const menuOverlay = $('#menu-overlay');
+    const closeMenuBtn = $('#close-menu');
+    const slideMenuItems = $$('.slide-menu-item');
 
     // --- PROVINCE CHECKER STATE ---
     // Example list from Android project - expanded for better coverage
@@ -55,7 +61,46 @@ document.addEventListener('DOMContentLoaded', () => {
         "vinh long", "hau giang"
     ];
 
+    // --- HAMBURGER MENU STATE ---
+    let hideMenuTimer;
+    const MENU_HIDE_DELAY = 2000; // 2 seconds
+
     // --- FUNCTIONS ---
+    
+    // --- HAMBURGER MENU FUNCTIONS ---
+    const showHamburgerMenu = () => {
+        if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('hidden');
+            clearTimeout(hideMenuTimer);
+            hideMenuTimer = setTimeout(() => {
+                if (!slideMenu.classList.contains('open')) {
+                    hamburgerMenu.classList.add('hidden');
+                }
+            }, MENU_HIDE_DELAY);
+        }
+    };
+
+    const openSlideMenu = () => {
+        if (slideMenu && menuOverlay) {
+            slideMenu.classList.add('open');
+            menuOverlay.classList.add('visible');
+            clearTimeout(hideMenuTimer);
+            hamburgerMenu.classList.remove('hidden');
+        }
+    };
+
+    const closeSlideMenu = () => {
+        if (slideMenu && menuOverlay) {
+            slideMenu.classList.remove('open');
+            menuOverlay.classList.remove('visible');
+            showHamburgerMenu(); // Restart hide timer
+        }
+    };
+
+    const handleSlideMenuItemClick = (tabName) => {
+        switchTab(tabName);
+        closeSlideMenu();
+    };
 
     // --- HISTORY FUNCTIONS ---
     const formatHistoryEntry = (entry) => {
@@ -134,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update bottom nav items
         bottomNavItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.tab === tabName);
+        });
+        
+        // Update slide menu items
+        slideMenuItems.forEach(item => {
             item.classList.toggle('active', item.dataset.tab === tabName);
         });
     };
@@ -391,6 +441,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- EVENT LISTENERS ---
+    // Hamburger menu
+    if (hamburgerMenu) {
+        hamburgerMenu.addEventListener('click', openSlideMenu);
+    }
+    if (closeMenuBtn) {
+        closeMenuBtn.addEventListener('click', closeSlideMenu);
+    }
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeSlideMenu);
+    }
+    slideMenuItems.forEach(item => {
+        item.addEventListener('click', () => handleSlideMenuItemClick(item.dataset.tab));
+    });
+    
+    // Activity listeners to show hamburger menu
+    document.addEventListener('touchstart', showHamburgerMenu);
+    document.addEventListener('mousemove', showHamburgerMenu);
+    document.addEventListener('keydown', showHamburgerMenu);
+    
     // Sidebar navigation
     sidebarNavItems.forEach(item => {
         item.addEventListener('click', () => switchTab(item.dataset.tab));
@@ -571,9 +640,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- INITIALIZATION ---
-    renderHistory();
+    // --- INIT ---
     renderCBM();
-    switchTab('cbm-calculator');
+    renderHistory();
+    
+    // Start hamburger menu auto-hide timer
+    if (hamburgerMenu) {
+        showHamburgerMenu();
+    }
+    
     cbmInput.focus();
 });

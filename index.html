@@ -11,6 +11,36 @@
 </head>
 <body>
     <div id="app">
+        <!-- Mobile Hamburger Menu -->
+        <button id="hamburger-menu" class="hamburger-menu" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Mobile Slide Menu -->
+        <div id="slide-menu" class="slide-menu">
+            <div class="slide-menu-header">
+                <span class="menu-title">📦 VinTransCBM</span>
+                <button id="close-menu" class="close-menu">&times;</button>
+            </div>
+            <nav class="slide-menu-nav">
+                <button class="slide-menu-item active" data-tab="cbm-calculator">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-text">Tính Toán</span>
+                </button>
+                <button class="slide-menu-item" data-tab="history">
+                    <span class="menu-icon">📋</span>
+                    <span class="menu-text">Lịch Sử</span>
+                </button>
+                <button class="slide-menu-item" data-tab="province-checker">
+                    <span class="menu-icon">📍</span>
+                    <span class="menu-text">Kiểm Tra Tỉnh</span>
+                </button>
+            </nav>
+        </div>
+        <div id="menu-overlay" class="menu-overlay"></div>
+        
         <!-- Desktop Header -->
         <header class="app-header">
             <div class="header-content">

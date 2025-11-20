@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return JSON.stringify(entry);
     };
     
-    const renderHistory = () => {
+    const renderHistory = async () => {
         if (history.length === 0) {
             historyListDiv.innerHTML = '<p>📋 LỊCH SỬ TÍNH TOÁN:\n\nChưa có dữ liệu tính toán nào.</p>';
             pageInfoSpan.textContent = 'Trang 1/1';
@@ -322,13 +322,88 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmInput.focus();
     };
 
+    const saveToCloud = async (entry) => {
+        try {
+            const response = await fetch('/.netlify/functions/history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(entry)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Đã lưu lên cloud:', result);
+            return result;
+        } catch (error) {
+            console.error('Lỗi khi lưu lên cloud:', error);
+            // Fallback: lưu vào localStorage nếu cloud lỗi
+            saveState();
+            throw error;
+        }
+    };
+
+    const loadFromCloud = async () => {
+        try {
+            const response = await fetch('/.netlify/functions/history?limit=200');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            return result.data || [];
+        } catch (error) {
+            console.error('Lỗi khi lấy từ cloud:', error);
+            // Fallback: lấy từ localStorage nếu cloud lỗi
+            return JSON.parse(localStorage.getItem('vinTransCBMHistory') || '[]');
+        }
+    };
+
+    const deleteFromCloud = async (month = null, all = false) => {
+        try {
+            const params = new URLSearchParams();
+            if (month) params.append('month', month);
+            if (all) params.append('all', 'true');
+            
+            const response = await fetch(`/.netlify/functions/history?${params}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Đã xóa trên cloud:', result);
+            return result;
+        } catch (error) {
+            console.error('Lỗi khi xóa trên cloud:', error);
+            throw error;
+        }
+    };
+
     const saveState = () => {
         localStorage.setItem('vinTransCBMHistory', JSON.stringify(history));
         localStorage.setItem('vinTransCBMGroups', JSON.stringify(completedGroups));
     };
-    
-    const addToHistory = (entry) => {
+
+    const addToHistory = async (entry) => {
+        // Thêm vào mảng local ngay lập tức
         history.push(entry);
+        
+        // Lưu lên cloud (async)
+        try {
+            await saveToCloud(entry);
+        } catch (error) {
+            console.warn('Cloud save failed, using localStorage only:', error.message);
+        }
+        
+        // Luôn lưu local backup
         saveState();
     };
     

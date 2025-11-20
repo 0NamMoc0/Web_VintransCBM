@@ -3,21 +3,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => document.querySelectorAll(selector);
     const df = (num) => {
-        // Custom formatter to behave like the original app's DecimalFormat("#.###")
         if (Math.round(num) === num) return num.toString();
         const fixed = num.toFixed(3);
-        return parseFloat(fixed).toString(); // Removes trailing zeros
+        return parseFloat(fixed).toString();
     };
-
 
     // --- STATE ---
     let history = JSON.parse(localStorage.getItem('vinTransCBMHistory')) || [];
     let completedGroups = JSON.parse(localStorage.getItem('vinTransCBMGroups')) || [];
-    
-    // CBM Calculator State
     let cbmCurrentIndex = 1;
     let cbmBuffer = [0, 0, 0, 0];
     let cbmCurrentGroup = completedGroups.length + 1;
+    
+    // --- HISTORY PAGINATION STATE ---
+    let currentPage = 1;
+    let itemsPerPage = 25;
+    let totalPages = 1;
 
     // --- DOM ELEMENTS ---
     const tabButtons = $$('.tab-button');
@@ -27,53 +28,170 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnBack2 = $('#btn-back2');
     const btnReset = $('#btn-reset');
     const groupsDisplay = $('#groups-display');
-    const totalsDisplay = $('#totals-display'); // This will be hidden, totals are in groupsDisplay now
     const mainContent = $('#cbm-main-content');
     const historyListDiv = $('#history-list');
     const clearHistoryBtn = $('#clear-history-button');
+    const searchHistoryInput = $('#search-history-input');
+    const clearSearchBtn = $('#clear-search-button');
+    const prevPageBtn = $('#prev-page-button');
+    const nextPageBtn = $('#next-page-button');
+    const pageInfoSpan = $('#page-info');
+    // Province Checker DOM elements
+    const provinceInput = $('#province-input');
+    const provinceResultDiv = $('#province-result');
+    // Hamburger menu DOM elements
+    const hamburgerButton = $('#hamburger-button');
+    const sideNav = $('#side-nav');
+    const backdrop = $('#backdrop');
+    const hamburgerMenu = $('#hamburger-button');
+    const headerActivationZone = $('#header-activation-zone'); // New DOM element
+
+    // --- PROVINCE CHECKER STATE ---
+    // Example list from Android project - expanded for better coverage
+    const provinceList = [
+        "ha noi", "da nang", "hai phong", "can tho", "ho chi minh",
+        "lai chau", "lao cai", "bac kan", "cao bang", "lang son", "tuyen quang", "thai nguyen", "phu tho",
+        "bac giang", "quang ninh", "dien bien", "son la", "hoa binh", "thanh hoa", "nghe an", "ha tinh",
+        "quang binh", "quang tri", "thua thien hue", "quang nam", "quang ngai", "binh dinh", "phu yen",
+        "khanh hoa", "ninh thuan", "binh thuan", "kon tum", "gia lai", "dak lak", "dak nong", "lam dong",
+        "binh phuoc", "tay ninh", "binh duong", "dong nai", "ba ria - vung tau", "long an", "tien giang",
+        "ben tre", "tra vinh", "soc trang", "bac lieu", "ca mau", "kien giang", "an giang", "dong thap",
+        "vinh long", "hau giang"
+    ];
+
+    // --- AUTO-HIDE HEADER STATE ---
+    let headerHideTimer;
+    const INACTIVITY_TIMEOUT = 3000; // 3 seconds
 
     // --- FUNCTIONS ---
 
-    const saveState = () => {
-        localStorage.setItem('vinTransCBMHistory', JSON.stringify(history));
-        localStorage.setItem('vinTransCBMGroups', JSON.stringify(completedGroups));
+    const resetHeaderTimer = () => {
+        clearTimeout(headerHideTimer);
+        hamburgerMenu.classList.remove('header-hidden');
+        headerHideTimer = setTimeout(() => {
+            if (!sideNav.classList.contains('open')) { // Only hide if side nav is closed
+                hamburgerMenu.classList.add('header-hidden');
+            }
+        }, INACTIVITY_TIMEOUT);
     };
 
-    const addToHistory = (entry, skipSave = false) => {
-        const timestamp = new Date().toLocaleString('vi-VN');
-        history.unshift(`[${timestamp}] ${entry}`);
-        if (!skipSave) {
-            saveState();
+    const setupActivityListeners = () => {
+        document.addEventListener('mousemove', resetHeaderTimer);
+        document.addEventListener('keydown', resetHeaderTimer);
+        document.addEventListener('touchstart', resetHeaderTimer);
+    };
+
+    // --- HISTORY FUNCTIONS ---
+    const formatHistoryEntry = (entry) => {
+        if (typeof entry === 'string') return entry; // Legacy format
+        
+        if (entry.type === 'cbm') {
+            const { timestamp, groupNumber, inputs, calculatedOutputs } = entry;
+            const { v1, v2, v3, v4 } = inputs;
+            const { cbm, kgDuongBo, kgVinEco, kgCpn, kgHoaToc } = calculatedOutputs;
+            
+            return `📦 [${timestamp}] Nhóm ${groupNumber}:\n` +
+                   `Dài: ${df(v1)}, Rộng: ${df(v2)}, Cao: ${df(v3)}, Số kiện: ${df(v4)}\n` +
+                   `✨ CBM = ${df(cbm)}\n` +
+                   `🚛 Kg (ĐƯỜNG BỘ) = ${df(kgDuongBo)}\n` +
+                   `🚐 Kg (VIN-ECO) = ${df(kgVinEco)}\n` +
+                   `✈️ Kg (CPN) = ${df(kgCpn)}\n` +
+                   `🚀 Kg (HỎA TỐC) = ${df(kgHoaToc)}`;
+        } else if (entry.type === 'province') {
+            return `🏙️ [${entry.timestamp}] Kiểm tra tỉnh: ${entry.province} → ${entry.result}`;
         }
-        renderHistory();
+        return JSON.stringify(entry);
     };
-
+    
     const renderHistory = () => {
         if (history.length === 0) {
-            historyListDiv.innerHTML = '<p>Chưa có lịch sử.</p>';
+            historyListDiv.innerHTML = '<p>📋 LỊCH SỬ TÍNH TOÁN:\n\nChưa có dữ liệu tính toán nào.</p>';
+            pageInfoSpan.textContent = 'Trang 1/1';
+            prevPageBtn.disabled = true;
+            nextPageBtn.disabled = true;
             return;
         }
-        historyListDiv.innerHTML = history.map(item => `<p>${item.replace(/\n/g, '<br>')}</p>`).join('');
+        
+        // Tính toán phân trang
+        totalPages = Math.ceil(history.length / itemsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, history.length);
+        
+        let html = `<div class="history-header">📋 LỊCH SỬ TÍNH TOÁN</div>`;
+        html += `<div class="history-stats">📊 Hiển thị ${startIndex + 1}-${endIndex} trên tổng ${history.length} mục</div>`;
+        
+        // Hiển thị các mục trong trang hiện tại
+        for (let i = startIndex; i < endIndex; i++) {
+            const formattedEntry = formatHistoryEntry(history[i]);
+            html += `<div class="history-item">${formattedEntry.replace(/\n/g, '<br>')}</div>`;
+        }
+        
+        historyListDiv.innerHTML = html;
+        
+        // Cập nhật thông tin trang
+        pageInfoSpan.textContent = `Trang ${currentPage}/${totalPages}`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+        
+        // Cuộn lên đầu
+        historyListDiv.scrollTop = 0;
     };
 
     const switchTab = (tabName) => {
+        const activeContent = $('.tab-content.active');
+        if (activeContent) {
+            activeContent.style.animation = 'fadeOut 0.15s ease-out forwards'; // Use forwards to keep the end state
+            setTimeout(() => {
+                activeContent.style.display = 'none';
+                activeContent.style.animation = ''; // Reset animation
+                
+                tabContents.forEach(content => {
+                    if (content.id === tabName) {
+                        content.style.display = 'flex';
+                        content.style.animation = 'fadeIn 0.25s ease-in';
+                    } else {
+                        content.style.display = 'none';
+                    }
+                });
+            }, 150);
+        }
         tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
-        tabContents.forEach(content => content.style.display = content.id === tabName ? 'flex' : 'none');
+        closeSideNav(); // Close side nav after tab selection
+        resetHeaderTimer(); // Reset timer after tab switch
+    };
+
+    const toggleSideNav = () => {
+        hamburgerMenu.classList.remove('header-hidden'); // Always ensure header is visible on interaction
+        if (!sideNav.classList.contains('open')) { // If opening side nav
+            clearTimeout(headerHideTimer); // Stop timer while side nav is open
+        } else { // If closing side nav
+            resetHeaderTimer(); // Restart timer after closing
+        }
+        sideNav.classList.toggle('open');
+        backdrop.classList.toggle('visible');
+    };
+
+    const closeSideNav = () => {
+        sideNav.classList.remove('open');
+        backdrop.classList.remove('visible');
+        resetHeaderTimer(); // Restart timer after closing side nav
     };
     
     // --- CBM Calculator ---
-    const renderCBM = () => {
+    const renderCBM = (isNewGroup = false) => {
         let groupHtml = '';
         let totalCbm = 0, totalKgDuongBo = 0, totalKgVinEco = 0, totalKgCpn = 0, totalKgHoaToc = 0, totalPieces = 0;
 
-        completedGroups.forEach(group => {
+        completedGroups.forEach((group, index) => {
             const [v1, v2, v3, v4] = group.nums;
             
             const cbm = ((v1 * v2 * v3 * v4) / 3000.0) / 333.0;
             const kgDuongBo = ((v1 * v2 * v3) / 4000.0) * v4;
-            const kgVinEco = ((v1 * v2 * v3) / 4000.0) * v4; // Same as DuongBo
+            const kgVinEco = kgDuongBo;
             const kgCpn = ((v1 * v2 * v3) / 6000.0) * v4;
-            const kgHoaToc = ((v1 * v2 * v3) / 6000.0) * v4; // Same as CPN
+            const kgHoaToc = kgCpn;
 
             totalCbm += cbm;
             totalKgDuongBo += kgDuongBo;
@@ -81,37 +199,39 @@ document.addEventListener('DOMContentLoaded', () => {
             totalKgCpn += kgCpn;
             totalKgHoaToc += kgHoaToc;
             totalPieces += v4;
+            
+            const isLast = isNewGroup && index === completedGroups.length - 1;
 
             groupHtml += `
-                <div class="group-item">
+                <div class="group-item${isLast ? ' new-item' : ''}" data-group-index="${index}">
                     <p class="group-title">☀️ Nhóm ${group.groupNumber}:</p>
                     <p>Dài: <span class="value">${df(v1)}</span></p>
                     <p>Rộng: <span class="value">${df(v2)}</span></p>
                     <p>Cao: <span class="value">${df(v3)}</span></p>
                     <p>Số kiện: <span class="value">${df(v4)}</span></p>
+                    <hr>
                     <p>✨ CBM nhóm ${group.groupNumber} = ${df(cbm)}, Tổng: ${df(totalCbm)}, Số Kiện: ${df(totalPieces)}</p>
                     <p>🚛 Kg nhóm ${group.groupNumber} (ĐƯỜNG BỘ) = ${df(kgDuongBo)}, Tổng: ${df(totalKgDuongBo)}</p>
                     <p>🚐 Kg nhóm ${group.groupNumber} (VIN-ECO) = ${df(kgVinEco)}, Tổng: ${df(totalKgVinEco)}</p>
                     <p>✈️ Kg nhóm ${group.groupNumber} (CPN) = ${df(kgCpn)}, Tổng: ${df(totalKgCpn)}</p>
                     <p>🚀 Kg nhóm ${group.groupNumber} (HỎA TỐC) = ${df(kgHoaToc)}, Tổng: ${df(totalKgHoaToc)}</p>
-                </div>
-                <hr>`;
+                </div>`;
         });
         
-        // Display current input buffer
         const labels = ["Dài", "Rộng", "Cao", "Số kiện"];
         if (cbmCurrentIndex > 1) {
-            groupHtml += `<div class="group-item current-input"><strong>☀️ Nhóm ${cbmCurrentGroup} (đang nhập):</strong><br>`;
+            let currentInputHtml = '';
             for(let i=0; i < cbmCurrentIndex - 1; i++) {
-                groupHtml += `${labels[i]}: ${df(cbmBuffer[i])}<br>`;
+                currentInputHtml += `${labels[i]}: <span class="value">${df(cbmBuffer[i])}</span>, `;
             }
-            groupHtml += `</div>`;
+            groupHtml += `<div class="group-item current-input"><strong>☀️ Nhóm ${cbmCurrentGroup} (đang nhập):</strong><br>${currentInputHtml.slice(0, -2)}</div>`;
         }
         
-        groupsDisplay.innerHTML = groupHtml;
-        totalsDisplay.style.display = 'none'; // We no longer use the separate totals display
+        groupsDisplay.innerHTML = groupHtml || '<p class="empty-message">Chưa có lô hàng nào.</p>';
 
-        mainContent.scrollTop = mainContent.scrollHeight;
+        if (isNewGroup) {
+            mainContent.scrollTop = mainContent.scrollHeight;
+        }
     };
     
     const handleCBMInput = () => {
@@ -119,7 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!rawValue) return;
         const value = parseFloat(rawValue);
         if (isNaN(value) || value <= 0) {
-            alert("Vui lòng nhập một số dương.");
+            cbmInput.style.animation = 'shake 0.5s';
+            setTimeout(()=> cbmInput.style.animation = '', 500);
             cbmInput.value = "";
             return;
         }
@@ -130,26 +251,47 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cbmCurrentIndex > 4) {
             const newGroup = { groupNumber: cbmCurrentGroup, nums: [...cbmBuffer] };
             completedGroups.push(newGroup);
-            saveGroupToHistory(newGroup); // Also saves state
+            saveGroupToHistory(newGroup);
             
             cbmCurrentGroup++;
             cbmBuffer = [0, 0, 0, 0];
             cbmCurrentIndex = 1;
+            renderCBM(true);
         } else {
             saveState();
+            renderCBM();
         }
         
         cbmInput.value = "";
         cbmInput.focus();
-        renderCBM();
     };
 
+    const saveState = () => {
+        localStorage.setItem('vinTransCBMHistory', JSON.stringify(history));
+        localStorage.setItem('vinTransCBMGroups', JSON.stringify(completedGroups));
+    };
+    
+    const addToHistory = (entry) => {
+        history.push(entry);
+        saveState();
+    };
+    
     const saveGroupToHistory = (group) => {
         const [v1, v2, v3, v4] = group.nums;
         const cbm = ((v1 * v2 * v3 * v4) / 3000.0) / 333.0;
-        let historyEntry = `📦 Nhóm ${group.groupNumber}: Dài: ${df(v1)}, Rộng: ${df(v2)}, Cao:. ${df(v3)}, Số kiện: ${df(v4)} (Kết quả CBM: ${df(cbm)})`;
-        addToHistory(historyEntry, true); // Batch save
-        saveState();
+        const kgDuongBo = ((v1 * v2 * v3) / 4000.0) * v4;
+        const kgVinEco = kgDuongBo;
+        const kgCpn = ((v1 * v2 * v3) / 6000.0) * v4;
+        const kgHoaToc = kgCpn;
+
+        const historyEntry = {
+            type: 'cbm',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            groupNumber: group.groupNumber,
+            inputs: { v1, v2, v3, v4 },
+            calculatedOutputs: { cbm, kgDuongBo, kgVinEco, kgCpn, kgHoaToc }
+        };
+        addToHistory(historyEntry);
     };
 
     const handleBack1 = () => {
@@ -168,41 +310,259 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCBM();
             saveState();
         } else if (completedGroups.length > 0) {
-            if (confirm("Xóa lô hàng cuối cùng?")) {
-                completedGroups.pop();
-                cbmCurrentGroup--;
-                addToHistory("TÍNH CBM: Đã xóa lô hàng cuối cùng."); // Also saves
-                renderCBM();
+            const lastGroupEl = $(`[data-group-index="${completedGroups.length - 1}"]`);
+            if (lastGroupEl) {
+                 if (confirm("Xóa lô hàng cuối cùng?")) {
+                    lastGroupEl.style.animation = 'fadeOutUp 0.4s ease-out forwards';
+                    setTimeout(() => {
+                        completedGroups.pop();
+                        cbmCurrentGroup--;
+                        saveState();
+                        renderCBM();
+                    }, 400);
+                }
             }
         }
     };
 
     const handleReset = () => {
         if (confirm("Bạn có chắc muốn xóa tất cả các lô hàng?")) {
-            completedGroups = [];
-            cbmBuffer = [0, 0, 0, 0];
-            cbmCurrentIndex = 1;
-            cbmCurrentGroup = 1;
-            addToHistory("TÍNH CBM: Đã xóa tất cả các lô hàng."); // Also saves
-            renderCBM();
+            groupsDisplay.style.animation = 'fadeOutUp 0.5s ease-out forwards';
+            setTimeout(() => {
+                completedGroups = [];
+                cbmBuffer = [0, 0, 0, 0];
+                cbmCurrentIndex = 1;
+                cbmCurrentGroup = 1;
+                saveState();
+                renderCBM();
+                groupsDisplay.style.animation = 'fadeIn 0.5s ease-in';
+                 setTimeout(()=> groupsDisplay.style.animation = '', 500);
+            }, 500);
         }
     };
 
+    // --- PROVINCE CHECKER FUNCTIONS ---
+    const removeAccents = (str) => {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+    };
+
+    const checkProvince = () => {
+        const inputProvince = removeAccents(provinceInput.value.toLowerCase()).trim();
+        provinceResultDiv.classList.remove('hang-bay', 'hang-bo', 'not-found');
+
+        if (inputProvince === "") {
+            provinceResultDiv.innerHTML = '<p>Nhập tên tỉnh để kiểm tra.</p>';
+            provinceResultDiv.classList.add('not-found');
+            return;
+        }
+
+        const found = provinceList.includes(inputProvince);
+        let resultText = '';
+
+        if (found) {
+            // Logic from Android app was simple hardcoded check: "Hàng Bay" or "Hàng Bộ"
+            // For simplicity, let's assume specific provinces are 'Hàng Bay'
+            if (["ha noi", "da nang", "hai phong", "ho chi minh"].includes(inputProvince)) {
+                resultText = '✈️ Hàng Bay';
+                provinceResultDiv.classList.add('hang-bay');
+            } else {
+                resultText = '🚛 Hàng Bộ';
+                provinceResultDiv.classList.add('hang-bo');
+            }
+        } else {
+            resultText = 'Không tìm thấy thông tin tỉnh này.';
+            provinceResultDiv.classList.add('not-found');
+        }
+        provinceResultDiv.innerHTML = `<p>${resultText}</p>`;
+        
+        const historyEntry = {
+            type: 'province',
+            timestamp: new Date().toLocaleString('vi-VN'),
+            province: provinceInput.value,
+            result: resultText
+        };
+        addToHistory(historyEntry);
+    };
+
     // --- EVENT LISTENERS ---
+    // Remove old tab button event listeners
+    // tabButtons.forEach(button => button.addEventListener('click', () => switchTab(button.dataset.tab)));
+    hamburgerButton.addEventListener('click', toggleSideNav);
+    backdrop.addEventListener('click', closeSideNav);
+    headerActivationZone.addEventListener('click', () => {
+        hamburgerMenu.classList.remove('header-hidden'); // Force show the header
+        resetHeaderTimer(); // Reset the timer, which will start the 3-second countdown again
+    });
     tabButtons.forEach(button => button.addEventListener('click', () => switchTab(button.dataset.tab)));
     cbmInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleCBMInput(); });
     btnBack1.addEventListener('click', handleBack1);
     btnBack2.addEventListener('click', handleBack2);
     btnReset.addEventListener('click', handleReset);
+    
+    // --- HISTORY EVENT LISTENERS ---
     clearHistoryBtn.addEventListener('click', () => {
-        if (confirm('Bạn có chắc muốn xóa toàn bộ lịch sử và các lô hàng đã tính?')) {
-            history = [];
-            completedGroups = [];
-            saveState();
+        showClearHistoryOptions();
+    });
+    
+    prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
             renderHistory();
-            handleReset(); // Also reset CBM state
         }
     });
+    
+    nextPageBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderHistory();
+        }
+    });
+    
+    searchHistoryInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            searchByDate();
+        }
+    });
+    
+    clearSearchBtn.addEventListener('click', () => {
+        searchHistoryInput.value = '';
+        currentPage = 1;
+        renderHistory();
+    });
+    
+    provinceInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkProvince(); });
+    
+    // --- HISTORY HELPER FUNCTIONS ---
+    const showClearHistoryOptions = () => {
+        const options = ['Xóa tất cả', 'Xóa theo tháng', 'Hủy'];
+        const choice = prompt('Chọn phương thức xóa:\n1. Xóa tất cả\n2. Xóa theo tháng\n3. Hủy\n\nNhập số (1-3):');
+        
+        if (choice === '1') {
+            if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử tính toán?')) {
+                history = [];
+                completedGroups = [];
+                currentPage = 1;
+                saveState();
+                renderHistory();
+                alert('Đã xóa toàn bộ lịch sử');
+            }
+        } else if (choice === '2') {
+            showMonthSelectionDialog();
+        }
+    };
+    
+    const showMonthSelectionDialog = () => {
+        if (history.length === 0) {
+            alert('Lịch sử trống');
+            return;
+        }
+        
+        const months = getMonthsFromHistory();
+        if (months.length === 0) {
+            alert('Không tìm thấy tháng nào');
+            return;
+        }
+        
+        let monthList = 'Chọn tháng để xóa:\n';
+        months.forEach((month, index) => {
+            monthList += `${index + 1}. ${month}\n`;
+        });
+        monthList += `${months.length + 1}. Hủy\n\nNhập số:`;
+        
+        const choice = prompt(monthList);
+        const choiceIndex = parseInt(choice) - 1;
+        
+        if (choiceIndex >= 0 && choiceIndex < months.length) {
+            const selectedMonth = months[choiceIndex];
+            if (confirm(`Bạn có chắc chắn muốn xóa toàn bộ lịch sử của tháng ${selectedMonth}?`)) {
+                deleteMonthHistory(selectedMonth);
+            }
+        }
+    };
+    
+    const getMonthsFromHistory = () => {
+        const months = new Set();
+        history.forEach(entry => {
+            let timestamp = '';
+            if (typeof entry === 'string') {
+                const match = entry.match(/\[(\d{1,2}\/\d{1,2}\/\d{4})/); 
+                if (match) timestamp = match[1];
+            } else if (entry.timestamp) {
+                timestamp = entry.timestamp;
+            }
+            
+            if (timestamp) {
+                try {
+                    const parts = timestamp.split(/[\/\s:,]/);
+                    if (parts.length >= 3) {
+                        const monthYear = `${parts[1]}/${parts[2]}`; // MM/YYYY
+                        months.add(monthYear);
+                    }
+                } catch (e) {}
+            }
+        });
+        return Array.from(months).sort();
+    };
+    
+    const deleteMonthHistory = (monthYear) => {
+        history = history.filter(entry => {
+            let timestamp = '';
+            if (typeof entry === 'string') {
+                const match = entry.match(/\[(\d{1,2}\/\d{1,2}\/\d{4})/); 
+                if (match) timestamp = match[1];
+            } else if (entry.timestamp) {
+                timestamp = entry.timestamp;
+            }
+            
+            if (timestamp) {
+                try {
+                    const parts = timestamp.split(/[\/\s:,]/);
+                    if (parts.length >= 3) {
+                        const entryMonthYear = `${parts[1]}/${parts[2]}`;
+                        return entryMonthYear !== monthYear;
+                    }
+                } catch (e) {}
+            }
+            return true;
+        });
+        
+        currentPage = 1;
+        saveState();
+        renderHistory();
+        alert(`Đã xóa lịch sử tháng ${monthYear}`);
+    };
+    
+    const searchByDate = () => {
+        const searchDate = searchHistoryInput.value.trim();
+        if (!searchDate) {
+            alert('Vui lòng nhập ngày tìm kiếm (dd/MM/yyyy)');
+            return;
+        }
+        
+        if (history.length === 0) {
+            alert('Lịch sử trống');
+            return;
+        }
+        
+        // Tìm vị trí đầu tiên chứa ngày
+        let foundIndex = -1;
+        for (let i = 0; i < history.length; i++) {
+            const formattedEntry = formatHistoryEntry(history[i]);
+            if (formattedEntry.includes(`[${searchDate}`)) {
+                foundIndex = i;
+                break;
+            }
+        }
+        
+        if (foundIndex !== -1) {
+            const targetPage = Math.floor(foundIndex / itemsPerPage) + 1;
+            currentPage = targetPage;
+            renderHistory();
+            alert(`Đã tìm thấy nhóm ngày ${searchDate} (trang ${targetPage})`);
+        } else {
+            alert(`Không tìm thấy nhóm nào vào ngày ${searchDate}`);
+        }
+    };
 
     // --- INITIALIZATION ---
     renderHistory();

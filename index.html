@@ -4,21 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VinTransCBM - Web</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="container">
-        <nav id="tab-nav">
+        <button id="hamburger-button" aria-label="Mở menu">☰</button>
+        <div id="header-activation-zone"></div>
+
+        <div id="side-nav">
             <button class="tab-button active" data-tab="cbm-calculator">📊 Tính Toán</button>
             <button class="tab-button" data-tab="history">📋 Lịch Sử</button>
-        </nav>
+            <button class="tab-button" data-tab="province-checker">📍 Kiểm Tra Tỉnh</button>
+        </div>
 
         <main id="content">
             <!-- Tab Tính CBM -->
             <div id="cbm-calculator" class="tab-content active">
                 <div id="cbm-main-content">
                     <div id="groups-display"></div>
-                    <div id="totals-display"><p>Chưa có lô hàng nào.</p></div>
                 </div>
                 <div id="cbm-controls">
                     <div id="cbm-actions">
@@ -27,7 +33,7 @@
                         <button id="btn-reset">Xóa Tất Cả</button>
                     </div>
                     <div id="cbm-input-group">
-                         <input type="number" id="cbm-input" placeholder="Nhập Số...">
+                         <input type="number" id="cbm-input" placeholder="Nhập Số và Enter...">
                     </div>
                 </div>
             </div>
@@ -35,16 +41,43 @@
             <!-- Tab Lịch sử -->
             <div id="history" class="tab-content">
                 <div class="history-container">
+                    <!-- Thanh tìm kiếm -->
+                    <div class="search-bar">
+                        <input type="text" id="search-history-input" placeholder="Tìm theo ngày (dd/MM/yyyy)...">
+                        <button id="clear-search-button">Xóa Tìm</button>
+                    </div>
+                    
+                    <!-- Hiển thị lịch sử -->
                     <div id="history-list">
                         <p>Chưa có lịch sử.</p>
                     </div>
+                    
+                    <!-- Phân trang -->
+                    <div class="pagination-controls">
+                        <button id="prev-page-button" disabled>◀ Trước</button>
+                        <span id="page-info">Trang 1/1</span>
+                        <button id="next-page-button" disabled>Sau ▶</button>
+                    </div>
+                    
+                    <!-- Nút xóa -->
                     <div class="history-controls">
-                        <button id="clear-history-button">Xóa Lịch Sử</button>
+                        <button id="clear-history-button" class="btn-danger">Xóa Lịch Sử</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Kiểm Tra Tỉnh -->
+            <div id="province-checker" class="tab-content">
+                <div class="province-container">
+                    <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
+                    <div id="province-result" class="province-result">
+                        <p>Nhập tên tỉnh để kiểm tra.</p>
                     </div>
                 </div>
             </div>
         </main>
     </div>
     <script src="script.js"></script>
+    <div id="backdrop"></div>
 </body>
 </html>

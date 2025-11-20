@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalPages = 1;
 
     // --- DOM ELEMENTS ---
-    const tabButtons = $$('.tab-button');
+    const sidebarNavItems = $$('.nav-item');
+    const bottomNavItems = $$('.bottom-nav-item');
     const tabContents = $$('.tab-content');
     const cbmInput = $('#cbm-input');
     const btnBack1 = $('#btn-back1');
@@ -39,12 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Province Checker DOM elements
     const provinceInput = $('#province-input');
     const provinceResultDiv = $('#province-result');
-    // Hamburger menu DOM elements
-    const hamburgerButton = $('#hamburger-button');
-    const sideNav = $('#side-nav');
-    const backdrop = $('#backdrop');
-    const hamburgerMenu = $('#hamburger-button');
-    const headerActivationZone = $('#header-activation-zone'); // New DOM element
+    const btnClearProvince = $('#btn-clear-province');
 
     // --- PROVINCE CHECKER STATE ---
     // Example list from Android project - expanded for better coverage
@@ -59,27 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "vinh long", "hau giang"
     ];
 
-    // --- AUTO-HIDE HEADER STATE ---
-    let headerHideTimer;
-    const INACTIVITY_TIMEOUT = 3000; // 3 seconds
-
     // --- FUNCTIONS ---
-
-    const resetHeaderTimer = () => {
-        clearTimeout(headerHideTimer);
-        hamburgerMenu.classList.remove('header-hidden');
-        headerHideTimer = setTimeout(() => {
-            if (!sideNav.classList.contains('open')) { // Only hide if side nav is closed
-                hamburgerMenu.classList.add('header-hidden');
-            }
-        }, INACTIVITY_TIMEOUT);
-    };
-
-    const setupActivityListeners = () => {
-        document.addEventListener('mousemove', resetHeaderTimer);
-        document.addEventListener('keydown', resetHeaderTimer);
-        document.addEventListener('touchstart', resetHeaderTimer);
-    };
 
     // --- HISTORY FUNCTIONS ---
     const formatHistoryEntry = (entry) => {
@@ -140,44 +116,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const switchTab = (tabName) => {
-        const activeContent = $('.tab-content.active');
-        if (activeContent) {
-            activeContent.style.animation = 'fadeOut 0.15s ease-out forwards'; // Use forwards to keep the end state
-            setTimeout(() => {
-                activeContent.style.display = 'none';
-                activeContent.style.animation = ''; // Reset animation
-                
-                tabContents.forEach(content => {
-                    if (content.id === tabName) {
-                        content.style.display = 'flex';
-                        content.style.animation = 'fadeIn 0.25s ease-in';
-                    } else {
-                        content.style.display = 'none';
-                    }
-                });
-            }, 150);
+        // Hide all tabs
+        tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const selectedTab = $(`#${tabName}`);
+        if (selectedTab) {
+            selectedTab.classList.add('active');
         }
-        tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
-        closeSideNav(); // Close side nav after tab selection
-        resetHeaderTimer(); // Reset timer after tab switch
+        
+        // Update sidebar nav items
+        sidebarNavItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.tab === tabName);
+        });
+        
+        // Update bottom nav items
+        bottomNavItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.tab === tabName);
+        });
     };
 
-    const toggleSideNav = () => {
-        hamburgerMenu.classList.remove('header-hidden'); // Always ensure header is visible on interaction
-        if (!sideNav.classList.contains('open')) { // If opening side nav
-            clearTimeout(headerHideTimer); // Stop timer while side nav is open
-        } else { // If closing side nav
-            resetHeaderTimer(); // Restart timer after closing
-        }
-        sideNav.classList.toggle('open');
-        backdrop.classList.toggle('visible');
-    };
-
-    const closeSideNav = () => {
-        sideNav.classList.remove('open');
-        backdrop.classList.remove('visible');
-        resetHeaderTimer(); // Restart timer after closing side nav
-    };
     
     // --- CBM Calculator ---
     const renderCBM = (isNewGroup = false) => {
@@ -348,52 +308,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkProvince = () => {
         const inputProvince = removeAccents(provinceInput.value.toLowerCase()).trim();
-        provinceResultDiv.classList.remove('hang-bay', 'hang-bo', 'not-found');
+        const originalName = provinceInput.value.trim();
 
         if (inputProvince === "") {
-            provinceResultDiv.innerHTML = '<p>Nhập tên tỉnh để kiểm tra.</p>';
-            provinceResultDiv.classList.add('not-found');
             return;
         }
 
         const found = provinceList.includes(inputProvince);
         let resultText = '';
+        let resultClass = '';
 
         if (found) {
-            // Logic from Android app was simple hardcoded check: "Hàng Bay" or "Hàng Bộ"
-            // For simplicity, let's assume specific provinces are 'Hàng Bay'
+            // Logic: Hà Nội, Đà Nẵng, Hải Phòng, HCM = Hàng Bay
             if (["ha noi", "da nang", "hai phong", "ho chi minh"].includes(inputProvince)) {
                 resultText = '✈️ Hàng Bay';
-                provinceResultDiv.classList.add('hang-bay');
+                resultClass = 'hang-bay';
             } else {
                 resultText = '🚛 Hàng Bộ';
-                provinceResultDiv.classList.add('hang-bo');
+                resultClass = 'hang-bo';
             }
         } else {
-            resultText = 'Không tìm thấy thông tin tỉnh này.';
-            provinceResultDiv.classList.add('not-found');
+            resultText = '❓ Không tìm thấy';
+            resultClass = '';
         }
-        provinceResultDiv.innerHTML = `<p>${resultText}</p>`;
-        
+
+        // Get current time
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+        // Remove message if exists
+        const message = provinceResultDiv.querySelector('.province-message');
+        if (message) {
+            message.remove();
+        }
+
+        // Create new item
+        const item = document.createElement('div');
+        item.className = `province-item ${resultClass}`;
+        item.innerHTML = `
+            <span class="time">[${timeStr}]</span>
+            <span class="name">${originalName}</span>
+            <span class="arrow">→</span>
+            <span class="result">${resultText}</span>
+        `;
+
+        // Insert after header
+        const header = provinceResultDiv.querySelector('.province-header');
+        if (header && header.nextSibling) {
+            provinceResultDiv.insertBefore(item, header.nextSibling);
+        } else {
+            provinceResultDiv.appendChild(item);
+        }
+
+        // Scroll to top to see new item
+        provinceResultDiv.scrollTop = 0;
+
+        // Add to history
         const historyEntry = {
             type: 'province',
-            timestamp: new Date().toLocaleString('vi-VN'),
-            province: provinceInput.value,
+            timestamp: now.toLocaleString('vi-VN'),
+            province: originalName,
             result: resultText
         };
         addToHistory(historyEntry);
+
+        // Clear input
+        provinceInput.value = '';
+    };
+
+    const clearProvinceResults = () => {
+        // Keep header, remove all items
+        const header = provinceResultDiv.querySelector('.province-header');
+        provinceResultDiv.innerHTML = '';
+        if (header) {
+            provinceResultDiv.appendChild(header);
+        }
+        // Add message back
+        const message = document.createElement('div');
+        message.className = 'province-message';
+        message.textContent = 'Nhập tên tỉnh để kiểm tra loại vận chuyển.';
+        provinceResultDiv.appendChild(message);
     };
 
     // --- EVENT LISTENERS ---
-    // Remove old tab button event listeners
-    // tabButtons.forEach(button => button.addEventListener('click', () => switchTab(button.dataset.tab)));
-    hamburgerButton.addEventListener('click', toggleSideNav);
-    backdrop.addEventListener('click', closeSideNav);
-    headerActivationZone.addEventListener('click', () => {
-        hamburgerMenu.classList.remove('header-hidden'); // Force show the header
-        resetHeaderTimer(); // Reset the timer, which will start the 3-second countdown again
+    // Sidebar navigation
+    sidebarNavItems.forEach(item => {
+        item.addEventListener('click', () => switchTab(item.dataset.tab));
     });
-    tabButtons.forEach(button => button.addEventListener('click', () => switchTab(button.dataset.tab)));
+    
+    // Bottom navigation
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', () => switchTab(item.dataset.tab));
+    });
     cbmInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleCBMInput(); });
     btnBack1.addEventListener('click', handleBack1);
     btnBack2.addEventListener('click', handleBack2);
@@ -431,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     provinceInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkProvince(); });
+    btnClearProvince.addEventListener('click', clearProvinceResults);
     
     // --- HISTORY HELPER FUNCTIONS ---
     const showClearHistoryOptions = () => {

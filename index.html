@@ -7,20 +7,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-new.css">
 </head>
 <body>
-    <div id="container">
-        <button id="hamburger-button" aria-label="Mở menu">☰</button>
-        <div id="header-activation-zone"></div>
+    <div id="app">
+        <!-- Desktop Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">VinTransCBM</h1>
+                <p class="app-subtitle">Tính toán vận chuyển</p>
+            </div>
+        </header>
 
-        <div id="side-nav">
-            <button class="tab-button active" data-tab="cbm-calculator">📊 Tính Toán</button>
-            <button class="tab-button" data-tab="history">📋 Lịch Sử</button>
-            <button class="tab-button" data-tab="province-checker">📍 Kiểm Tra Tỉnh</button>
-        </div>
+        <!-- Desktop Sidebar Navigation -->
+        <nav class="sidebar-nav">
+            <div class="nav-brand">
+                <span class="brand-icon">&#128230;</span>
+                <span class="brand-text">VinTransCBM</span>
+            </div>
+            <button class="nav-item active" data-tab="cbm-calculator">
+                <span class="nav-icon">&#128202;</span>
+                <span class="nav-text">Tính Toán</span>
+            </button>
+            <button class="nav-item" data-tab="history">
+                <span class="nav-icon">&#128203;</span>
+                <span class="nav-text">Lịch Sử</span>
+            </button>
+            <button class="nav-item" data-tab="province-checker">
+                <span class="nav-icon">&#128205;</span>
+                <span class="nav-text">Kiểm Tra Tỉnh</span>
+            </button>
+        </nav>
 
-        <main id="content">
+        <!-- Main Content -->
+        <main class="main-content">
             <!-- Tab Tính CBM -->
             <div id="cbm-calculator" class="tab-content active">
                 <div id="cbm-main-content">
@@ -69,15 +89,34 @@
             <!-- Tab Kiểm Tra Tỉnh -->
             <div id="province-checker" class="tab-content">
                 <div class="province-container">
-                    <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
+                    <div class="province-input-section">
+                        <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
+                        <button id="btn-clear-province">Xóa Kết Quả</button>
+                    </div>
                     <div id="province-result" class="province-result">
-                        <p>Nhập tên tỉnh để kiểm tra.</p>
+                        <div class="province-header">🏙️ KIỂM TRA TỈNH THÀNH</div>
+                        <div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>
                     </div>
                 </div>
             </div>
         </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-tab="cbm-calculator">
+                <span class="bottom-nav-icon">&#128202;</span>
+                <span class="bottom-nav-text">Tính Toán</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="history">
+                <span class="bottom-nav-icon">&#128203;</span>
+                <span class="bottom-nav-text">Lịch Sử</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="province-checker">
+                <span class="bottom-nav-icon">&#128205;</span>
+                <span class="bottom-nav-text">Kiểm Tra</span>
+            </button>
+        </nav>
     </div>
     <script src="script.js"></script>
-    <div id="backdrop"></div>
 </body>
 </html>

@@ -1,5 +1,0 @@
-# Netlify Configuration - Simple (No Security Headers)
-
-[build]
-  publish = "."
-  command = "echo 'No build needed - static site'"

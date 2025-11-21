@@ -80,6 +80,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCTIONS ---
     
+    // --- SECURITY FUNCTIONS ---
+    // Sanitize input để ngăn XSS
+    const sanitizeInput = (str) => {
+        if (typeof str !== 'string') return '';
+        return str
+            .replace(/[<>\"']/g, '')
+            .replace(/javascript:/gi, '')
+            .replace(/on\w+=/gi, '')
+            .trim();
+    };
+    
+    const sanitizeNumber = (str) => {
+        if (typeof str !== 'string') return '';
+        return str.replace(/[^0-9.,]/g, '');
+    };
+    
+    // --- THEME & SETTINGS FUNCTIONS ---
+    const loadSettings = () => {
+        const savedTheme = localStorage.getItem('vinTransCBMTheme') || 'light';
+        const savedSize = localStorage.getItem('vinTransCBMSize') || 'medium';
+        const savedAnimations = localStorage.getItem('vinTransCBMAnimations') !== 'false';
+        const savedTabSize = localStorage.getItem('vinTransCBMTabSize') || 'medium';
+        
+        applyTheme(savedTheme);
+        applySize(savedSize);
+        applyAnimations(savedAnimations);
+        applyTabFontSize(savedTabSize);
+        
+        // Update UI states
+        updateThemeButtons(savedTheme);
+        updateSizeButtons(savedSize);
+        updateTabFontSizeButtons(savedTabSize);
+        document.getElementById('animations-toggle').checked = savedAnimations;
+    };
+    
+    const saveSettings = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const currentSize = document.documentElement.getAttribute('data-size') || 'medium';
+        const currentAnimations = !document.body.classList.contains('no-animations');
+        const currentTabSize = localStorage.getItem('vinTransCBMTabSize') || 'medium';
+        
+        localStorage.setItem('vinTransCBMTheme', currentTheme);
+        localStorage.setItem('vinTransCBMSize', currentSize);
+        localStorage.setItem('vinTransCBMAnimations', currentAnimations.toString());
+        localStorage.setItem('vinTransCBMTabSize', currentTabSize);
+    };
+    
+    const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+    };
+    
+    const applySize = (size) => {
+        document.documentElement.setAttribute('data-size', size);
+    };
+    
+    const applyAnimations = (enabled) => {
+        if (enabled) {
+            document.body.classList.remove('no-animations');
+        } else {
+            document.body.classList.add('no-animations');
+        }
+    };
+    
+    const updateThemeButtons = (theme) => {
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+        });
+    };
+    
+    const updateSizeButtons = (size) => {
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-size') === size);
+        });
+    };
+    
+    const toggleTheme = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        applyTheme(newTheme);
+        updateThemeButtons(newTheme);
+        saveSettings();
+    };
+    
+    const applyTabFontSize = (size) => {
+        console.log('Applying tab font size:', size);
+        document.documentElement.setAttribute('data-tab-size', size);
+        console.log('Current data-tab-size:', document.documentElement.getAttribute('data-tab-size'));
+    };
+    
+    const updateTabFontSizeButtons = (size) => {
+        document.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-size') === size);
+        });
+    };
+    
+    const resetSettings = () => {
+        if (confirm('Khôi phục tất cả cài đặt về mặc định?')) {
+            localStorage.removeItem('vinTransCBMTheme');
+            localStorage.removeItem('vinTransCBMSize');
+            localStorage.removeItem('vinTransCBMAnimations');
+            localStorage.removeItem('vinTransCBMTabSize');
+            loadSettings();
+        }
+    };
+    
     // --- HAMBURGER MENU FUNCTIONS ---
     const startHideTimer = () => {
         clearTimeout(hideMenuTimer);
@@ -132,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { v1, v2, v3, v4 } = inputs;
             const { cbm, kgDuongBo, kgVinEco, kgCpn, kgHoaToc } = calculatedOutputs;
             
-            return `📦 [${timestamp}] Nhóm ${groupNumber}:\n` +
+            return `📦 [${timestamp}] Kiện ${groupNumber}:\n` +
                    `Dài: ${df(v1)}, Rộng: ${df(v2)}, Cao: ${df(v3)}, Số kiện: ${df(v4)}\n` +
                    `✨ CBM = ${df(cbm)}\n` +
                    `🚛 Kg (ĐƯỜNG BỘ) = ${df(kgDuongBo)}\n` +
@@ -235,17 +341,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             groupHtml += `
                 <div class="group-item${isLast ? ' new-item' : ''}" data-group-index="${index}">
-                    <p class="group-title">☀️ Nhóm ${group.groupNumber}:</p>
+                    <p class="group-title">☀️ Kiện ${group.groupNumber}:</p>
                     <p>Dài: <span class="value">${df(v1)}</span></p>
                     <p>Rộng: <span class="value">${df(v2)}</span></p>
                     <p>Cao: <span class="value">${df(v3)}</span></p>
                     <p>Số kiện: <span class="value">${df(v4)}</span></p>
                     <hr>
-                    <p>✨ CBM nhóm ${group.groupNumber} = ${df(cbm)}, Tổng: ${df(totalCbm)}, Số Kiện: ${df(totalPieces)}</p>
-                    <p>🚛 Kg nhóm ${group.groupNumber} (ĐƯỜNG BỘ) = ${df(kgDuongBo)}, Tổng: ${df(totalKgDuongBo)}</p>
-                    <p>🚐 Kg nhóm ${group.groupNumber} (VIN-ECO) = ${df(kgVinEco)}, Tổng: ${df(totalKgVinEco)}</p>
-                    <p>✈️ Kg nhóm ${group.groupNumber} (CPN) = ${df(kgCpn)}, Tổng: ${df(totalKgCpn)}</p>
-                    <p>🚀 Kg nhóm ${group.groupNumber} (HỎA TỐC) = ${df(kgHoaToc)}, Tổng: ${df(totalKgHoaToc)}</p>
+                    <p>✨ CBM kiện ${group.groupNumber} = ${df(cbm)}, Tổng: ${df(totalCbm)}, Số Kiện: ${df(totalPieces)}</p>
+                    <p>🚛 Kg kiện ${group.groupNumber} (ĐƯỜNG BỘ) = ${df(kgDuongBo)}, Tổng: ${df(totalKgDuongBo)}</p>
+                    <p>🚐 Kg kiện ${group.groupNumber} (VIN-ECO) = ${df(kgVinEco)}, Tổng: ${df(totalKgVinEco)}</p>
+                    <p>✈️ Kg kiện ${group.groupNumber} (CPN) = ${df(kgCpn)}, Tổng: ${df(totalKgCpn)}</p>
+                    <p>🚀 Kg kiện ${group.groupNumber} (HỎA TỐC) = ${df(kgHoaToc)}, Tổng: ${df(totalKgHoaToc)}</p>
                 </div>`;
         });
         
@@ -255,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i=0; i < cbmCurrentIndex - 1; i++) {
                 currentInputHtml += `${labels[i]}: <span class="value">${df(cbmBuffer[i])}</span>, `;
             }
-            groupHtml += `<div class="group-item current-input"><strong>☀️ Nhóm ${cbmCurrentGroup} (đang nhập):</strong><br>${currentInputHtml.slice(0, -2)}</div>`;
+            groupHtml += `<div class="group-item current-input"><strong>☀️ Kiện ${cbmCurrentGroup} (đang nhập):</strong><br>${currentInputHtml.slice(0, -2)}</div>`;
         }
         
         groupsDisplay.innerHTML = groupHtml || '<p class="empty-message">Chưa có lô hàng nào.</p>';
@@ -273,7 +379,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const handleCBMInput = () => {
-        const value = parseFloat(cbmInput.value);
+        const rawValue = sanitizeNumber(cbmInput.value);
+        if (!rawValue) return;
+        const value = parseFloat(rawValue);
         if (isNaN(value) || value <= 0) {
             cbmInput.style.animation = 'shake 0.5s';
             setTimeout(()=> cbmInput.style.animation = '', 500);
@@ -383,8 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkProvince = () => {
-        const inputProvince = removeAccents(provinceInput.value.toLowerCase()).trim();
-        const originalName = provinceInput.value.trim();
+        const sanitizedInput = sanitizeInput(provinceInput.value);
+        const inputProvince = removeAccents(sanitizedInput.toLowerCase()).trim();
+        const originalName = sanitizedInput.trim();
 
         if (inputProvince === "") {
             return;
@@ -648,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const searchByDate = () => {
-        const searchDate = searchHistoryInput.value.trim();
+        const searchDate = sanitizeInput(searchHistoryInput.value).trim();
         if (!searchDate) {
             alert('Vui lòng nhập ngày tìm kiếm (dd/MM/yyyy)');
             return;
@@ -673,13 +782,66 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetPage = Math.floor(foundIndex / itemsPerPage) + 1;
             currentPage = targetPage;
             renderHistory();
-            alert(`Đã tìm thấy nhóm ngày ${searchDate} (trang ${targetPage})`);
+            alert(`Đã tìm thấy kiện ngày ${searchDate} (trang ${targetPage})`);
         } else {
-            alert(`Không tìm thấy nhóm nào vào ngày ${searchDate}`);
+            alert(`Không tìm thấy kiện nào vào ngày ${searchDate}`);
         }
     };
 
+    // --- SETTINGS EVENT LISTENERS ---
+    // Theme toggle button
+    const themeToggle = $('#theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Theme buttons in settings
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.getAttribute('data-theme');
+            applyTheme(theme);
+            updateThemeButtons(theme);
+            saveSettings();
+        });
+    });
+    
+    // Size buttons
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const size = btn.getAttribute('data-size');
+            applySize(size);
+            updateSizeButtons(size);
+            saveSettings();
+        });
+    });
+    
+    // Tab font size buttons
+    document.querySelectorAll('.font-size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const size = btn.getAttribute('data-size');
+            applyTabFontSize(size);
+            updateTabFontSizeButtons(size);
+            localStorage.setItem('vinTransCBMTabSize', size);
+        });
+    });
+    
+    // Animations toggle
+    const animationsToggle = $('#animations-toggle');
+    if (animationsToggle) {
+        animationsToggle.addEventListener('change', () => {
+            applyAnimations(animationsToggle.checked);
+            saveSettings();
+        });
+    }
+    
+    // Reset settings button
+    const resetSettingsBtn = $('#reset-settings-btn');
+    if (resetSettingsBtn) {
+        resetSettingsBtn.addEventListener('click', resetSettings);
+    }
+    
     // --- INIT ---
+    loadSettings(); // Load theme and settings first
     renderCBM();
     renderHistory();
     

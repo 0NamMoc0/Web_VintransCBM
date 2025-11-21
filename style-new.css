@@ -4,7 +4,7 @@
    VARIABLES & RESET
    ======================== */
 :root {
-    /* Colors */
+    /* Colors - Light Theme (Default) */
     --primary: #1a73e8;
     --primary-dark: #1557b0;
     --secondary: #34a853;
@@ -40,6 +40,73 @@
     
     /* Typography */
     --font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-base: 16px;
+    --font-size-small: 14px;
+    --font-size-large: 18px;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --primary: #8ab4f8;
+    --primary-dark: #669df6;
+    --secondary: #34a853;
+    --danger: #f28b82;
+    --warning: #fdd663;
+    --background: #121212;
+    --surface: #1e1e1e;
+    --surface-variant: #2d2d2d;
+    --on-surface: #e8eaed;
+    --on-surface-variant: #9aa0a6;
+    --border: #3c4043;
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+    --shadow-md: 0 1px 3px 0 rgba(0,0,0,0.3), 0 4px 8px 3px rgba(0,0,0,0.15);
+    --shadow-lg: 0 2px 6px 2px rgba(0,0,0,0.3), 0 8px 12px 6px rgba(0,0,0,0.15);
+}
+
+/* Size Variants */
+[data-size="tiny"] {
+    --font-size-base: 12px;
+    --font-size-small: 10px;
+    --font-size-large: 14px;
+    --font-size-nav: 11px;
+    --spacing-xs: 2px;
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+}
+
+[data-size="small"] {
+    --font-size-base: 14px;
+    --font-size-small: 12px;
+    --font-size-large: 16px;
+    --font-size-nav: 13px;
+    --spacing-xs: 3px;
+    --spacing-sm: 6px;
+    --spacing-md: 12px;
+    --spacing-lg: 18px;
+    --spacing-xl: 24px;
+}
+
+[data-size="large"] {
+    --font-size-base: 18px;
+    --font-size-small: 16px;
+    --font-size-large: 20px;
+    --font-size-nav: 17px;
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 28px;
+    --spacing-xl: 36px;
+}
+
+/* Add default nav font size and tab-specific fonts */
+:root {
+    --font-size-nav: 15px;
+    --font-size-tabs: 16px;
+    --font-size-tab-title: 18px;
+    --font-size-tab-content: 14px;
+    --font-size-tab-small: 13px;
 }
 
 *, *::before, *::after {
@@ -52,6 +119,11 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--on-surface);
+    background: var(--background);
+    transition: all var(--transition-base);
 }
 
 body {
@@ -61,6 +133,41 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Tab-specific font sizes */
+#cbm-calculator,
+#history {
+    font-size: var(--font-size-tabs);
+}
+
+/* Tab font sizes for different sizes */
+html[data-tab-size="tiny"] {
+    --font-size-tabs: 12px !important;
+    --font-size-tab-title: 13px !important;
+    --font-size-tab-content: 11px !important;
+    --font-size-tab-small: 10px !important;
+}
+
+html[data-tab-size="small"] {
+    --font-size-tabs: 14px !important;
+    --font-size-tab-title: 15px !important;
+    --font-size-tab-content: 13px !important;
+    --font-size-tab-small: 11px !important;
+}
+
+html[data-tab-size="medium"] {
+    --font-size-tabs: 16px !important;
+    --font-size-tab-title: 18px !important;
+    --font-size-tab-content: 14px !important;
+    --font-size-tab-small: 13px !important;
+}
+
+html[data-tab-size="large"] {
+    --font-size-tabs: 18px !important;
+    --font-size-tab-title: 20px !important;
+    --font-size-tab-content: 16px !important;
+    --font-size-tab-small: 15px !important;
 }
 
 /* ========================
@@ -175,8 +282,8 @@ body {
     align-items: center;
     padding: var(--spacing-lg);
     border-bottom: 1px solid var(--border);
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
+    background: var(--surface);
+    color: var(--on-surface);
 }
 
 .menu-title {
@@ -187,9 +294,9 @@ body {
 .close-menu {
     width: 36px;
     height: 36px;
-    border: none;
-    background: rgba(255,255,255,0.2);
-    color: white;
+    border: 1px solid var(--border);
+    background: var(--surface-variant);
+    color: var(--on-surface);
     font-size: 28px;
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -219,7 +326,7 @@ body {
     border: none;
     border-radius: var(--radius-md);
     color: var(--on-surface);
-    font-size: 16px;
+    font-size: var(--font-size-nav);
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -256,6 +363,77 @@ body {
 .menu-overlay.visible {
     opacity: 1;
     pointer-events: all;
+}
+
+/* Theme Toggle Button - Medium Size & Adaptive */
+.theme-toggle {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-icon {
+    position: absolute;
+    font-size: 14px;
+    transition: all var(--transition-base);
+    filter: brightness(1);
+}
+
+.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    color: #f59e0b;
+}
+
+.moon-icon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+    color: #6366f1;
+}
+
+[data-theme="dark"] .sun-icon {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+}
+
+[data-theme="dark"] .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* Adaptive colors based on theme */
+[data-theme="light"] .theme-toggle {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .theme-toggle {
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 /* Bottom Navigation - REMOVED (using hamburger menu instead) */
@@ -300,12 +478,19 @@ input[type="text"] {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     color: var(--on-surface);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 500;
     font-family: var(--font-family);
     transition: all var(--transition-fast);
     -webkit-appearance: none;
     appearance: none;
+}
+
+/* Input fields in CBM Calculator and History tabs */
+#cbm-calculator input[type="number"],
+#cbm-calculator input[type="text"],
+#history input[type="text"] {
+    font-size: var(--font-size-tabs);
 }
 
 input:focus {
@@ -389,7 +574,7 @@ button:active {
 .group-item p {
     margin: 0 0 8px 0;
     line-height: 1.6;
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
 }
 
 .group-item .value {
@@ -400,13 +585,19 @@ button:active {
 .group-title {
     font-weight: 700;
     color: var(--on-surface);
-    font-size: 16px;
+    font-size: var(--font-size-tabs, 16px);
     margin-bottom: 12px !important;
 }
 
 .group-item.current-input {
     border-left-color: var(--primary);
     background: #e8f0fe;
+    color: var(--on-surface);
+}
+
+[data-theme="dark"] .group-item.current-input {
+    background: var(--surface-variant);
+    color: var(--on-surface);
 }
 
 .group-item hr {
@@ -419,6 +610,7 @@ button:active {
     text-align: center;
     color: var(--on-surface-variant);
     padding: var(--spacing-xl);
+    font-size: var(--font-size-tab-content, 14px);
 }
 
 /* CBM Controls */
@@ -437,7 +629,7 @@ button:active {
 
 #cbm-actions button {
     padding: 12px;
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
     color: white;
     box-shadow: var(--shadow-sm);
 }
@@ -483,7 +675,7 @@ button:active {
     background: var(--primary);
     color: white;
     padding: 0 20px;
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
 }
@@ -500,7 +692,7 @@ button:active {
 }
 
 .history-header {
-    font-size: 18px;
+    font-size: var(--font-size-tab-title, 18px);
     font-weight: 700;
     color: var(--primary);
     margin-bottom: var(--spacing-sm);
@@ -509,7 +701,7 @@ button:active {
 }
 
 .history-stats {
-    font-size: 13px;
+    font-size: var(--font-size-tab-small, 13px);
     color: var(--on-surface-variant);
     font-weight: 500;
     margin-bottom: var(--spacing-md);
@@ -527,7 +719,7 @@ button:active {
     background: var(--surface-variant);
     border-radius: var(--radius-md);
     border-left: 4px solid var(--secondary);
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
     color: var(--on-surface);
     animation: slideUp var(--transition-base);
     box-shadow: var(--shadow-sm);
@@ -550,7 +742,7 @@ button:active {
     background: var(--primary);
     color: white;
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
     font-weight: 600;
     min-width: 90px;
     box-shadow: var(--shadow-sm);
@@ -564,7 +756,7 @@ button:active {
 }
 
 #page-info {
-    font-size: 14px;
+    font-size: var(--font-size-tab-content, 14px);
     font-weight: 600;
     color: var(--on-surface);
     white-space: nowrap;
@@ -580,7 +772,7 @@ button:active {
     background: var(--danger);
     color: white;
     width: 100%;
-    font-size: 15px;
+    font-size: var(--font-size-tabs, 15px);
     padding: 14px 0;
     font-weight: 600;
     box-shadow: var(--shadow-md);
@@ -794,7 +986,7 @@ button:active {
         text-align: left;
         border-radius: var(--radius-md);
         transition: all var(--transition-fast);
-        font-size: 15px;
+        font-size: var(--font-size-nav);
     }
     
     .nav-icon {
@@ -869,11 +1061,11 @@ button:active {
     .pagination-controls button {
         min-width: 120px;
         padding: 12px 24px;
-        font-size: 15px;
+        font-size: var(--font-size-tabs, 15px);
     }
     
     #page-info {
-        font-size: 15px;
+        font-size: var(--font-size-tabs, 15px);
         min-width: 120px;
         text-align: center;
     }

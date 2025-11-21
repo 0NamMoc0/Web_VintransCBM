@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style-new.css">
+    <link rel="stylesheet" href="settings.css">
 </head>
 <body>
     <div id="app">
@@ -17,10 +18,16 @@
             <span></span>
         </button>
         
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi giao diện">
+            <span class="theme-icon sun-icon">☀️</span>
+            <span class="theme-icon moon-icon">🌙</span>
+        </button>
+        
         <!-- Mobile Slide Menu -->
         <div id="slide-menu" class="slide-menu">
             <div class="slide-menu-header">
-                <span class="menu-title">📦 VinTransCBM</span>
+                <span class="menu-title">Menu</span>
                 <button id="close-menu" class="close-menu">&times;</button>
             </div>
             <nav class="slide-menu-nav">
@@ -36,24 +43,18 @@
                     <span class="menu-icon">📍</span>
                     <span class="menu-text">Kiểm Tra Tỉnh</span>
                 </button>
+                <button class="slide-menu-item" data-tab="settings">
+                    <span class="menu-icon">⚙️</span>
+                    <span class="menu-text">Cài Đặt</span>
+                </button>
             </nav>
         </div>
         <div id="menu-overlay" class="menu-overlay"></div>
         
-        <!-- Desktop Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <h1 class="app-title">VinTransCBM</h1>
-                <p class="app-subtitle">Tính toán vận chuyển</p>
-            </div>
-        </header>
+        <!-- Desktop Header - REMOVED -->
 
         <!-- Desktop Sidebar Navigation -->
         <nav class="sidebar-nav">
-            <div class="nav-brand">
-                <span class="brand-icon">&#128230;</span>
-                <span class="brand-text">VinTransCBM</span>
-            </div>
             <button class="nav-item active" data-tab="cbm-calculator">
                 <span class="nav-icon">&#128202;</span>
                 <span class="nav-text">Tính Toán</span>
@@ -65,6 +66,10 @@
             <button class="nav-item" data-tab="province-checker">
                 <span class="nav-icon">&#128205;</span>
                 <span class="nav-text">Kiểm Tra Tỉnh</span>
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <span class="nav-icon">&#9881;</span>
+                <span class="nav-text">Cài Đặt</span>
             </button>
         </nav>
 
@@ -125,6 +130,72 @@
                     <div id="province-result" class="province-result">
                         <div class="province-header">🏙️ KIỂM TRA TỈNH THÀNH</div>
                         <div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Cài Đặt -->
+            <div id="settings" class="tab-content">
+                <div class="settings-container">
+                    <div class="settings-header">⚙️ CÀI ĐẶT GIAO DIỆN</div>
+                    
+                    <!-- Giao diện -->
+                    <div class="settings-section">
+                        <h3 class="section-title">🎨 Giao diện</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Chủ đề</label>
+                            <div class="theme-switcher">
+                                <button class="theme-btn light-theme-btn" data-theme="light">
+                                    <span class="theme-btn-icon">☀️</span>
+                                    <span class="theme-btn-text">Sáng</span>
+                                </button>
+                                <button class="theme-btn dark-theme-btn" data-theme="dark">
+                                    <span class="theme-btn-icon">🌙</span>
+                                    <span class="theme-btn-text">Tối</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kích thước -->
+                    <div class="settings-section">
+                        <h3 class="section-title">📏 Kích thước</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Cỡ chữ & Giao diện</label>
+                            <div class="size-switcher">
+                                <button class="size-btn" data-size="tiny">Siêu nhỏ</button>
+                                <button class="size-btn" data-size="small">Nhỏ</button>
+                                <button class="size-btn active" data-size="medium">Vừa</button>
+                                <button class="size-btn" data-size="large">Lớn</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Cỡ chữ tab Tính toán & Lịch sử</label>
+                            <div class="font-size-switcher">
+                                <button class="font-size-btn" data-size="tiny">Siêu nhỏ</button>
+                                <button class="font-size-btn" data-size="small">Nhỏ</button>
+                                <button class="font-size-btn active" data-size="medium">Vừa</button>
+                                <button class="font-size-btn" data-size="large">Lớn</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                        
+                    <!-- Hiệu ứng -->
+                    <div class="settings-section">
+                        <h3 class="section-title">✨ Hiệu ứng</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Chuyển động mượt</label>
+                            <label class="switch">
+                                <input type="checkbox" id="animations-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Nút reset -->
+                    <div class="settings-actions">
+                        <button id="reset-settings-btn" class="btn-secondary">Khôi phục mặc định</button>
                     </div>
                 </div>
             </div>

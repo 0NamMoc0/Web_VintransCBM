@@ -43,6 +43,10 @@
                     <span class="menu-icon">📍</span>
                     <span class="menu-text">Kiểm Tra Tỉnh</span>
                 </button>
+                <button class="slide-menu-item" data-tab="shipping-calculator">
+                    <span class="menu-icon">💰</span>
+                    <span class="menu-text">Tính Cước Phí</span>
+                </button>
                 <button class="slide-menu-item" data-tab="settings">
                     <span class="menu-icon">⚙️</span>
                     <span class="menu-text">Cài Đặt</span>
@@ -66,6 +70,10 @@
             <button class="nav-item" data-tab="province-checker">
                 <span class="nav-icon">&#128205;</span>
                 <span class="nav-text">Kiểm Tra Tỉnh</span>
+            </button>
+            <button class="nav-item" data-tab="shipping-calculator">
+                <span class="nav-icon">&#128176;</span>
+                <span class="nav-text">Tính Cước Phí</span>
             </button>
             <button class="nav-item" data-tab="settings">
                 <span class="nav-icon">&#9881;</span>
@@ -130,6 +138,47 @@
                     <div id="province-result" class="province-result">
                         <div class="province-header">🏙️ KIỂM TRA TỈNH THÀNH</div>
                         <div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Tính Cước Phí -->
+            <div id="shipping-calculator" class="tab-content">
+                <div class="shipping-calculator-container">
+                    <!-- Form nhập liệu -->
+                    <div class="shipping-form">
+                        <div class="form-header">💰 TÍNH CƯỚC VẬN CHUYỂN</div>
+                        
+                        <div class="form-group">
+                            <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
+                            <select id="shipping-tinh-select">
+                                <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shipping-huyen-select">Quận/Huyện đến:</label>
+                            <select id="shipping-huyen-select" disabled>
+                                <option value="">-- Vui lòng chọn Tỉnh trước --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shipping-weight-input">Trọng lượng (kg):</label>
+                            <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button id="btn-calculate-shipping" class="btn-primary">Tính Cước Phí</button>
+                            <button id="btn-reset-shipping" class="btn-secondary">Xóa Form</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Kết quả -->
+                    <div id="shipping-result" class="shipping-result">
+                        <div class="result-message">
+                            📦 Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -214,6 +263,10 @@
             <button class="bottom-nav-item" data-tab="province-checker">
                 <span class="bottom-nav-icon">&#128205;</span>
                 <span class="bottom-nav-text">Kiểm Tra</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="shipping-calculator">
+                <span class="bottom-nav-icon">&#128176;</span>
+                <span class="bottom-nav-text">Cước Phí</span>
             </button>
         </nav>
     </div>

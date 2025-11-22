@@ -1260,7 +1260,152 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
-    // Tính giá cho một dịch vụ dựa trên bảng giá và trọng lượng
+    // Tính giá cho VIN-TRUCK và VIN-ECO theo quy định mới (2025)
+    // Quy tắc: Xác định khung giá dựa trên SỐ KG CÒN LẠI (W_dư = kg - 10)
+    // Trả về object chứa thông tin chi tiết để hiển thị quy trình tính toán
+    const tinhGiaTheoBangMoi = (bangGia, kg, vung) => {
+        // Giá 10kg đầu tiên
+        const gia10kgDau = bangGia[10][vung];
+        
+        // Nếu ≤ 10kg, chỉ trả về giá 10kg đầu
+        if (kg <= 10) {
+            return {
+                giaGoc: gia10kgDau,
+                gia10kgDau: gia10kgDau,
+                wDu: 0,
+                donGiaKhung: 0,
+                khungGiaTen: '≤ 10kg',
+                tienPhanDu: 0
+            };
+        }
+        
+        // Tính số kg còn lại (W_dư)
+        const wDu = kg - 10;
+        
+        // Xác định khung giá dựa trên W_dư (KHÔNG phải tổng kg)
+        // Lưu ý: "Trên 10-50kg" = 11-50kg, "Trên 50-100kg" = 51-100kg
+        let donGiaKhung = 0;
+        let khungGiaTen = '';
+        
+        if (wDu <= 40) { // 0 < W_dư ≤ 40 → khung "Trên 10 - 50 kg" (11-50kg)
+            donGiaKhung = bangGia[50][vung];
+            khungGiaTen = 'Trên 10 - 50 kg (11-50kg)';
+        } else if (wDu <= 90) { // 40 < W_dư ≤ 90 → khung "Trên 50 - 100 kg" (51-100kg)
+            donGiaKhung = bangGia[100][vung];
+            khungGiaTen = 'Trên 50 - 100 kg (51-100kg)';
+        } else if (wDu <= 290) { // 90 < W_dư ≤ 290 → khung "Trên 100 - 300 kg" (101-300kg)
+            donGiaKhung = bangGia[300][vung];
+            khungGiaTen = 'Trên 100 - 300 kg (101-300kg)';
+        } else if (wDu <= 490) { // 290 < W_dư ≤ 490 → khung "Trên 300 - 500 kg" (301-500kg)
+            donGiaKhung = bangGia[500][vung];
+            khungGiaTen = 'Trên 300 - 500 kg (301-500kg)';
+        } else if (wDu <= 990) { // 490 < W_dư ≤ 990 → khung "Trên 500 - 1000 kg" (501-1000kg)
+            donGiaKhung = bangGia[1000][vung];
+            khungGiaTen = 'Trên 500 - 1000 kg (501-1000kg)';
+        } else if (wDu <= 1990) { // 990 < W_dư ≤ 1990 → khung "Trên 1000 - 2000 kg" (1001-2000kg)
+            donGiaKhung = bangGia[2000][vung];
+            khungGiaTen = 'Trên 1000 - 2000 kg (1001-2000kg)';
+        } else { // W_dư > 1990 → khung "Trên 2000 kg" (2001kg trở lên)
+            donGiaKhung = bangGia.max[vung];
+            khungGiaTen = 'Trên 2000 kg (2001kg+)';
+        }
+        
+        // Tính tiền phần dư: W_dư × ĐG_khung
+        const tienPhanDu = wDu * donGiaKhung;
+        
+        // Tính giá gốc: P_10 + W_dư × ĐG_khung
+        const giaGoc = gia10kgDau + tienPhanDu;
+        
+        return {
+            giaGoc: Math.round(giaGoc),
+            gia10kgDau: gia10kgDau,
+            wDu: wDu,
+            donGiaKhung: donGiaKhung,
+            khungGiaTen: khungGiaTen,
+            tienPhanDu: Math.round(tienPhanDu)
+        };
+    };
+    
+    // Format số tiền (helper function)
+    const formatTien = (soTien) => {
+        return soTien.toLocaleString('vi-VN') + ' đ';
+    };
+    
+    // Tính giá chi tiết cho VIN-EXPRESS
+    const tinhGiaChiTietExpress = (kg, vung) => {
+        const bangGia = bangGiaVinExpress;
+        let giaCoBan = 0;
+        let chiTiet = {
+            giaCoBan: 0,
+            buoc1: '',
+            buoc2: '',
+            kgVuot: 0,
+            soBuoc: 0,
+            tienBuoc: 0
+        };
+        
+        if (kg <= 1) {
+            giaCoBan = bangGia[1][vung];
+            chiTiet.buoc1 = `≤ 1kg: ${formatTien(bangGia[1][vung])}`;
+            chiTiet.buoc2 = '';
+        } else if (kg <= 2) {
+            giaCoBan = bangGia[2][vung];
+            chiTiet.buoc1 = `≤ 2kg: ${formatTien(bangGia[2][vung])}`;
+            chiTiet.buoc2 = '';
+        } else {
+            giaCoBan = bangGia[2][vung];
+            const kgVuot = kg - 2;
+            const soBuoc = Math.ceil(kgVuot / 0.5);
+            const tienBuoc = soBuoc * bangGia.step[vung];
+            giaCoBan += tienBuoc;
+            
+            chiTiet.buoc1 = `≤ 2kg: ${formatTien(bangGia[2][vung])}`;
+            chiTiet.kgVuot = kgVuot;
+            chiTiet.soBuoc = soBuoc;
+            chiTiet.tienBuoc = tienBuoc;
+            chiTiet.buoc2 = `Phần vượt: ${kgVuot.toFixed(1)} kg ÷ 0.5 = ${soBuoc} bước × ${formatTien(bangGia.step[vung])} = ${formatTien(tienBuoc)}`;
+        }
+        
+        chiTiet.giaCoBan = Math.round(giaCoBan);
+        return chiTiet;
+    };
+    
+    // Tính giá chi tiết cho VIN-HOATOC
+    const tinhGiaChiTietHoaToc = (kg, vung) => {
+        const bangGia = bangGiaVinHoaToc;
+        let giaCoBan = 0;
+        let chiTiet = {
+            giaCoBan: 0,
+            buoc1: '',
+            buoc2: '',
+            kgVuot: 0,
+            soBuoc: 0,
+            tienBuoc: 0
+        };
+        
+        if (kg <= 2) {
+            giaCoBan = bangGia[2][vung];
+            chiTiet.buoc1 = `≤ 2kg: ${formatTien(bangGia[2][vung])}`;
+            chiTiet.buoc2 = '';
+        } else {
+            giaCoBan = bangGia[2][vung];
+            const kgVuot = kg - 2;
+            const soBuoc = Math.ceil(kgVuot / 0.5);
+            const tienBuoc = soBuoc * bangGia.step[vung];
+            giaCoBan += tienBuoc;
+            
+            chiTiet.buoc1 = `≤ 2kg: ${formatTien(bangGia[2][vung])}`;
+            chiTiet.kgVuot = kgVuot;
+            chiTiet.soBuoc = soBuoc;
+            chiTiet.tienBuoc = tienBuoc;
+            chiTiet.buoc2 = `Phần vượt: ${kgVuot.toFixed(1)} kg ÷ 0.5 = ${soBuoc} bước × ${formatTien(bangGia.step[vung])} = ${formatTien(tienBuoc)}`;
+        }
+        
+        chiTiet.giaCoBan = Math.round(giaCoBan);
+        return chiTiet;
+    };
+    
+    // Tính giá cho EXPRESS và HỎA TỐC (giữ nguyên logic cũ)
     const tinhGiaTheoBang = (bangGia, kg, vung) => {
         let giaCoBan = 0;
         
@@ -1291,35 +1436,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return giaCoBan;
         }
         
-        // Xử lý cho VIN-TRUCK và VIN-ECO
-        if (kg <= 10) {
-            giaCoBan = bangGia[10][vung];
-        } else if (kg <= 50) {
-            giaCoBan = bangGia[10][vung] + (kg - 10) * bangGia[50][vung];
-        } else if (kg <= 100) {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + (kg - 50) * bangGia[100][vung];
-        } else if (kg <= 300) {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + 50 * bangGia[100][vung] + (kg - 100) * bangGia[300][vung];
-        } else if (kg <= 500) {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + 50 * bangGia[100][vung] + 200 * bangGia[300][vung] + (kg - 300) * bangGia[500][vung];
-        } else if (kg <= 1000) {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + 50 * bangGia[100][vung] + 200 * bangGia[300][vung] + 200 * bangGia[500][vung] + (kg - 500) * bangGia[1000][vung];
-        } else if (kg <= 2000) {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + 50 * bangGia[100][vung] + 200 * bangGia[300][vung] + 200 * bangGia[500][vung] + 500 * bangGia[1000][vung] + (kg - 1000) * bangGia[2000][vung];
-        } else {
-            giaCoBan = bangGia[10][vung] + 40 * bangGia[50][vung] + 50 * bangGia[100][vung] + 200 * bangGia[300][vung] + 200 * bangGia[500][vung] + 500 * bangGia[1000][vung] + 1000 * bangGia[2000][vung] + (kg - 2000) * bangGia.max[vung];
-        }
-        
-        return Math.round(giaCoBan);
+        // VIN-TRUCK và VIN-ECO sử dụng hàm mới
+        return tinhGiaTheoBangMoi(bangGia, kg, vung);
     };
     
-    // Tính phụ phí ngoại tuyến
-    const tinhPhuPhiNgoaiTuyen = (giaCoBan, kg, loaiTuyen) => {
+    // Tính phụ phí ngoại tuyến - dựa trên TỔNG SỐ KG GỐC (không trừ 10 hay trừ 2)
+    const tinhPhuPhiNgoaiTuyen = (giaCoBan, tongKgGoc, loaiTuyen) => {
         if (loaiTuyen === 'noi') return 0;
         
-        if (kg < 100) return Math.round(giaCoBan * 0.3); // +30%
-        if (kg < 200) return Math.round(giaCoBan * 0.2); // +20%
-        return Math.round(giaCoBan * 0.1); // +10%
+        // Dựa trên tổng kg gốc (không trừ 10 hay trừ 2)
+        if (tongKgGoc <= 100) {
+            return Math.round(giaCoBan * 0.3); // ≤100kg: +30% (nhân 1.3)
+        } else if (tongKgGoc <= 200) {
+            return Math.round(giaCoBan * 0.2); // 101-200kg: +20% (nhân 1.2)
+        } else {
+            return Math.round(giaCoBan * 0.1); // ≥201kg: +10% (nhân 1.1)
+        }
     };
     
     // Hàm tính toán chính
@@ -1358,41 +1490,97 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tính toán cho 4 dịch vụ
         const danhSachKetQua = [];
         
-        // 1. VIN-TRUCK
-        const giaTruck = tinhGiaTheoBang(bangGiaVinTruck, kgInput, vung);
-        const phuPhiTruck = tinhPhuPhiNgoaiTuyen(giaTruck, kgInput, loaiTuyen);
-        const truocThueVATTruck = giaTruck + phuPhiTruck;
-        const phuPhiXangVATTruck = Math.round(truocThueVATTruck * 0.2);
-        const tongTruck = truocThueVATTruck + phuPhiXangVATTruck;
+        // Lưu thông tin chi tiết quy trình tính toán (cho VIN-TRUCK và VIN-ECO)
+        let chiTietQuyTrinh = null;
+        
+        // 1. VIN-TRUCK (Áp dụng quy định mới 2025)
+        const chiTietTruck = tinhGiaTheoBangMoi(bangGiaVinTruck, kgInput, vung);
+        const giaGocTruck = chiTietTruck.giaGoc;
+        // Nhân hệ số 1.32 (nhiên liệu & VAT) trước - BẮT BUỘC cho tất cả dịch vụ
+        const sauNhiLieuVATTruck = Math.round(giaGocTruck * 1.32);
+        // Nhân hệ số ngoại tuyến sau (nếu ngoại tuyến) - dựa trên TỔNG KG GỐC
+        let heSoNgoaiTuyenTruck = 1;
+        if (loaiTuyen === 'ngoai') {
+            if (kgInput <= 100) {
+                heSoNgoaiTuyenTruck = 1.3; // ≤100kg: +30%
+            } else if (kgInput <= 200) {
+                heSoNgoaiTuyenTruck = 1.2; // 101-200kg: +20%
+            } else {
+                heSoNgoaiTuyenTruck = 1.1; // ≥201kg: +10%
+            }
+        }
+        const tongTruck = Math.round(sauNhiLieuVATTruck * heSoNgoaiTuyenTruck);
+        const phuPhiXangVATTruck = sauNhiLieuVATTruck - giaGocTruck;
+        const phuPhiNgoaiTuyenTruck = loaiTuyen === 'ngoai' ? tongTruck - sauNhiLieuVATTruck : 0;
+        
+        // Lưu chi tiết quy trình tính toán (dùng cho VIN-TRUCK làm mẫu)
+        chiTietQuyTrinh = {
+            gia10kgDau: chiTietTruck.gia10kgDau,
+            wDu: chiTietTruck.wDu,
+            donGiaKhung: chiTietTruck.donGiaKhung,
+            khungGiaTen: chiTietTruck.khungGiaTen || '≤ 10kg',
+            tienPhanDu: chiTietTruck.tienPhanDu,
+            giaGoc: giaGocTruck,
+            sauNhiLieuVAT: sauNhiLieuVATTruck,
+            tongCuoc: tongTruck
+        };
         
         danhSachKetQua.push({
             ten: "VIN-TRUCK (Đường Bộ)",
             icon: "🚛",
-            giaCoBan: giaTruck,
-            phuPhiNgoaiTuyen: phuPhiTruck,
+            giaCoBan: giaGocTruck,
+            phuPhiNgoaiTuyen: phuPhiNgoaiTuyenTruck,
             phuPhiXangVAT: phuPhiXangVATTruck,
             tongCuoc: tongTruck,
             thoiGian: thoiGianGiaoHang["VIN-TRUCK"][vung],
-            disabled: false
+            disabled: false,
+            chiTietQuyTrinh: chiTietQuyTrinh,
+            loaiDichVu: 'truck'
         });
         
-        // 2. VIN-ECO (hiển thị nhưng disabled nếu < 30kg)
+        // 2. VIN-ECO (Áp dụng quy định mới 2025, hiển thị nhưng disabled nếu < 30kg)
         if (kgInput >= 30) {
-            const giaEco = tinhGiaTheoBang(bangGiaVinEco, kgInput, vung);
-            const phuPhiEco = tinhPhuPhiNgoaiTuyen(giaEco, kgInput, loaiTuyen);
-            const truocThueVATEco = giaEco + phuPhiEco;
-            const phuPhiXangVATEco = Math.round(truocThueVATEco * 0.2);
-            const tongEco = truocThueVATEco + phuPhiXangVATEco;
+            const chiTietEco = tinhGiaTheoBangMoi(bangGiaVinEco, kgInput, vung);
+            const giaGocEco = chiTietEco.giaGoc;
+            // Nhân hệ số 1.32 (nhiên liệu & VAT) trước - BẮT BUỘC cho tất cả dịch vụ
+            const sauNhiLieuVATEco = Math.round(giaGocEco * 1.32);
+            // Nhân hệ số ngoại tuyến sau (nếu ngoại tuyến) - dựa trên TỔNG KG GỐC
+            let heSoNgoaiTuyenEco = 1;
+            if (loaiTuyen === 'ngoai') {
+                if (kgInput <= 100) {
+                    heSoNgoaiTuyenEco = 1.3; // ≤100kg: +30%
+                } else if (kgInput <= 200) {
+                    heSoNgoaiTuyenEco = 1.2; // 101-200kg: +20%
+                } else {
+                    heSoNgoaiTuyenEco = 1.1; // ≥201kg: +10%
+                }
+            }
+            const tongEco = Math.round(sauNhiLieuVATEco * heSoNgoaiTuyenEco);
+            const phuPhiXangVATEco = sauNhiLieuVATEco - giaGocEco;
+            const phuPhiNgoaiTuyenEco = loaiTuyen === 'ngoai' ? tongEco - sauNhiLieuVATEco : 0;
+            
+            const chiTietQuyTrinhEco = {
+                gia10kgDau: chiTietEco.gia10kgDau,
+                wDu: chiTietEco.wDu,
+                donGiaKhung: chiTietEco.donGiaKhung,
+                khungGiaTen: chiTietEco.khungGiaTen || '≤ 10kg',
+                tienPhanDu: chiTietEco.tienPhanDu,
+                giaGoc: giaGocEco,
+                sauNhiLieuVAT: sauNhiLieuVATEco,
+                tongCuoc: tongEco
+            };
             
             danhSachKetQua.push({
                 ten: "VIN-ECO (Tiết Kiệm)",
                 icon: "🚐",
-                giaCoBan: giaEco,
-                phuPhiNgoaiTuyen: phuPhiEco,
+                giaCoBan: giaGocEco,
+                phuPhiNgoaiTuyen: phuPhiNgoaiTuyenEco,
                 phuPhiXangVAT: phuPhiXangVATEco,
                 tongCuoc: tongEco,
                 thoiGian: thoiGianGiaoHang["VIN-ECO"][vung],
-                disabled: false
+                disabled: false,
+                chiTietQuyTrinh: chiTietQuyTrinhEco,
+                loaiDichVu: 'eco'
             });
         } else {
             // Hiển thị card bị vô hiệu hóa
@@ -1410,39 +1598,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // 3. VIN-EXPRESS
-        const giaExpress = tinhGiaTheoBang(bangGiaVinExpress, kgInput, vung);
-        const phuPhiExpress = tinhPhuPhiNgoaiTuyen(giaExpress, kgInput, loaiTuyen);
-        const truocThueVATExpress = giaExpress + phuPhiExpress;
-        const phuPhiXangVATExpress = Math.round(truocThueVATExpress * 0.2);
-        const tongExpress = truocThueVATExpress + phuPhiXangVATExpress;
+        const chiTietExpress = tinhGiaChiTietExpress(kgInput, vung);
+        const giaGocExpress = chiTietExpress.giaCoBan;
+        // Nhân hệ số 1.32 (nhiên liệu & VAT) trước - BẮT BUỘC cho tất cả dịch vụ
+        const sauNhiLieuVATExpress = Math.round(giaGocExpress * 1.32);
+        // Nhân hệ số ngoại tuyến sau (nếu ngoại tuyến) - dựa trên TỔNG KG GỐC
+        let heSoNgoaiTuyenExpress = 1;
+        if (loaiTuyen === 'ngoai') {
+            if (kgInput <= 100) {
+                heSoNgoaiTuyenExpress = 1.3; // ≤100kg: +30%
+            } else if (kgInput <= 200) {
+                heSoNgoaiTuyenExpress = 1.2; // 101-200kg: +20%
+            } else {
+                heSoNgoaiTuyenExpress = 1.1; // ≥201kg: +10%
+            }
+        }
+        const tongExpress = Math.round(sauNhiLieuVATExpress * heSoNgoaiTuyenExpress);
+        const phuPhiXangVATExpress = sauNhiLieuVATExpress - giaGocExpress;
+        const phuPhiNgoaiTuyenExpress = loaiTuyen === 'ngoai' ? tongExpress - sauNhiLieuVATExpress : 0;
+        
+        const chiTietQuyTrinhExpress = {
+            ...chiTietExpress,
+            giaCoBan: giaGocExpress,
+            phuPhiNgoaiTuyen: phuPhiNgoaiTuyenExpress,
+            sauNhiLieuVAT: sauNhiLieuVATExpress,
+            phuPhiXangVAT: phuPhiXangVATExpress,
+            tongCuoc: tongExpress
+        };
         
         danhSachKetQua.push({
             ten: "VIN-EXPRESS (Chuyển Phát Nhanh)",
             icon: "✈️",
-            giaCoBan: giaExpress,
-            phuPhiNgoaiTuyen: phuPhiExpress,
+            giaCoBan: giaGocExpress,
+            phuPhiNgoaiTuyen: phuPhiNgoaiTuyenExpress,
             phuPhiXangVAT: phuPhiXangVATExpress,
             tongCuoc: tongExpress,
             thoiGian: thoiGianGiaoHang["VIN-EXPRESS"][vung],
-            disabled: false
+            disabled: false,
+            chiTietQuyTrinh: chiTietQuyTrinhExpress,
+            loaiDichVu: 'express'
         });
         
         // 4. VIN-HOATOC
-        const giaHoaToc = tinhGiaTheoBang(bangGiaVinHoaToc, kgInput, vung);
-        const phuPhiHoaToc = tinhPhuPhiNgoaiTuyen(giaHoaToc, kgInput, loaiTuyen);
-        const truocThueVATHoaToc = giaHoaToc + phuPhiHoaToc;
-        const phuPhiXangVATHoaToc = Math.round(truocThueVATHoaToc * 0.2);
-        const tongHoaToc = truocThueVATHoaToc + phuPhiXangVATHoaToc;
+        const chiTietHoaToc = tinhGiaChiTietHoaToc(kgInput, vung);
+        const giaGocHoaToc = chiTietHoaToc.giaCoBan;
+        // Nhân hệ số 1.32 (nhiên liệu & VAT) trước - BẮT BUỘC cho tất cả dịch vụ
+        const sauNhiLieuVATHoaToc = Math.round(giaGocHoaToc * 1.32);
+        // Nhân hệ số ngoại tuyến sau (nếu ngoại tuyến) - dựa trên TỔNG KG GỐC
+        let heSoNgoaiTuyenHoaToc = 1;
+        if (loaiTuyen === 'ngoai') {
+            if (kgInput <= 100) {
+                heSoNgoaiTuyenHoaToc = 1.3; // ≤100kg: +30%
+            } else if (kgInput <= 200) {
+                heSoNgoaiTuyenHoaToc = 1.2; // 101-200kg: +20%
+            } else {
+                heSoNgoaiTuyenHoaToc = 1.1; // ≥201kg: +10%
+            }
+        }
+        const tongHoaToc = Math.round(sauNhiLieuVATHoaToc * heSoNgoaiTuyenHoaToc);
+        const phuPhiXangVATHoaToc = sauNhiLieuVATHoaToc - giaGocHoaToc;
+        const phuPhiNgoaiTuyenHoaToc = loaiTuyen === 'ngoai' ? tongHoaToc - sauNhiLieuVATHoaToc : 0;
+        
+        const chiTietQuyTrinhHoaToc = {
+            ...chiTietHoaToc,
+            giaCoBan: giaGocHoaToc,
+            phuPhiNgoaiTuyen: phuPhiNgoaiTuyenHoaToc,
+            sauNhiLieuVAT: sauNhiLieuVATHoaToc,
+            phuPhiXangVAT: phuPhiXangVATHoaToc,
+            tongCuoc: tongHoaToc
+        };
         
         danhSachKetQua.push({
             ten: "VIN-HOATOC (Hỏa Tốc)",
             icon: "🚀",
-            giaCoBan: giaHoaToc,
-            phuPhiNgoaiTuyen: phuPhiHoaToc,
+            giaCoBan: giaGocHoaToc,
+            phuPhiNgoaiTuyen: phuPhiNgoaiTuyenHoaToc,
             phuPhiXangVAT: phuPhiXangVATHoaToc,
             tongCuoc: tongHoaToc,
             thoiGian: thoiGianGiaoHang["VIN-HOATOC"][vung],
-            disabled: false
+            disabled: false,
+            chiTietQuyTrinh: chiTietQuyTrinhHoaToc,
+            loaiDichVu: 'hoatoc'
         });
         
         // Tạo object kết quả đầy đủ
@@ -1453,7 +1689,8 @@ document.addEventListener('DOMContentLoaded', () => {
             vungGoc: vung, // Giữ vùng gốc (index 0-8) để tính toán
             tuyen: loaiTuyen === 'noi' ? 'Nội tuyến' : 'Ngoại tuyến',
             trongLuong: kgInput,
-            danhSachDichVu: danhSachKetQua
+            danhSachDichVu: danhSachKetQua,
+            chiTietQuyTrinh: chiTietQuyTrinh // Thông tin chi tiết quy trình tính toán
         };
         
         // Hiển thị kết quả
@@ -1461,11 +1698,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Lưu vào lịch sử
         luuLichSuCuocPhi(ketQua);
-    };
-    
-    // Format số tiền
-    const formatTien = (soTien) => {
-        return soTien.toLocaleString('vi-VN') + ' đ';
     };
     
     // Hiển thị kết quả
@@ -1495,16 +1727,289 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         
+        // Hàm helper để render quy trình tính toán cho từng dịch vụ
+        const renderQuyTrinhTinhToan = (dichVu, ketQua) => {
+            if (!dichVu.chiTietQuyTrinh || dichVu.disabled) return '';
+            
+            const ct = dichVu.chiTietQuyTrinh;
+            let html = '';
+            
+            if (dichVu.loaiDichVu === 'truck' || dichVu.loaiDichVu === 'eco') {
+                // VIN-TRUCK và VIN-ECO
+                if (ketQua.trongLuong > 10) {
+                    html = `
+                        <div class="process-steps">
+                            <div class="process-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-label">Xác định vùng và tuyến:</div>
+                                    <div class="step-value">${ketQua.huyen}, ${ketQua.tinh} → <strong>${ketQua.vung}</strong> - <strong>${ketQua.tuyen}</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-label">Trừ 10kg đầu tiên:</div>
+                                    <div class="step-value">Tổng trọng lượng: <strong>${ketQua.trongLuong} kg</strong> - 10 kg = <strong>${ct.wDu} kg</strong> (số kg còn lại)</div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-label">Giá 10kg đầu tiên:</div>
+                                    <div class="step-value"><strong>${formatTien(ct.gia10kgDau)}</strong> (theo bảng giá ${ketQua.vung})</div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-label">Xác định khung giá cho ${ct.wDu} kg còn lại:</div>
+                                    <div class="step-value">Khung: <strong>${ct.khungGiaTen}</strong> → Đơn giá: <strong>${formatTien(ct.donGiaKhung)}/kg</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-label">Tính tiền phần dư:</div>
+                                    <div class="step-value">${ct.wDu} kg × ${formatTien(ct.donGiaKhung)} = <strong>${formatTien(ct.tienPhanDu)}</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-label">Tính giá gốc:</div>
+                                    <div class="step-value">${formatTien(ct.gia10kgDau)} + ${formatTien(ct.tienPhanDu)} = <strong>${formatTien(ct.giaGoc)}</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">7</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nhân hệ số nhiên liệu & VAT (× 1.32):</div>
+                                    <div class="step-value">${formatTien(ct.giaGoc)} × 1.32 = <strong>${formatTien(ct.sauNhiLieuVAT)}</strong></div>
+                                </div>
+                            </div>
+                            ${ketQua.tuyen === 'Ngoại tuyến' ? (() => {
+                                // Xác định hệ số ngoại tuyến dựa trên tổng kg gốc
+                                let heSoNgoaiTuyen = 1;
+                                let heSoNgoaiTuyenText = '';
+                                if (ketQua.trongLuong <= 100) {
+                                    heSoNgoaiTuyen = 1.3;
+                                    heSoNgoaiTuyenText = '1.3 (≤100kg: +30%)';
+                                } else if (ketQua.trongLuong <= 200) {
+                                    heSoNgoaiTuyen = 1.2;
+                                    heSoNgoaiTuyenText = '1.2 (101-200kg: +20%)';
+                                } else {
+                                    heSoNgoaiTuyen = 1.1;
+                                    heSoNgoaiTuyenText = '1.1 (≥201kg: +10%)';
+                                }
+                                return `
+                            <div class="process-step">
+                                <div class="step-number">8</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nhân hệ số ngoại tuyến (× ${heSoNgoaiTuyenText}):</div>
+                                    <div class="step-value">Tổng kg gốc: <strong>${ketQua.trongLuong} kg</strong> → ${formatTien(ct.sauNhiLieuVAT)} × ${heSoNgoaiTuyen} = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                                </div>
+                            </div>
+                            `;
+                            })() : `
+                            <div class="process-step">
+                                <div class="step-number">8</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nội tuyến (không nhân hệ số ngoại tuyến):</div>
+                                    <div class="step-value">Tổng cước = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                                </div>
+                            </div>
+                            `}
+                        </div>
+                    `;
+                } else {
+                    html = `
+                        <div class="process-steps">
+                            <div class="process-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-label">Xác định vùng và tuyến:</div>
+                                    <div class="step-value">${ketQua.huyen}, ${ketQua.tinh} → <strong>${ketQua.vung}</strong> - <strong>${ketQua.tuyen}</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-label">Trọng lượng ≤ 10kg:</div>
+                                    <div class="step-value">Áp dụng giá trọn gói 10kg đầu: <strong>${formatTien(ct.gia10kgDau)}</strong></div>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nhân hệ số nhiên liệu & VAT (× 1.32):</div>
+                                    <div class="step-value">${formatTien(ct.gia10kgDau)} × 1.32 = <strong>${formatTien(ct.sauNhiLieuVAT)}</strong></div>
+                                </div>
+                            </div>
+                            ${ketQua.tuyen === 'Ngoại tuyến' ? (() => {
+                                // Xác định hệ số ngoại tuyến dựa trên tổng kg gốc
+                                let heSoNgoaiTuyen = 1;
+                                let heSoNgoaiTuyenText = '';
+                                if (ketQua.trongLuong <= 100) {
+                                    heSoNgoaiTuyen = 1.3;
+                                    heSoNgoaiTuyenText = '1.3 (≤100kg: +30%)';
+                                } else if (ketQua.trongLuong <= 200) {
+                                    heSoNgoaiTuyen = 1.2;
+                                    heSoNgoaiTuyenText = '1.2 (101-200kg: +20%)';
+                                } else {
+                                    heSoNgoaiTuyen = 1.1;
+                                    heSoNgoaiTuyenText = '1.1 (≥201kg: +10%)';
+                                }
+                                return `
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nhân hệ số ngoại tuyến (× ${heSoNgoaiTuyenText}):</div>
+                                    <div class="step-value">Tổng kg gốc: <strong>${ketQua.trongLuong} kg</strong> → ${formatTien(ct.sauNhiLieuVAT)} × ${heSoNgoaiTuyen} = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                                </div>
+                            </div>
+                            `;
+                            })() : `
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-label">Nội tuyến (không nhân hệ số ngoại tuyến):</div>
+                                    <div class="step-value">Tổng cước = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                                </div>
+                            </div>
+                            `}
+                        </div>
+                    `;
+                }
+            } else if (dichVu.loaiDichVu === 'express' || dichVu.loaiDichVu === 'hoatoc') {
+                // VIN-EXPRESS và VIN-HOATOC
+                // Xác định hệ số ngoại tuyến dựa trên tổng kg gốc
+                let heSoNgoaiTuyen = 1;
+                let heSoNgoaiTuyenText = '';
+                if (ketQua.tuyen === 'Ngoại tuyến') {
+                    if (ketQua.trongLuong <= 100) {
+                        heSoNgoaiTuyen = 1.3;
+                        heSoNgoaiTuyenText = '1.3 (≤100kg: +30%)';
+                    } else if (ketQua.trongLuong <= 200) {
+                        heSoNgoaiTuyen = 1.2;
+                        heSoNgoaiTuyenText = '1.2 (101-200kg: +20%)';
+                    } else {
+                        heSoNgoaiTuyen = 1.1;
+                        heSoNgoaiTuyenText = '1.1 (≥201kg: +10%)';
+                    }
+                }
+                
+                html = `
+                    <div class="process-steps">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-label">Xác định vùng và tuyến:</div>
+                                <div class="step-value">${ketQua.huyen}, ${ketQua.tinh} → <strong>${ketQua.vung}</strong> - <strong>${ketQua.tuyen}</strong></div>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-label">Tính giá cơ sở:</div>
+                                <div class="step-value">${ct.buoc1}</div>
+                            </div>
+                        </div>
+                        ${ct.buoc2 ? `
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">Tính phần vượt:</div>
+                                <div class="step-value">${ct.buoc2}</div>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">Tổng giá cơ sở:</div>
+                                <div class="step-value"><strong>${formatTien(ct.giaCoBan)}</strong></div>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Nhân hệ số nhiên liệu & VAT (× 1.32):</div>
+                                <div class="step-value">${formatTien(ct.giaCoBan)} × 1.32 = <strong>${formatTien(ct.sauNhiLieuVAT)}</strong></div>
+                            </div>
+                        </div>
+                        ${ketQua.tuyen === 'Ngoại tuyến' ? `
+                        <div class="process-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <div class="step-label">Nhân hệ số ngoại tuyến (× ${heSoNgoaiTuyenText}):</div>
+                                <div class="step-value">Tổng kg gốc: <strong>${ketQua.trongLuong} kg</strong> → ${formatTien(ct.sauNhiLieuVAT)} × ${heSoNgoaiTuyen} = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                            </div>
+                        </div>
+                        ` : `
+                        <div class="process-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <div class="step-label">Nội tuyến (không nhân hệ số ngoại tuyến):</div>
+                                <div class="step-value">Tổng cước = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                            </div>
+                        </div>
+                        `}
+                        ` : `
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-label">Giá cơ sở:</div>
+                                <div class="step-value"><strong>${formatTien(ct.giaCoBan)}</strong></div>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-label">Nhân hệ số nhiên liệu & VAT (× 1.32):</div>
+                                <div class="step-value">${formatTien(ct.giaCoBan)} × 1.32 = <strong>${formatTien(ct.sauNhiLieuVAT)}</strong></div>
+                            </div>
+                        </div>
+                        ${ketQua.tuyen === 'Ngoại tuyến' ? `
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Nhân hệ số ngoại tuyến (× ${heSoNgoaiTuyenText}):</div>
+                                <div class="step-value">Tổng kg gốc: <strong>${ketQua.trongLuong} kg</strong> → ${formatTien(ct.sauNhiLieuVAT)} × ${heSoNgoaiTuyen} = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                            </div>
+                        </div>
+                        ` : `
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-label">Nội tuyến (không nhân hệ số ngoại tuyến):</div>
+                                <div class="step-value">Tổng cước = <strong>${formatTien(ct.tongCuoc)}</strong></div>
+                            </div>
+                        </div>
+                        `}
+                        `}
+                    </div>
+                `;
+            }
+            
+            return html || '';
+        };
+        
+        // Quy trình sẽ hiển thị khi click vào service card (không hiển thị tự động)
+        
         // Chi tiết từng dịch vụ
         html += '<div class="services-container">';
         
         ketQua.danhSachDichVu.forEach((dichVu, index) => {
             const isDisabled = dichVu.disabled === true;
+            const hasQuyTrinh = !isDisabled && dichVu.chiTietQuyTrinh;
             html += `
-                <div class="service-card ${isDisabled ? 'service-disabled' : ''}" style="animation-delay: ${index * 0.1}s">
+                <div class="service-card ${isDisabled ? 'service-disabled' : ''} ${hasQuyTrinh ? 'service-clickable' : ''}" 
+                     data-service-index="${index}" 
+                     style="animation-delay: ${index * 0.1}s">
                     <div class="service-header">
                         <span class="service-icon">${dichVu.icon}</span>
                         <span class="service-name">${dichVu.ten}</span>
+                        ${hasQuyTrinh ? '<span class="toggle-icon">▼</span>' : ''}
                     </div>
                     <div class="service-body">
                         ${isDisabled ? `
@@ -1539,8 +2044,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="time-icon">⏱️</span>
                             <span class="time-text">Thời gian: ${dichVu.thoiGian}</span>
                         </div>
+                        ${hasQuyTrinh ? `
+                        <div class="process-toggle-hint">
+                            <span class="hint-icon">👆</span>
+                            <span class="hint-text">Nhấp vào đây để xem quy trình tính toán chi tiết</span>
+                        </div>
+                        ` : ''}
                         `}
                     </div>
+                    ${hasQuyTrinh ? `
+                    <div class="calculation-process-detail" style="display: none;">
+                        <div class="process-title">📋 QUY TRÌNH TÍNH TOÁN CHI TIẾT - ${dichVu.ten}</div>
+                        ${renderQuyTrinhTinhToan(dichVu, ketQua)}
+                    </div>
+                    ` : ''}
                 </div>
             `;
         });
@@ -1590,6 +2107,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         shippingResultDiv.innerHTML = html;
         shippingResultDiv.scrollTop = 0;
+        
+        // Thêm event listener cho các service card có thể click
+        const serviceCards = shippingResultDiv.querySelectorAll('.service-clickable');
+        serviceCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Không toggle nếu click vào các phần tử con (button, input, etc.)
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+                
+                const detailDiv = this.querySelector('.calculation-process-detail');
+                const toggleIcon = this.querySelector('.toggle-icon');
+                
+                if (detailDiv) {
+                    const isHidden = detailDiv.style.display === 'none';
+                    detailDiv.style.display = isHidden ? 'block' : 'none';
+                    if (toggleIcon) {
+                        toggleIcon.textContent = isHidden ? '▲' : '▼';
+                    }
+                    this.classList.toggle('process-expanded', isHidden);
+                }
+            });
+        });
     };
     
     // Lưu vào lịch sử
@@ -1636,6 +2174,103 @@ document.addEventListener('DOMContentLoaded', () => {
         if (shippingWeightInput) {
             shippingWeightInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') tinhToanCuocPhi();
+            });
+        }
+        
+        // Xử lý scroll để ẩn/hiện form
+        const shippingForm = $('.shipping-form');
+        const shippingCalculatorTab = $('#shipping-calculator');
+        const shippingResultDiv = $('#shipping-result');
+        
+        if (shippingForm && shippingCalculatorTab && shippingResultDiv) {
+            let lastScrollTop = 0;
+            const scrollThresholdHide = 100; // Ngưỡng scroll để ẩn form (px)
+            const scrollThresholdShow = 30; // Ngưỡng scroll để hiện form (px) - nhỏ hơn để tránh flickering
+            let isHidden = false;
+            let scrollTimeout = null;
+            let rafId = null;
+            
+            const handleShippingScroll = () => {
+                // Chỉ xử lý khi tab shipping-calculator đang active
+                if (!shippingCalculatorTab.classList.contains('active')) {
+                    return;
+                }
+                
+                // Hủy requestAnimationFrame trước đó nếu có
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                }
+                
+                // Sử dụng requestAnimationFrame để tối ưu performance
+                rafId = requestAnimationFrame(() => {
+                    // Lấy scroll position từ container hoặc window
+                    let currentScrollTop = 0;
+                    const tabScrollTop = shippingCalculatorTab.scrollTop;
+                    const resultScrollTop = shippingResultDiv.scrollTop;
+                    const windowScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Ưu tiên scroll của result div, sau đó là tab, cuối cùng là window
+                    if (resultScrollTop > 0) {
+                        currentScrollTop = resultScrollTop;
+                    } else if (tabScrollTop > 0) {
+                        currentScrollTop = tabScrollTop;
+                    } else {
+                        currentScrollTop = windowScrollTop;
+                    }
+                    
+                    // Kiểm tra nếu có kết quả (không phải message mặc định)
+                    const hasResults = shippingResultDiv.querySelector('.result-header') !== null;
+                    
+                    if (!hasResults) {
+                        // Nếu chưa có kết quả, luôn hiện form
+                        if (isHidden) {
+                            shippingForm.classList.remove('hidden-on-scroll');
+                            isHidden = false;
+                        }
+                        lastScrollTop = currentScrollTop;
+                        return;
+                    }
+                    
+                    // Tính toán hướng scroll
+                    const scrollDelta = currentScrollTop - lastScrollTop;
+                    
+                    // Chỉ xử lý nếu scroll đủ lớn (tránh giật khi scroll nhỏ)
+                    if (Math.abs(scrollDelta) > 3) {
+                        if (scrollDelta > 0) {
+                            // Cuộn xuống
+                            if (currentScrollTop > scrollThresholdHide && !isHidden) {
+                                shippingForm.classList.add('hidden-on-scroll');
+                                isHidden = true;
+                            }
+                        } else {
+                            // Cuộn lên
+                            if (currentScrollTop <= scrollThresholdShow && isHidden) {
+                                shippingForm.classList.remove('hidden-on-scroll');
+                                isHidden = false;
+                            }
+                        }
+                        
+                        lastScrollTop = currentScrollTop;
+                    }
+                });
+            };
+            
+            // Lắng nghe scroll trên shipping-result (kết quả) - chỉ một listener
+            shippingResultDiv.addEventListener('scroll', handleShippingScroll, { passive: true });
+            
+            // Hiện lại form khi tab được kích hoạt
+            const observer = new MutationObserver(() => {
+                if (shippingCalculatorTab.classList.contains('active')) {
+                    // Reset scroll state khi tab được kích hoạt
+                    shippingForm.classList.remove('hidden-on-scroll');
+                    isHidden = false;
+                    lastScrollTop = 0;
+                }
+            });
+            
+            observer.observe(shippingCalculatorTab, {
+                attributes: true,
+                attributeFilter: ['class']
             });
         }
     };

@@ -1102,41 +1102,60 @@ button:active {
 /* Form nhập liệu */
 .shipping-form {
     background: var(--surface);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    padding: 8px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
+    position: sticky;
+    top: var(--spacing-sm);
+    z-index: 10;
+    margin-bottom: var(--spacing-sm);
+    max-width: 100%;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out, margin 0.3s ease-out, opacity 0.3s ease-out, border 0.3s ease-out;
+    max-height: 500px;
+    overflow: hidden;
+}
+
+/* Ẩn form khi scroll xuống */
+.shipping-form.hidden-on-scroll {
+    max-height: 0;
+    padding: 0;
+    margin-bottom: 0;
+    opacity: 0;
+    border: none;
+    pointer-events: none;
+    box-shadow: none;
 }
 
 .form-header {
-    font-size: var(--font-size-large);
+    font-size: 13px;
     font-weight: 700;
     color: var(--primary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 6px;
     text-align: center;
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--border);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
 }
 
 .form-group {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 6px;
 }
 
 .form-group label {
     display: block;
     font-weight: 600;
     color: var(--on-surface);
-    margin-bottom: var(--spacing-xs);
-    font-size: var(--font-size-small);
+    margin-bottom: 3px;
+    font-size: 12px;
 }
 
 .form-group select,
 .form-group input[type="number"] {
     width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--border);
+    padding: 6px 10px;
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-base);
+    font-size: 13px;
     font-family: var(--font-family);
     background: var(--surface);
     color: var(--on-surface);
@@ -1147,7 +1166,7 @@ button:active {
 .form-group input[type="number"]:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
 }
 
 .form-group select:disabled {
@@ -1158,16 +1177,16 @@ button:active {
 
 .form-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-lg);
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .form-actions button {
     flex: 1;
-    padding: 14px 24px;
+    padding: 8px 12px;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-base);
+    font-size: 12px;
     font-weight: 600;
     font-family: var(--font-family);
     cursor: pointer;
@@ -1251,6 +1270,87 @@ button:active {
     font-weight: 600;
 }
 
+/* Quy trình tính toán chi tiết */
+.calculation-process {
+    background: linear-gradient(135deg, var(--surface-variant) 0%, var(--surface) 100%);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.process-title {
+    font-size: var(--font-size-large);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border);
+}
+
+.process-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.process-step {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+    background: var(--surface);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--primary);
+    transition: all var(--transition-base);
+}
+
+.process-step:hover {
+    background: var(--surface-variant);
+    transform: translateX(4px);
+}
+
+.step-number {
+    min-width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.step-label {
+    font-size: var(--font-size-small);
+    color: var(--on-surface-variant);
+    font-weight: 500;
+}
+
+.step-value {
+    font-size: var(--font-size-base);
+    color: var(--on-surface);
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.step-value strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
 /* Cards dịch vụ */
 .services-container {
     display: grid;
@@ -1296,6 +1396,76 @@ button:active {
     transform: none;
     box-shadow: none;
     border-color: var(--border);
+}
+
+.service-card.service-clickable {
+    cursor: pointer;
+    position: relative;
+}
+
+.service-card.service-clickable:hover {
+    border-color: var(--primary);
+}
+
+.service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.toggle-icon {
+    font-size: var(--font-size-small);
+    color: var(--primary);
+    transition: transform var(--transition-base);
+    user-select: none;
+}
+
+.service-card.process-expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.process-toggle-hint {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--surface-variant);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: var(--font-size-small);
+    color: var(--on-surface-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    border: 1px dashed var(--border);
+}
+
+.hint-icon {
+    font-size: var(--font-size-base);
+}
+
+.hint-text {
+    font-weight: 500;
+}
+
+.calculation-process-detail {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 2px solid var(--border);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 2000px;
+        transform: translateY(0);
+    }
 }
 
 .service-header {
@@ -1513,26 +1683,53 @@ button:active {
         padding: 0;
     }
     
-    .shipping-form,
+    .shipping-form {
+        padding: 6px;
+        border-radius: var(--radius-sm);
+        top: 4px;
+    }
+    
     .shipping-result {
         padding: var(--spacing-sm);
         border-radius: var(--radius-sm);
     }
     
-    .form-header,
-    .result-title,
-    .comparison-title {
-        font-size: var(--font-size-base);
+    .form-header {
+        font-size: 12px;
+        margin-bottom: 5px;
+        padding-bottom: 3px;
+    }
+    
+    .form-group {
+        margin-bottom: 5px;
+    }
+    
+    .form-group label {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+    
+    .form-group select,
+    .form-group input[type="number"] {
+        padding: 6px 8px;
+        font-size: 12px;
     }
     
     .form-actions {
         flex-direction: column;
-        gap: var(--spacing-xs);
+        gap: 5px;
+        margin-top: 6px;
     }
     
     .form-actions button {
         width: 100%;
-        padding: 12px 20px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .result-title,
+    .comparison-title {
+        font-size: var(--font-size-base);
     }
     
     .services-container {

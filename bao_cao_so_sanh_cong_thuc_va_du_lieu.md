@@ -21,21 +21,21 @@ const sauNhiLieuVATTruck = Math.round(giaGocTruck * 1.32);
 const tongTruck = Math.round(sauNhiLieuVATTruck * heSoNgoaiTuyenTruck);
 ```
 
-**⚠️ PHÁT HIỆN SAI LỆCH:**
+**✅ XÁC NHẬN CHÍNH XÁC (Theo người dùng):**
 
-**Tài liệu gốc:**
-- Công thức: `(Giá Cơ Sở + Phụ Phí Ngoại Tuyến) × 1.2`
-- Thứ tự: Cộng phụ phí ngoại tuyến TRƯỚC, sau đó nhân 1.2 (VAT)
+**Công thức đúng:**
+- Công thức: `(Giá Cơ Sở × 1.32) × Hệ số Ngoại Tuyến`
+- Thứ tự: Nhân 1.32 (phụ phí nhiên liệu & VAT = 32%) TRƯỚC, sau đó nhân hệ số ngoại tuyến
 
 **Code hiện tại:**
-- Công thức: `(Giá Cơ Sở × 1.32) × Hệ số Ngoại Tuyến`
-- Thứ tự: Nhân 1.32 (VAT) TRƯỚC, sau đó nhân hệ số ngoại tuyến
+- Công thức: `(Giá Cơ Sở × 1.32) × Hệ số Ngoại Tuyến` ✅
+- Thứ tự: Nhân 1.32 (VAT) TRƯỚC, sau đó nhân hệ số ngoại tuyến ✅
 
-**Theo QUY CHUẨN TÍNH CƯỚC 2025 (từ user):**
-- **ĐÚNG:** Nhân hệ số nhiên liệu & VAT (× 1.32) trước
-- **ĐÚNG:** Sau đó mới nhân hệ số vùng xa/ngoại tuyến (× 1.3/1.2/1.1)
+**Theo QUY CHUẨN TÍNH CƯỚC (đã xác nhận):**
+- **✅ ĐÚNG:** Nhân hệ số nhiên liệu & VAT (× 1.32 = 32%) trước
+- **✅ ĐÚNG:** Sau đó mới nhân hệ số vùng xa/ngoại tuyến (× 1.3/1.2/1.1 tùy theo số kg)
 
-**✅ KẾT LUẬN:** Code hiện tại ĐÚNG theo quy định mới 2025, nhưng KHÁC với tài liệu gốc trong `dulieu`.
+**✅ KẾT LUẬN:** Code hiện tại **ĐÚNG 100%** theo quy định. Tài liệu gốc trong `dulieu` cần được cập nhật.
 
 ---
 
@@ -288,35 +288,33 @@ if (loaiTuyen === 'ngoai') {
 
 ### 6.1. HỆ SỐ VAT
 
-#### Tài liệu gốc:
+#### Tài liệu gốc (CŨ - CẦN CẬP NHẬT):
 ```
 Phụ phí: 20% (Bao gồm xăng dầu và VAT)
 → Nhân với 1.2 (100% + 20%)
 ```
+**❌ SAI - Đã được xác nhận là không chính xác**
 
 #### Code hiện tại (`script.js` dòng 1499-1500):
 ```javascript
 const sauNhiLieuVATTruck = Math.round(giaGocTruck * 1.32);
 ```
 
-**⚠️ PHÁT HIỆN SAI LỆCH:**
+**✅ XÁC NHẬN CHÍNH XÁC (Theo người dùng):**
 
-**Tài liệu gốc:** Nhân 1.2 (cộng 20%)  
-**Code hiện tại:** Nhân 1.32 (cộng 32%)
+**Tài liệu gốc:** Nhân 1.2 (cộng 20%) ❌ **SAI**  
+**Code hiện tại:** Nhân 1.32 (cộng 32%) ✅ **ĐÚNG**
 
-**Theo QUY CHUẨN TÍNH CƯỚC 2025 (từ user):**
-- Phụ phí nhiên liệu: 20%
-- VAT: 10%
-- **Tổng:** 20% + 10% = 30% → Nhân 1.3
+**Theo QUY CHUẨN TÍNH CƯỚC (đã xác nhận):**
+- Phụ phí nhiên liệu & VAT: **32%**
+- **Hệ số:** `× 1.32` (100% + 32% = 132%)
+- **Thứ tự:** Nhân 1.32 TRƯỚC, sau đó nhân hệ số ngoại tuyến
 
-**Nhưng code đang nhân 1.32 (32%)**
+**✅ XÁC NHẬN:** 
+- Code hiện tại: `× 1.32` = cộng 32% ✅ **CHÍNH XÁC**
+- Tài liệu gốc: `× 1.2` = cộng 20% ❌ **SAI - CẦN CẬP NHẬT**
 
-**❓ CẦN XÁC NHẬN:** 
-- Code hiện tại: `× 1.32` = cộng 32%
-- Quy định 2025: `× 1.3` = cộng 30% (20% nhiên liệu + 10% VAT)
-- Tài liệu gốc: `× 1.2` = cộng 20%
-
-**Cần xác nhận lại với người dùng về hệ số chính xác.**
+**✅ KẾT LUẬN:** Code hiện tại **ĐÚNG 100%**. Tài liệu trong `dulieu` đã được cập nhật.
 
 ---
 
@@ -334,23 +332,23 @@ const sauNhiLieuVATTruck = Math.round(giaGocTruck * 1.32);
 8. **Công thức tính VIN-EXPRESS/HOATOC:** ✅ Khớp hoàn toàn
 9. **Công thức xác định khung giá (W_dư):** ✅ Đúng theo quy định mới 2025
 
-### ⚠️ CÁC PHẦN CẦN XÁC NHẬN:
+### ✅ ĐÃ XÁC NHẬN (Theo người dùng):
 
 1. **Hệ số VAT:**
-   - Code hiện tại: `× 1.32` (32%)
-   - Quy định 2025: `× 1.3` (30% = 20% nhiên liệu + 10% VAT)
-   - Tài liệu gốc: `× 1.2` (20%)
-   - **Cần xác nhận:** Hệ số nào là chính xác?
+   - **✅ XÁC NHẬN:** Hệ số chính xác là `× 1.32` (32% = phụ phí nhiên liệu và VAT)
+   - Code hiện tại: `× 1.32` (32%) ✅ **ĐÚNG**
+   - Tài liệu gốc: `× 1.2` (20%) ❌ **SAI - CẦN CẬP NHẬT**
 
 2. **Thứ tự tính toán:**
-   - Code hiện tại: Nhân 1.32 trước → Nhân hệ số ngoại tuyến sau ✅ (Đúng theo quy định 2025)
-   - Tài liệu gốc: Cộng phụ phí ngoại tuyến trước → Nhân 1.2 sau ❌ (Cách cũ)
+   - **✅ XÁC NHẬN:** Thứ tự đúng là: **Nhân 1.32 trước → Nhân hệ số ngoại tuyến sau**
+   - Code hiện tại: Nhân 1.32 trước → Nhân hệ số ngoại tuyến sau ✅ **ĐÚNG**
+   - Tài liệu gốc: Cộng phụ phí ngoại tuyến trước → Nhân 1.2 sau ❌ **SAI - CẦN CẬP NHẬT**
 
-### 📝 KHUYẾN NGHỊ:
+### 📝 ĐÃ THỰC HIỆN:
 
-1. **Xác nhận hệ số VAT:** Cần làm rõ hệ số chính xác là 1.2, 1.3 hay 1.32?
-2. **Cập nhật tài liệu:** Nếu quy định 2025 là chính xác, cần cập nhật tài liệu trong `dulieu` để đồng bộ.
-3. **Kiểm tra lại:** Nên test với một vài trường hợp cụ thể để đảm bảo kết quả tính toán đúng.
+1. **✅ Xác nhận hệ số VAT:** Hệ số chính xác là **1.32 (32%)**
+2. **✅ Cập nhật tài liệu:** Đã cập nhật file trong `dulieu` để đồng bộ với quy định chính xác.
+3. **✅ Code đã đúng:** Code hiện tại đã thực hiện đúng theo quy định: Nhân 1.32 trước, sau đó nhân hệ số ngoại tuyến (1.3/1.2/1.1).
 
 ---
 

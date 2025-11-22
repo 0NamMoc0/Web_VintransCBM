@@ -1290,22 +1290,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wDu <= 40) { // 0 < W_dư ≤ 40 → khung "Trên 10 - 50 kg" (11-50kg)
             donGiaKhung = bangGia[50][vung];
             khungGiaTen = 'Trên 10 - 50 kg (11-50kg)';
-        } else if (wDu <= 90) { // 40 < W_dư ≤ 90 → khung "Trên 50 - 100 kg" (51-100kg)
+        } else if (wDu <= 100) { // 40 < W_dư ≤ 100 → khung "Trên 50 - 100 kg" (51-100kg)
             donGiaKhung = bangGia[100][vung];
             khungGiaTen = 'Trên 50 - 100 kg (51-100kg)';
-        } else if (wDu <= 290) { // 90 < W_dư ≤ 290 → khung "Trên 100 - 300 kg" (101-300kg)
+        } else if (wDu <= 300) { // 100 < W_dư ≤ 300 → khung "Trên 100 - 300 kg" (101-300kg)
             donGiaKhung = bangGia[300][vung];
             khungGiaTen = 'Trên 100 - 300 kg (101-300kg)';
-        } else if (wDu <= 490) { // 290 < W_dư ≤ 490 → khung "Trên 300 - 500 kg" (301-500kg)
+        } else if (wDu <= 500) { // 300 < W_dư ≤ 500 → khung "Trên 300 - 500 kg" (301-500kg)
             donGiaKhung = bangGia[500][vung];
             khungGiaTen = 'Trên 300 - 500 kg (301-500kg)';
-        } else if (wDu <= 990) { // 490 < W_dư ≤ 990 → khung "Trên 500 - 1000 kg" (501-1000kg)
+        } else if (wDu <= 1000) { // 500 < W_dư ≤ 1000 → khung "Trên 500 - 1000 kg" (501-1000kg)
             donGiaKhung = bangGia[1000][vung];
             khungGiaTen = 'Trên 500 - 1000 kg (501-1000kg)';
-        } else if (wDu <= 1990) { // 990 < W_dư ≤ 1990 → khung "Trên 1000 - 2000 kg" (1001-2000kg)
+        } else if (wDu <= 2000) { // 1000 < W_dư ≤ 2000 → khung "Trên 1000 - 2000 kg" (1001-2000kg)
             donGiaKhung = bangGia[2000][vung];
             khungGiaTen = 'Trên 1000 - 2000 kg (1001-2000kg)';
-        } else { // W_dư > 1990 → khung "Trên 2000 kg" (2001kg trở lên)
+        } else { // W_dư > 2000 → khung "Trên 2000 kg" (2001kg trở lên)
             donGiaKhung = bangGia.max[vung];
             khungGiaTen = 'Trên 2000 kg (2001kg+)';
         }

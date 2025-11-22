@@ -21,71 +21,71 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalPages = 1;
 
     // --- SHIPPING CALCULATOR DATA ---
-    // Bảng phân vùng: 36 tỉnh thành
+    // Bảng phân vùng: 36 tỉnh thành (dùng index 0-8 cho array giá cước)
     const duLieuTinh = {
-        "TP.HCM": { vung: 0, ten: "TP. Hồ Chí Minh" },
-        "Bình Dương": { vung: 1, ten: "Bình Dương" },
-        "Đồng Nai": { vung: 1, ten: "Đồng Nai" },
-        "Long An": { vung: 1, ten: "Long An" },
-        "Bà Rịa - Vũng Tàu": { vung: 2, ten: "Bà Rịa - Vũng Tàu" },
-        "Bình Phước": { vung: 2, ten: "Bình Phước" },
-        "Tây Ninh": { vung: 2, ten: "Tây Ninh" },
-        "Bình Thuận": { vung: 2, ten: "Bình Thuận" },
-        "Tiền Giang": { vung: 2, ten: "Tiền Giang" },
-        "Bến Tre": { vung: 2, ten: "Bến Tre" },
-        "Vĩnh Long": { vung: 2, ten: "Vĩnh Long" },
-        "Cần Thơ": { vung: 2, ten: "Cần Thơ" },
-        "Đồng Tháp": { vung: 2, ten: "Đồng Tháp" },
-        "Trà Vinh": { vung: 2, ten: "Trà Vinh" },
-        "An Giang": { vung: 3, ten: "An Giang" },
-        "Kiên Giang": { vung: 3, ten: "Kiên Giang" },
-        "Hậu Giang": { vung: 3, ten: "Hậu Giang" },
-        "Cà Mau": { vung: 3, ten: "Cà Mau" },
-        "Sóc Trăng": { vung: 3, ten: "Sóc Trăng" },
-        "Bạc Liêu": { vung: 3, ten: "Bạc Liêu" },
-        "Ninh Thuận": { vung: 3, ten: "Ninh Thuận" },
-        "Khánh Hòa": { vung: 4, ten: "Khánh Hòa" },
-        "Bình Định": { vung: 4, ten: "Bình Định" },
-        "Phú Yên": { vung: 4, ten: "Phú Yên" },
-        "Lâm Đồng": { vung: 4, ten: "Lâm Đồng" },
-        "Đắk Nông": { vung: 4, ten: "Đắk Nông" },
-        "Đắk Lắk": { vung: 4, ten: "Đắk Lắk" },
-        "Kon Tum": { vung: 5, ten: "Kon Tum" },
-        "Gia Lai": { vung: 5, ten: "Gia Lai" },
-        "Huế": { vung: 5, ten: "Huế" },
-        "Quảng Ngãi": { vung: 5, ten: "Quảng Ngãi" },
-        "Đà Nẵng": { vung: 5, ten: "Đà Nẵng" },
-        "Quảng Nam": { vung: 5, ten: "Quảng Nam" },
-        "Nghệ An": { vung: 6, ten: "Nghệ An" },
-        "Hà Tĩnh": { vung: 6, ten: "Hà Tĩnh" },
-        "Quảng Bình": { vung: 6, ten: "Quảng Bình" },
-        "Quảng Trị": { vung: 6, ten: "Quảng Trị" },
-        "Hà Nội": { vung: 7, ten: "Hà Nội" },
-        "Bắc Ninh": { vung: 7, ten: "Bắc Ninh" },
-        "Vĩnh Phúc": { vung: 7, ten: "Vĩnh Phúc" },
-        "Thái Bình": { vung: 7, ten: "Thái Bình" },
-        "Hưng Yên": { vung: 7, ten: "Hưng Yên" },
-        "Ninh Bình": { vung: 7, ten: "Ninh Bình" },
-        "Hải Phòng": { vung: 7, ten: "Hải Phòng" },
-        "Hải Dương": { vung: 7, ten: "Hải Dương" },
-        "Hòa Bình": { vung: 7, ten: "Hòa Bình" },
-        "Nam Định": { vung: 7, ten: "Nam Định" },
-        "Thái Nguyên": { vung: 7, ten: "Thái Nguyên" },
-        "Bắc Giang": { vung: 7, ten: "Bắc Giang" },
-        "Hà Nam": { vung: 7, ten: "Hà Nam" },
-        "Thanh Hóa": { vung: 7, ten: "Thanh Hóa" },
-        "Quảng Ninh": { vung: 8, ten: "Quảng Ninh" },
-        "Bắc Kạn": { vung: 8, ten: "Bắc Kạn" },
-        "Lạng Sơn": { vung: 8, ten: "Lạng Sơn" },
-        "Cao Bằng": { vung: 8, ten: "Cao Bằng" },
-        "Điện Biên": { vung: 8, ten: "Điện Biên" },
-        "Sơn La": { vung: 8, ten: "Sơn La" },
-        "Yên Bái": { vung: 8, ten: "Yên Bái" },
-        "Lai Châu": { vung: 8, ten: "Lai Châu" },
-        "Tuyên Quang": { vung: 8, ten: "Tuyên Quang" },
-        "Hà Giang": { vung: 8, ten: "Hà Giang" },
-        "Lào Cai": { vung: 8, ten: "Lào Cai" },
-        "Phú Thọ": { vung: 8, ten: "Phú Thọ" }
+        "TP.HCM": { vung: 0, vungHienThi: "Nội Tỉnh", ten: "TP. Hồ Chí Minh" },
+        "Bình Dương": { vung: 1, vungHienThi: "Vùng 1", ten: "Bình Dương" },
+        "Đồng Nai": { vung: 1, vungHienThi: "Vùng 1", ten: "Đồng Nai" },
+        "Long An": { vung: 1, vungHienThi: "Vùng 1", ten: "Long An" },
+        "Bà Rịa - Vũng Tàu": { vung: 2, vungHienThi: "Vùng 2", ten: "Bà Rịa - Vũng Tàu" },
+        "Bình Phước": { vung: 2, vungHienThi: "Vùng 2", ten: "Bình Phước" },
+        "Tây Ninh": { vung: 2, vungHienThi: "Vùng 2", ten: "Tây Ninh" },
+        "Bình Thuận": { vung: 2, vungHienThi: "Vùng 2", ten: "Bình Thuận" },
+        "Tiền Giang": { vung: 2, vungHienThi: "Vùng 2", ten: "Tiền Giang" },
+        "Bến Tre": { vung: 2, vungHienThi: "Vùng 2", ten: "Bến Tre" },
+        "Vĩnh Long": { vung: 2, vungHienThi: "Vùng 2", ten: "Vĩnh Long" },
+        "Cần Thơ": { vung: 2, vungHienThi: "Vùng 2", ten: "Cần Thơ" },
+        "Đồng Tháp": { vung: 2, vungHienThi: "Vùng 2", ten: "Đồng Tháp" },
+        "Trà Vinh": { vung: 2, vungHienThi: "Vùng 2", ten: "Trà Vinh" },
+        "An Giang": { vung: 3, vungHienThi: "Vùng 3", ten: "An Giang" },
+        "Kiên Giang": { vung: 3, vungHienThi: "Vùng 3", ten: "Kiên Giang" },
+        "Hậu Giang": { vung: 3, vungHienThi: "Vùng 3", ten: "Hậu Giang" },
+        "Cà Mau": { vung: 3, vungHienThi: "Vùng 3", ten: "Cà Mau" },
+        "Sóc Trăng": { vung: 3, vungHienThi: "Vùng 3", ten: "Sóc Trăng" },
+        "Bạc Liêu": { vung: 3, vungHienThi: "Vùng 3", ten: "Bạc Liêu" },
+        "Ninh Thuận": { vung: 3, vungHienThi: "Vùng 3", ten: "Ninh Thuận" },
+        "Khánh Hòa": { vung: 4, vungHienThi: "Vùng 4", ten: "Khánh Hòa" },
+        "Bình Định": { vung: 4, vungHienThi: "Vùng 4", ten: "Bình Định" },
+        "Phú Yên": { vung: 4, vungHienThi: "Vùng 4", ten: "Phú Yên" },
+        "Lâm Đồng": { vung: 4, vungHienThi: "Vùng 4", ten: "Lâm Đồng" },
+        "Đắk Nông": { vung: 4, vungHienThi: "Vùng 4", ten: "Đắk Nông" },
+        "Đắk Lắk": { vung: 4, vungHienThi: "Vùng 4", ten: "Đắk Lắk" },
+        "Kon Tum": { vung: 5, vungHienThi: "Vùng 5", ten: "Kon Tum" },
+        "Gia Lai": { vung: 5, vungHienThi: "Vùng 5", ten: "Gia Lai" },
+        "Huế": { vung: 5, vungHienThi: "Vùng 5", ten: "Huế" },
+        "Quảng Ngãi": { vung: 5, vungHienThi: "Vùng 5", ten: "Quảng Ngãi" },
+        "Đà Nẵng": { vung: 5, vungHienThi: "Vùng 5", ten: "Đà Nẵng" },
+        "Quảng Nam": { vung: 5, vungHienThi: "Vùng 5", ten: "Quảng Nam" },
+        "Nghệ An": { vung: 6, vungHienThi: "Vùng 6", ten: "Nghệ An" },
+        "Hà Tĩnh": { vung: 6, vungHienThi: "Vùng 6", ten: "Hà Tĩnh" },
+        "Quảng Bình": { vung: 6, vungHienThi: "Vùng 6", ten: "Quảng Bình" },
+        "Quảng Trị": { vung: 6, vungHienThi: "Vùng 6", ten: "Quảng Trị" },
+        "Hà Nội": { vung: 7, vungHienThi: "Vùng 7", ten: "Hà Nội" },
+        "Bắc Ninh": { vung: 7, vungHienThi: "Vùng 7", ten: "Bắc Ninh" },
+        "Vĩnh Phúc": { vung: 7, vungHienThi: "Vùng 7", ten: "Vĩnh Phúc" },
+        "Thái Bình": { vung: 7, vungHienThi: "Vùng 7", ten: "Thái Bình" },
+        "Hưng Yên": { vung: 7, vungHienThi: "Vùng 7", ten: "Hưng Yên" },
+        "Ninh Bình": { vung: 7, vungHienThi: "Vùng 7", ten: "Ninh Bình" },
+        "Hải Phòng": { vung: 7, vungHienThi: "Vùng 7", ten: "Hải Phòng" },
+        "Hải Dương": { vung: 7, vungHienThi: "Vùng 7", ten: "Hải Dương" },
+        "Hòa Bình": { vung: 7, vungHienThi: "Vùng 7", ten: "Hòa Bình" },
+        "Nam Định": { vung: 7, vungHienThi: "Vùng 7", ten: "Nam Định" },
+        "Thái Nguyên": { vung: 7, vungHienThi: "Vùng 7", ten: "Thái Nguyên" },
+        "Bắc Giang": { vung: 7, vungHienThi: "Vùng 7", ten: "Bắc Giang" },
+        "Hà Nam": { vung: 7, vungHienThi: "Vùng 7", ten: "Hà Nam" },
+        "Thanh Hóa": { vung: 7, vungHienThi: "Vùng 7", ten: "Thanh Hóa" },
+        "Quảng Ninh": { vung: 8, vungHienThi: "Vùng 8", ten: "Quảng Ninh" },
+        "Bắc Kạn": { vung: 8, vungHienThi: "Vùng 8", ten: "Bắc Kạn" },
+        "Lạng Sơn": { vung: 8, vungHienThi: "Vùng 8", ten: "Lạng Sơn" },
+        "Cao Bằng": { vung: 8, vungHienThi: "Vùng 8", ten: "Cao Bằng" },
+        "Điện Biên": { vung: 8, vungHienThi: "Vùng 8", ten: "Điện Biên" },
+        "Sơn La": { vung: 8, vungHienThi: "Vùng 8", ten: "Sơn La" },
+        "Yên Bái": { vung: 8, vungHienThi: "Vùng 8", ten: "Yên Bái" },
+        "Lai Châu": { vung: 8, vungHienThi: "Vùng 8", ten: "Lai Châu" },
+        "Tuyên Quang": { vung: 8, vungHienThi: "Vùng 8", ten: "Tuyên Quang" },
+        "Hà Giang": { vung: 8, vungHienThi: "Vùng 8", ten: "Hà Giang" },
+        "Lào Cai": { vung: 8, vungHienThi: "Vùng 8", ten: "Lào Cai" },
+        "Phú Thọ": { vung: 8, vungHienThi: "Vùng 8", ten: "Phú Thọ" }
     };
 
     // Danh sách huyện theo tỉnh (noi = nội tuyến, ngoai = ngoại tuyến)
@@ -876,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { tinh, huyen, vung, tuyen, trongLuong, danhSachDichVu } = data;
             
             let result = `💰 [${timestamp}] Tính cước phí:\n`;
-            result += `📍 ${huyen}, ${tinh} (Vùng ${vung} - ${tuyen})\n`;
+            result += `📍 ${huyen}, ${tinh} (${vung} - ${tuyen})\n`;
             result += `⚖️ Trọng lượng: ${trongLuong} kg\n`;
             result += `\n📊 Bảng giá:\n`;
             
@@ -1449,8 +1449,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const ketQua = {
             tinh: duLieuTinh[tinhDaChon].ten,
             huyen: huyen.ten,
-            vung: vung + 1, // Hiển thị từ 1-8 thay vì 0-7
-            vungGoc: vung, // Giữ vùng gốc để tính toán
+            vung: duLieuTinh[tinhDaChon].vungHienThi, // Hiển thị vùng đúng (Nội Tỉnh, Vùng 1-8)
+            vungGoc: vung, // Giữ vùng gốc (index 0-8) để tính toán
             tuyen: loaiTuyen === 'noi' ? 'Nội tuyến' : 'Ngoại tuyến',
             trongLuong: kgInput,
             danhSachDichVu: danhSachKetQua
@@ -1485,7 +1485,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="info-item">
                         <span class="info-label">🗺️ Vùng:</span>
-                        <span class="info-value">Vùng ${ketQua.vung} - ${ketQua.tuyen}</span>
+                        <span class="info-value">${ketQua.vung} - ${ketQua.tuyen}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">⚖️ Trọng lượng:</span>

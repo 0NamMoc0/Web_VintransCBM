@@ -3,12 +3,13 @@
    ======================== */
 
 .settings-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: var(--spacing-lg);
+    max-width: 100%;
+    margin: 0;
+    padding: var(--spacing-md);
     background: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
 .settings-header {
@@ -16,30 +17,30 @@
     font-weight: 700;
     color: var(--on-surface);
     text-align: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--border);
 }
 
 .settings-section {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
 }
 
 .section-title {
     font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--on-surface);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
 }
 
 .setting-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-sm) 0;
     border-bottom: 1px solid var(--border);
 }
 
@@ -211,8 +212,8 @@ input:checked + .slider:before {
 
 /* Settings Actions */
 .settings-actions {
-    margin-top: var(--spacing-xl);
-    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
     border-top: 2px solid var(--border);
     display: flex;
     justify-content: center;
@@ -246,9 +247,9 @@ input:checked + .slider:before {
 /* Desktop Layout */
 @media (min-width: 769px) {
     .settings-container {
-        margin: var(--spacing-lg) auto;
-        max-width: 700px;
-        padding: var(--spacing-xl);
+        margin: 0;
+        max-width: 100%;
+        padding: var(--spacing-md);
     }
     
     .settings-header {
@@ -290,8 +291,8 @@ input:checked + .slider:before {
 /* Responsive Design */
 @media (max-width: 768px) {
     .settings-container {
-        margin: var(--spacing-md);
-        padding: var(--spacing-md);
+        margin: 0;
+        padding: var(--spacing-sm);
     }
     
     .setting-item {

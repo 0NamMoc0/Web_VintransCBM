@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VinTransCBM - Web</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style-new.css">
     <link rel="stylesheet" href="settings.css">
 </head>
@@ -20,8 +18,8 @@
         
         <!-- Theme Toggle Button -->
         <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi giao diện">
-            <span class="theme-icon sun-icon">☀️</span>
-            <span class="theme-icon moon-icon">🌙</span>
+            <span class="theme-icon sun-icon"><i data-lucide="sun"></i></span>
+            <span class="theme-icon moon-icon"><i data-lucide="moon"></i></span>
         </button>
         
         <!-- Mobile Slide Menu -->
@@ -32,23 +30,23 @@
             </div>
             <nav class="slide-menu-nav">
                 <button class="slide-menu-item active" data-tab="cbm-calculator">
-                    <span class="menu-icon">📊</span>
+                    <span class="menu-icon"><i data-lucide="calculator"></i></span>
                     <span class="menu-text">Tính Toán</span>
                 </button>
                 <button class="slide-menu-item" data-tab="history">
-                    <span class="menu-icon">📋</span>
+                    <span class="menu-icon"><i data-lucide="history"></i></span>
                     <span class="menu-text">Lịch Sử</span>
                 </button>
                 <button class="slide-menu-item" data-tab="province-checker">
-                    <span class="menu-icon">📍</span>
+                    <span class="menu-icon"><i data-lucide="map-pin"></i></span>
                     <span class="menu-text">Kiểm Tra Tỉnh</span>
                 </button>
                 <button class="slide-menu-item" data-tab="shipping-calculator">
-                    <span class="menu-icon">💰</span>
+                    <span class="menu-icon"><i data-lucide="package"></i></span>
                     <span class="menu-text">Tính Cước Phí</span>
                 </button>
                 <button class="slide-menu-item" data-tab="settings">
-                    <span class="menu-icon">⚙️</span>
+                    <span class="menu-icon"><i data-lucide="settings"></i></span>
                     <span class="menu-text">Cài Đặt</span>
                 </button>
             </nav>
@@ -60,23 +58,23 @@
         <!-- Desktop Sidebar Navigation -->
         <nav class="sidebar-nav">
             <button class="nav-item active" data-tab="cbm-calculator">
-                <span class="nav-icon">&#128202;</span>
+                <span class="nav-icon"><i data-lucide="calculator"></i></span>
                 <span class="nav-text">Tính Toán</span>
             </button>
             <button class="nav-item" data-tab="history">
-                <span class="nav-icon">&#128203;</span>
+                <span class="nav-icon"><i data-lucide="history"></i></span>
                 <span class="nav-text">Lịch Sử</span>
             </button>
             <button class="nav-item" data-tab="province-checker">
-                <span class="nav-icon">&#128205;</span>
+                <span class="nav-icon"><i data-lucide="map-pin"></i></span>
                 <span class="nav-text">Kiểm Tra Tỉnh</span>
             </button>
             <button class="nav-item" data-tab="shipping-calculator">
-                <span class="nav-icon">&#128176;</span>
+                <span class="nav-icon"><i data-lucide="package"></i></span>
                 <span class="nav-text">Tính Cước Phí</span>
             </button>
             <button class="nav-item" data-tab="settings">
-                <span class="nav-icon">&#9881;</span>
+                <span class="nav-icon"><i data-lucide="settings"></i></span>
                 <span class="nav-text">Cài Đặt</span>
             </button>
         </nav>
@@ -147,7 +145,7 @@
                 <div class="shipping-calculator-container">
                     <!-- Form nhập liệu -->
                     <div class="shipping-form">
-                        <div class="form-header">💰 TÍNH CƯỚC VẬN CHUYỂN</div>
+                        <div class="form-header"><i data-lucide="package" style="width:14px;height:14px;vertical-align:middle;"></i> TÍNH CƯỚC VẬN CHUYỂN</div>
                         
                         <div class="form-group">
                             <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
@@ -186,20 +184,20 @@
             <!-- Tab Cài Đặt -->
             <div id="settings" class="tab-content">
                 <div class="settings-container">
-                    <div class="settings-header">⚙️ CÀI ĐẶT GIAO DIỆN</div>
+                    <div class="settings-header"><i data-lucide="settings" style="width:20px;height:20px;vertical-align:middle;"></i> CÀI ĐẶT GIAO DIỆN</div>
                     
                     <!-- Giao diện -->
                     <div class="settings-section">
-                        <h3 class="section-title">🎨 Giao diện</h3>
+                        <h3 class="section-title"><i data-lucide="palette"></i> Giao diện</h3>
                         <div class="setting-item">
                             <label class="setting-label">Chủ đề</label>
                             <div class="theme-switcher">
                                 <button class="theme-btn light-theme-btn" data-theme="light">
-                                    <span class="theme-btn-icon">☀️</span>
+                                    <span class="theme-btn-icon"><i data-lucide="sun"></i></span>
                                     <span class="theme-btn-text">Sáng</span>
                                 </button>
                                 <button class="theme-btn dark-theme-btn" data-theme="dark">
-                                    <span class="theme-btn-icon">🌙</span>
+                                    <span class="theme-btn-icon"><i data-lucide="moon"></i></span>
                                     <span class="theme-btn-text">Tối</span>
                                 </button>
                             </div>
@@ -208,7 +206,7 @@
                     
                     <!-- Kích thước -->
                     <div class="settings-section">
-                        <h3 class="section-title">📏 Kích thước</h3>
+                        <h3 class="section-title"><i data-lucide="sliders-horizontal"></i> Kích thước</h3>
                         <div class="setting-item">
                             <label class="setting-label">Cỡ chữ & Giao diện</label>
                             <div class="size-switcher">
@@ -232,7 +230,7 @@
                                         
                     <!-- Hiệu ứng -->
                     <div class="settings-section">
-                        <h3 class="section-title">✨ Hiệu ứng</h3>
+                        <h3 class="section-title"><i data-lucide="sparkles"></i> Hiệu ứng</h3>
                         <div class="setting-item">
                             <label class="setting-label">Chuyển động mượt</label>
                             <label class="switch">
@@ -253,23 +251,24 @@
         <!-- Mobile Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="bottom-nav-item active" data-tab="cbm-calculator">
-                <span class="bottom-nav-icon">&#128202;</span>
+                <span class="bottom-nav-icon"><i data-lucide="calculator"></i></span>
                 <span class="bottom-nav-text">Tính Toán</span>
             </button>
             <button class="bottom-nav-item" data-tab="history">
-                <span class="bottom-nav-icon">&#128203;</span>
+                <span class="bottom-nav-icon"><i data-lucide="history"></i></span>
                 <span class="bottom-nav-text">Lịch Sử</span>
             </button>
             <button class="bottom-nav-item" data-tab="province-checker">
-                <span class="bottom-nav-icon">&#128205;</span>
+                <span class="bottom-nav-icon"><i data-lucide="map-pin"></i></span>
                 <span class="bottom-nav-text">Kiểm Tra</span>
             </button>
             <button class="bottom-nav-item" data-tab="shipping-calculator">
-                <span class="bottom-nav-icon">&#128176;</span>
+                <span class="bottom-nav-icon"><i data-lucide="package"></i></span>
                 <span class="bottom-nav-text">Cước Phí</span>
             </button>
         </nav>
     </div>
+    <script src="js/lucide.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

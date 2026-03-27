@@ -142,40 +142,104 @@
 
             <!-- Tab Tính Cước Phí -->
             <div id="shipping-calculator" class="tab-content">
-                <div class="shipping-calculator-container">
-                    <!-- Form nhập liệu -->
-                    <div class="shipping-form">
-                        <div class="form-header"><i data-lucide="package" style="width:14px;height:14px;vertical-align:middle;"></i> TÍNH CƯỚC VẬN CHUYỂN</div>
-                        
-                        <div class="form-group">
-                            <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
-                            <select id="shipping-tinh-select">
-                                <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                            </select>
+                <!-- Sub-tab navigation -->
+                <div class="sub-tab-nav">
+                    <button class="sub-tab-btn active" data-sub-tab="cuoc-phi">
+                        <i data-lucide="package"></i> Tính Cước Phí
+                    </button>
+                    <button class="sub-tab-btn" data-sub-tab="bong-bong-ca">
+                        <i data-lucide="fish"></i> Bong Bóng Cá
+                    </button>
+                </div>
+
+                <!-- Sub-tab 1: Tính Cước Phí (hiện có) -->
+                <div id="sub-tab-cuoc-phi" class="sub-tab-content active">
+                    <div class="shipping-calculator-container">
+                        <div class="shipping-form">
+                            <div class="form-header"><i data-lucide="package" style="width:14px;height:14px;vertical-align:middle;"></i> TÍNH CƯỚC VẬN CHUYỂN</div>
+                            <div class="form-group">
+                                <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
+                                <select id="shipping-tinh-select">
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="shipping-huyen-select">Quận/Huyện đến:</label>
+                                <select id="shipping-huyen-select" disabled>
+                                    <option value="">-- Vui lòng chọn Tỉnh trước --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="shipping-weight-input">Trọng lượng (kg):</label>
+                                <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
+                            </div>
+                            <div class="form-actions">
+                                <button id="btn-calculate-shipping" class="btn-primary">Tính Cước Phí</button>
+                                <button id="btn-reset-shipping" class="btn-secondary">Xóa Form</button>
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="shipping-huyen-select">Quận/Huyện đến:</label>
-                            <select id="shipping-huyen-select" disabled>
-                                <option value="">-- Vui lòng chọn Tỉnh trước --</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="shipping-weight-input">Trọng lượng (kg):</label>
-                            <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button id="btn-calculate-shipping" class="btn-primary">Tính Cước Phí</button>
-                            <button id="btn-reset-shipping" class="btn-secondary">Xóa Form</button>
+                        <div id="shipping-result" class="shipping-result">
+                            <div class="result-message">
+                                📦 Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Kết quả -->
-                    <div id="shipping-result" class="shipping-result">
-                        <div class="result-message">
-                            📦 Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.
+                </div>
+
+                <!-- Sub-tab 2: Hàng Bong Bóng Cá -->
+                <div id="sub-tab-bong-bong-ca" class="sub-tab-content">
+                    <div class="bbc-container">
+                        <div class="bbc-info-card">
+                            <div class="bbc-info-title"><i data-lucide="info"></i> Thông Tin Mặc Định</div>
+                            <div class="bbc-info-grid">
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Kích thước/kiện:</span>
+                                    <span class="bbc-info-value">60 × 40 × 41 cm</span>
+                                </div>
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Khối lượng quy đổi/kiện:</span>
+                                    <span class="bbc-info-value">16,4 kg</span>
+                                </div>
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Đơn giá:</span>
+                                    <span class="bbc-info-value">31.000 đ/kg</span>
+                                </div>
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Hệ số phụ phí:</span>
+                                    <span class="bbc-info-value">× 1,285</span>
+                                </div>
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Hệ số VAT:</span>
+                                    <span class="bbc-info-value">× 1,08</span>
+                                </div>
+                                <div class="bbc-info-item">
+                                    <span class="bbc-info-label">Dịch vụ:</span>
+                                    <span class="bbc-info-value">Hỏa Tốc (HT)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bbc-form">
+                            <div class="bbc-form-title"><i data-lucide="calculator"></i> TÍNH TIỀN HÀNG BONG BÓNG CÁ</div>
+                            <div class="bbc-form-group">
+                                <label for="bbc-so-kien">Số kiện hàng:</label>
+                                <input type="number" id="bbc-so-kien" placeholder="Nhập số kiện..." min="1" step="1">
+                            </div>
+                            <div class="bbc-form-actions">
+                                <button id="btn-tinh-bbc" class="btn-primary">
+                                    <i data-lucide="calculator"></i> Tính Tiền
+                                </button>
+                                <button id="btn-reset-bbc" class="btn-secondary">
+                                    <i data-lucide="rotate-ccw"></i> Xóa
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="bbc-result" class="bbc-result">
+                            <div class="bbc-result-empty">
+                                <i data-lucide="fish"></i>
+                                <p>Nhập số kiện và nhấn "Tính Tiền" để xem kết quả</p>
+                            </div>
                         </div>
                     </div>
                 </div>

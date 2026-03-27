@@ -2546,19 +2546,167 @@ document.addEventListener('DOMContentLoaded', () => {
         resetSettingsBtn.addEventListener('click', resetSettings);
     }
     
+    // --- HÀNG BONG BÓNG CÁ ---
+    // Hằng số cho hàng Bong Bóng Cá
+    const BBC_KG_MOT_KIEN = 16.4;      // kg quy đổi mỗi kiện
+    const BBC_DON_GIA = 31000;          // đ/kg
+    const BBC_HE_SO_PHU_PHI = 1.285;   // hệ số phụ phí
+    const BBC_HE_SO_VAT = 1.08;        // hệ số VAT
+
+    // Hàm định dạng số tiền
+    const formatTienBBC = (so) => {
+        return Math.round(so).toLocaleString('vi-VN') + ' đ';
+    };
+
+    // Hàm tính và hiển thị kết quả Bong Bóng Cá
+    const tinhBongBongCa = () => {
+        const bbcSoKienInput = $('#bbc-so-kien');
+        const bbcResultDiv = $('#bbc-result');
+        if (!bbcSoKienInput || !bbcResultDiv) return;
+
+        const soKienRaw = sanitizeNumber(bbcSoKienInput.value);
+        const soKien = parseFloat(soKienRaw);
+
+        // Validate
+        if (!soKienRaw || isNaN(soKien) || soKien <= 0) {
+            bbcResultDiv.innerHTML = '<div class="bbc-error"><i data-lucide="alert-circle"></i> Vui lòng nhập số kiện hợp lệ (lớn hơn 0).</div>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            return;
+        }
+
+        // Tính từng bước
+        const soKgQuyDoi = soKien * BBC_KG_MOT_KIEN;
+        const tienTruocHeSo = soKgQuyDoi * BBC_DON_GIA;
+        const tienSauPhuPhi = tienTruocHeSo * BBC_HE_SO_PHU_PHI;
+        const tongTien = tienSauPhuPhi * BBC_HE_SO_VAT;
+
+        const html = `
+            <div class="bbc-result-content">
+                <div class="bbc-result-title">
+                    <i data-lucide="check-circle"></i>
+                    KẾT QUẢ TÍNH TIỀN
+                </div>
+
+                <div class="bbc-summary-box">
+                    <div class="bbc-summary-label">Số kiện hàng</div>
+                    <div class="bbc-summary-value highlight">${soKien.toLocaleString('vi-VN')} kiện</div>
+                </div>
+
+                <div class="bbc-steps">
+                    <div class="bbc-step">
+                        <div class="bbc-step-num">1</div>
+                        <div class="bbc-step-body">
+                            <div class="bbc-step-label">Tính kg quy đổi:</div>
+                            <div class="bbc-step-formula">${soKien.toLocaleString('vi-VN')} kiện × ${BBC_KG_MOT_KIEN} kg/kiện</div>
+                            <div class="bbc-step-result">= <strong>${soKgQuyDoi.toLocaleString('vi-VN')} kg</strong></div>
+                        </div>
+                    </div>
+                    <div class="bbc-step">
+                        <div class="bbc-step-num">2</div>
+                        <div class="bbc-step-body">
+                            <div class="bbc-step-label">Tính tiền gốc:</div>
+                            <div class="bbc-step-formula">${soKgQuyDoi.toLocaleString('vi-VN')} kg × ${BBC_DON_GIA.toLocaleString('vi-VN')} đ/kg</div>
+                            <div class="bbc-step-result">= <strong>${formatTienBBC(tienTruocHeSo)}</strong></div>
+                        </div>
+                    </div>
+                    <div class="bbc-step">
+                        <div class="bbc-step-num">3</div>
+                        <div class="bbc-step-body">
+                            <div class="bbc-step-label">Nhân hệ số phụ phí (× ${BBC_HE_SO_PHU_PHI}):</div>
+                            <div class="bbc-step-formula">${formatTienBBC(tienTruocHeSo)} × ${BBC_HE_SO_PHU_PHI}</div>
+                            <div class="bbc-step-result">= <strong>${formatTienBBC(tienSauPhuPhi)}</strong></div>
+                        </div>
+                    </div>
+                    <div class="bbc-step">
+                        <div class="bbc-step-num">4</div>
+                        <div class="bbc-step-body">
+                            <div class="bbc-step-label">Nhân hệ số VAT (× ${BBC_HE_SO_VAT}):</div>
+                            <div class="bbc-step-formula">${formatTienBBC(tienSauPhuPhi)} × ${BBC_HE_SO_VAT}</div>
+                            <div class="bbc-step-result">= <strong>${formatTienBBC(tongTien)}</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bbc-total-box">
+                    <div class="bbc-total-label">💰 TỔNG TIỀN CẦN THANH TOÁN</div>
+                    <div class="bbc-total-value">${formatTienBBC(tongTien)}</div>
+                    <div class="bbc-total-note">= (${soKgQuyDoi.toLocaleString('vi-VN')} kg × ${BBC_DON_GIA.toLocaleString('vi-VN')}) × ${BBC_HE_SO_PHU_PHI} × ${BBC_HE_SO_VAT}</div>
+                </div>
+            </div>
+        `;
+
+        bbcResultDiv.innerHTML = html;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        bbcResultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    // Reset form Bong Bóng Cá
+    const resetBongBongCa = () => {
+        const bbcSoKienInput = $('#bbc-so-kien');
+        const bbcResultDiv = $('#bbc-result');
+        if (bbcSoKienInput) bbcSoKienInput.value = '';
+        if (bbcResultDiv) {
+            bbcResultDiv.innerHTML = `
+                <div class="bbc-result-empty">
+                    <i data-lucide="fish"></i>
+                    <p>Nhập số kiện và nhấn "Tính Tiền" để xem kết quả</p>
+                </div>
+            `;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        if (bbcSoKienInput) bbcSoKienInput.focus();
+    };
+
+    // Khởi tạo nút sub-tab navigation
+    const khoiTaoSubTab = () => {
+        const subTabBtns = document.querySelectorAll('.sub-tab-btn');
+        const subTabContents = document.querySelectorAll('.sub-tab-content');
+
+        subTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetSubTab = btn.dataset.subTab;
+
+                // Cập nhật trạng thái nút
+                subTabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Cập nhật nội dung hiển thị
+                subTabContents.forEach(content => content.classList.remove('active'));
+                const targetContent = $(`#sub-tab-${targetSubTab}`);
+                if (targetContent) targetContent.classList.add('active');
+
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        });
+
+        // Gắn nút Tính Tiền Bong Bóng Cá
+        const btnTinhBBC = $('#btn-tinh-bbc');
+        const btnResetBBC = $('#btn-reset-bbc');
+        const bbcSoKienInput = $('#bbc-so-kien');
+
+        if (btnTinhBBC) btnTinhBBC.addEventListener('click', tinhBongBongCa);
+        if (btnResetBBC) btnResetBBC.addEventListener('click', resetBongBongCa);
+        if (bbcSoKienInput) {
+            bbcSoKienInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') tinhBongBongCa();
+            });
+        }
+    };
+
     // --- INIT ---
     loadSettings(); // Load theme and settings first
     renderCBM();
     renderHistory();
     khoiTaoCuocPhi(); // Khởi tạo Shipping Calculator
-    
+    khoiTaoSubTab();  // Khởi tạo Sub-tab và Bong Bóng Cá
+
     // Khởi tạo tất cả Lucide icons trong HTML tĩnh
     if (typeof lucide !== 'undefined') lucide.createIcons();
-    
+
     // Start with hamburger hidden
     if (hamburgerMenu) {
         hamburgerMenu.classList.add('hidden');
     }
-    
+
     cbmInput.focus();
 });

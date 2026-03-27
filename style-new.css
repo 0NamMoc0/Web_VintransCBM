@@ -1806,3 +1806,390 @@ button:active {
         padding: 6px 8px;
     }
 }
+
+/* ========================
+   SUB-TAB NAVIGATION
+   ======================== */
+.sub-tab-nav {
+    display: flex;
+    gap: 4px;
+    padding: 8px 8px 0;
+    border-bottom: 2px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sub-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    background: var(--surface-variant);
+    color: var(--on-surface-variant);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.sub-tab-btn i[data-lucide] {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.sub-tab-btn:hover {
+    background: var(--surface);
+    color: var(--primary);
+}
+
+.sub-tab-btn.active {
+    background: var(--surface);
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+}
+
+.sub-tab-content {
+    display: none;
+}
+
+.sub-tab-content.active {
+    display: block;
+}
+
+/* ========================
+   HÀNG BONG BÓNG CÁ
+   ======================== */
+.bbc-container {
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+/* Info card */
+.bbc-info-card {
+    background: var(--surface-variant);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+}
+
+.bbc-info-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.bbc-info-title i[data-lucide] {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.bbc-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.bbc-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bbc-info-label {
+    font-size: calc(var(--font-size-small) * 0.9);
+    color: var(--on-surface-variant);
+}
+
+.bbc-info-value {
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    color: var(--on-surface);
+}
+
+/* Form Bong Bóng Cá */
+.bbc-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+}
+
+.bbc-form-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.bbc-form-title i[data-lucide] {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.bbc-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.bbc-form-group label {
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    color: var(--on-surface);
+}
+
+.bbc-form-group input[type="number"] {
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-variant);
+    color: var(--on-surface);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    transition: border-color var(--transition-fast);
+}
+
+.bbc-form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.bbc-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.bbc-form-actions button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.bbc-form-actions button i[data-lucide] {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* Kết quả Bong Bóng Cá */
+.bbc-result {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.bbc-result-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: var(--spacing-lg);
+    color: var(--on-surface-variant);
+}
+
+.bbc-result-empty i[data-lucide] {
+    width: 40px;
+    height: 40px;
+    stroke: currentColor;
+    fill: none;
+    opacity: 0.4;
+}
+
+.bbc-result-empty p {
+    font-size: var(--font-size-small);
+    text-align: center;
+    opacity: 0.7;
+}
+
+.bbc-result-content {
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.bbc-result-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    color: var(--primary);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.bbc-result-title i[data-lucide] {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.bbc-summary-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-variant);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+}
+
+.bbc-summary-label {
+    font-size: var(--font-size-small);
+    color: var(--on-surface-variant);
+}
+
+.bbc-summary-value {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+}
+
+.bbc-summary-value.highlight {
+    color: var(--primary);
+}
+
+/* Các bước tính toán */
+.bbc-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bbc-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.bbc-step-num {
+    min-width: 24px;
+    height: 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--font-size-small) * 0.85);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.bbc-step-body {
+    flex: 1;
+    background: var(--surface-variant);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+}
+
+.bbc-step-label {
+    font-size: calc(var(--font-size-small) * 0.9);
+    color: var(--on-surface-variant);
+    margin-bottom: 3px;
+}
+
+.bbc-step-formula {
+    font-size: var(--font-size-small);
+    color: var(--on-surface);
+    margin-bottom: 3px;
+}
+
+.bbc-step-result {
+    font-size: var(--font-size-small);
+    color: var(--primary);
+}
+
+/* Tổng tiền */
+.bbc-total-box {
+    background: linear-gradient(135deg, var(--primary), var(--primary-variant, var(--primary)));
+    color: white;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bbc-total-label {
+    font-size: calc(var(--font-size-small) * 0.9);
+    opacity: 0.9;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.bbc-total-value {
+    font-size: calc(var(--font-size-large, 1.2rem) * 1.2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.bbc-total-note {
+    font-size: calc(var(--font-size-small) * 0.85);
+    opacity: 0.7;
+}
+
+/* Lỗi */
+.bbc-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: var(--spacing-sm);
+    color: #e53935;
+    font-size: var(--font-size-small);
+    font-weight: 600;
+}
+
+.bbc-error i[data-lucide] {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    flex-shrink: 0;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+    .sub-tab-btn {
+        padding: 6px 12px;
+        font-size: calc(var(--font-size-small) * 0.9);
+    }
+
+    .bbc-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bbc-total-value {
+        font-size: var(--font-size-base);
+    }
+}
+

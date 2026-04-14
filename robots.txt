@@ -1,0 +1,17 @@
+# robots.txt cho VinTransCBM
+
+User-agent: *
+Allow: /
+
+# Chặn các bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Sitemap (tùy chọn - thêm sau nếu cần)
+# Sitemap: https://yourdomain.netlify.app/sitemap.xml

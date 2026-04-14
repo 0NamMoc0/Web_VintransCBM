@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VinTransCBM - Web</title>
+    <link rel="stylesheet" href="style-new.css">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Mobile Hamburger Menu -->
+        <button id="hamburger-menu" class="hamburger-menu" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi giao diện">
+            <span class="theme-icon sun-icon"><i data-lucide="sun"></i></span>
+            <span class="theme-icon moon-icon"><i data-lucide="moon"></i></span>
+        </button>
+        
+        <!-- Mobile Slide Menu -->
+        <div id="slide-menu" class="slide-menu">
+            <div class="slide-menu-header">
+                <span class="menu-title">MENU</span>
+                <button id="close-menu" class="close-menu">&times;</button>
+            </div>
+            <nav class="slide-menu-nav">
+                <button class="slide-menu-item active" data-tab="shipping-calculator">
+                    <span class="menu-icon"><i data-lucide="package"></i></span>
+                    <span class="menu-text">TÍNH CƯỚC PHÍ</span>
+                </button>
+                <button class="slide-menu-item" data-tab="province-checker">
+                    <span class="menu-icon"><i data-lucide="map-pin"></i></span>
+                    <span class="menu-text">KIỂM TRA TỈNH</span>
+                </button>
+            </nav>
+        </div>
+        <div id="menu-overlay" class="menu-overlay"></div>
+        
+        <!-- Desktop Sidebar Navigation -->
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="shipping-calculator">
+                <span class="nav-icon"><i data-lucide="package"></i></span>
+                <span class="nav-text">TÍNH CƯỚC PHÍ</span>
+            </button>
+            <button class="nav-item" data-tab="province-checker">
+                <span class="nav-icon"><i data-lucide="map-pin"></i></span>
+                <span class="nav-text">KIỂM TRA TỈNH</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tab Tính Cước Phí -->
+            <div id="shipping-calculator" class="tab-content active">
+                <!-- Sub-tab navigation -->
+                <div class="sub-tab-nav">
+                    <button class="sub-tab-btn active" data-sub-tab="cuoc-phi">
+                        <i data-lucide="package"></i> TÍNH CƯỚC
+                    </button>
+                    <button class="sub-tab-btn" data-sub-tab="bong-bong-ca">
+                        <i data-lucide="fish"></i> BONG BÓNG CÁ
+                    </button>
+                </div>
+
+                <!-- Sub-tab 1: Tính Cước Phí -->
+                <div id="sub-tab-cuoc-phi" class="sub-tab-content active">
+                    <div class="shipping-calculator-container">
+                        <div class="shipping-form">
+                            <div class="form-header">TÍNH CƯỚC VẬN CHUYỂN</div>
+                            <div class="form-group">
+                                <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
+                                <select id="shipping-tinh-select">
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="shipping-huyen-select">Quận/Huyện đến:</label>
+                                <select id="shipping-huyen-select" disabled>
+                                    <option value="">-- Vui lòng chọn Tỉnh trước --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="shipping-weight-input">Trọng lượng (kg):</label>
+                                <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
+                            </div>
+                            <div class="form-actions">
+                                <button id="btn-calculate-shipping" class="btn-primary">TÍNH CƯỚC</button>
+                                <button id="btn-reset-shipping" class="btn-secondary">XÓA FORM</button>
+                            </div>
+                        </div>
+                        <div id="shipping-result" class="shipping-result">
+                            <div class="result-message">
+                                Vui lòng điền đầy đủ thông tin và nhấn "TÍNH CƯỚC" để xem kết quả.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-tab 2: Hàng Bong Bóng Cá -->
+                <div id="sub-tab-bong-bong-ca" class="sub-tab-content">
+                    <div class="bbc-container">
+                        <div class="bbc-form">
+                            <div class="bbc-form-title">TÍNH TIỀN BONG BÓNG CÁ</div>
+                            <div class="bbc-form-group">
+                                <label for="bbc-so-kien">Số kiện hàng:</label>
+                                <input type="number" id="bbc-so-kien" placeholder="Nhập số kiện..." min="1" step="1">
+                            </div>
+                            <div class="bbc-form-actions">
+                                <button id="btn-tinh-bbc" class="btn-primary">TÍNH TIỀN</button>
+                                <button id="btn-reset-bbc" class="btn-secondary">XÓA</button>
+                            </div>
+                        </div>
+                        <div id="bbc-result" class="bbc-result">
+                            <div class="bbc-result-empty">
+                                Nhập số kiện và nhấn "TÍNH TIỀN" để xem kết quả
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Kiểm Tra Tỉnh -->
+            <div id="province-checker" class="tab-content">
+                <div class="province-container">
+                    <div class="province-input-section">
+                        <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
+                        <button id="btn-clear-province" class="btn-secondary">XÓA KẾT QUẢ</button>
+                    </div>
+                    <div id="province-result" class="province-result">
+                        <div class="province-header">KIỂM TRA TỈNH THÀNH</div>
+                        <div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-tab="shipping-calculator">
+                <span class="bottom-nav-icon"><i data-lucide="package"></i></span>
+                <span class="bottom-nav-text">CƯỚC PHÍ</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="province-checker">
+                <span class="bottom-nav-icon"><i data-lucide="map-pin"></i></span>
+                <span class="bottom-nav-text">KIỂM TRA</span>
+            </button>
+        </nav>
+    </div>
+    <script src="js/lucide.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

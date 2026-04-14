@@ -109,19 +109,19 @@
                     
                     <!-- Hiển thị lịch sử -->
                     <div id="history-list">
-                        <p>Chưa có lịch sử.</p>
+                        <p><i data-lucide="info"></i> Chưa có lịch sử.</p>
                     </div>
                     
                     <!-- Phân trang -->
                     <div class="pagination-controls">
-                        <button id="prev-page-button" disabled>◀ Trước</button>
+                        <button id="prev-page-button" disabled><i data-lucide="chevron-left"></i> Trước</button>
                         <span id="page-info">Trang 1/1</span>
-                        <button id="next-page-button" disabled>Sau ▶</button>
+                        <button id="next-page-button" disabled>Sau <i data-lucide="chevron-right"></i></button>
                     </div>
                     
                     <!-- Nút xóa -->
                     <div class="history-controls">
-                        <button id="clear-history-button" class="btn-danger">Xóa Lịch Sử</button>
+                        <button id="clear-history-button" class="btn-danger"><i data-lucide="trash-2"></i> Xóa Lịch Sử</button>
                     </div>
                 </div>
             </div>
@@ -131,10 +131,10 @@
                 <div class="province-container">
                     <div class="province-input-section">
                         <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
-                        <button id="btn-clear-province">Xóa Kết Quả</button>
+                        <button id="btn-clear-province"><i data-lucide="eraser"></i> Xóa Kết Quả</button>
                     </div>
                     <div id="province-result" class="province-result">
-                        <div class="province-header">🏙️ KIỂM TRA TỈNH THÀNH</div>
+                        <div class="province-header"><i data-lucide="map"></i> KIỂM TRA TỈNH THÀNH</div>
                         <div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                         <i data-lucide="package"></i> Tính Cước Phí
                     </button>
                     <button class="sub-tab-btn" data-sub-tab="bong-bong-ca">
-                        <i data-lucide="fish"></i> Bong Bóng Cá
+                        <i data-lucide="anchor"></i> Bong Bóng Cá
                     </button>
                 </div>
 
@@ -156,7 +156,7 @@
                 <div id="sub-tab-cuoc-phi" class="sub-tab-content active">
                     <div class="shipping-calculator-container">
                         <div class="shipping-form">
-                            <div class="form-header"><i data-lucide="package" style="width:14px;height:14px;vertical-align:middle;"></i> TÍNH CƯỚC VẬN CHUYỂN</div>
+                            <div class="form-header"><i data-lucide="package"></i> TÍNH CƯỚC VẬN CHUYỂN</div>
                             <div class="form-group">
                                 <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
                                 <select id="shipping-tinh-select">
@@ -174,13 +174,13 @@
                                 <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
                             </div>
                             <div class="form-actions">
-                                <button id="btn-calculate-shipping" class="btn-primary">Tính Cước Phí</button>
-                                <button id="btn-reset-shipping" class="btn-secondary">Xóa Form</button>
+                                <button id="btn-calculate-shipping" class="btn-primary"><i data-lucide="calculator"></i> Tính Cước Phí</button>
+                                <button id="btn-reset-shipping" class="btn-secondary"><i data-lucide="rotate-ccw"></i> Xóa Form</button>
                             </div>
                         </div>
                         <div id="shipping-result" class="shipping-result">
                             <div class="result-message">
-                                📦 Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.
+                                <i data-lucide="package"></i> Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.
                             </div>
                         </div>
                     </div>
@@ -237,7 +237,7 @@
 
                         <div id="bbc-result" class="bbc-result">
                             <div class="bbc-result-empty">
-                                <i data-lucide="fish"></i>
+                                <i data-lucide="anchor"></i>
                                 <p>Nhập số kiện và nhấn "Tính Tiền" để xem kết quả</p>
                             </div>
                         </div>

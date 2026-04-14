@@ -673,29 +673,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const shippingResultDiv = $('#shipping-result');
 
     // --- PROVINCE CHECKER STATE ---
-    // Danh sách 32 tỉnh HÀNG BAY (từ Android app)
-    const hangBayProvinces = [
-        "ha noi", "son la", "quang binh", "cao bang", "quang tri", "hue",
+    const danhSach63TinhKhongDau = [
+        "an giang", "ba ria vung tau", "bac giang", "bac kan", "bac lieu", "bac ninh", 
+        "ben tre", "binh dinh", "binh duong", "binh phuoc", "binh thuan", "ca mau", 
+        "can tho", "cao bang", "da nang", "dak lak", "dak nong", "dien bien", 
+        "dong nai", "dong thap", "gia lai", "ha giang", "ha nam", "ha noi", 
+        "ha tinh", "hai duong", "hai phong", "hau giang", "hoa binh", "hung yen", 
+        "khanh hoa", "kien giang", "kon tum", "lai chau", "lam dong", "lang son", 
+        "lao cai", "long an", "nam dinh", "nghe an", "ninh binh", "ninh thuan", 
+        "phu tho", "phu yen", "quang binh", "quang nam", "quang ngai", "quang ninh", 
+        "quang tri", "soc trang", "son la", "tay ninh", "thai binh", "thai nguyen", 
+        "thanh hoa", "thua thien hue", "tien giang", "tp ho chi minh", "tra vinh", 
+        "tuyen quang", "vinh long", "vinh phuc", "yen bai"
+    ];
+
+    const tenTinhCoDau = [
+        "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh",
+        "Bến Tre", "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau",
+        "Cần Thơ", "Cao Bằng", "Đà Nẵng", "Đắk Lắk", "Đắk Nông", "Điện Biên",
+        "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội",
+        "Hà Tĩnh", "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên",
+        "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn",
+        "Lào Cai", "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
+        "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi", "Quảng Ninh",
+        "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên",
+        "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang", "TP. Hồ Chí Minh", "Trà Vinh",
+        "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+    ];
+
+    const danhSachDiBay = [
+        "ha noi", "son la", "quang binh", "cao bang", "quang tri", "thua thien hue",
         "da nang", "quang nam", "quang ngai", "ha giang", "bac kan", "tuyen quang",
         "lao cai", "dien bien", "lai chau", "thai binh", "ha nam", "nam dinh",
         "ninh binh", "thanh hoa", "yen bai", "hoa binh", "thai nguyen", "lang son",
         "quang ninh", "bac giang", "phu tho", "vinh phuc", "bac ninh", "hai duong",
-        "hai phong", "hung yen"
+        "hai phong", "hung yen", "nghe an", "ha tinh"
     ];
-    
-    // Danh sách đầy đủ 63 tỉnh thành Việt Nam (để check "Không tìm thấy")
-    const allProvinces = [
-        "ha noi", "ho chi minh", "da nang", "hai phong", "can tho",
-        "an giang", "ba ria vung tau", "bac giang", "bac kan", "bac lieu", "bac ninh",
-        "ben tre", "binh dinh", "binh duong", "binh phuoc", "binh thuan",
-        "ca mau", "cao bang", "dak lak", "dak nong", "dien bien", "dong nai", "dong thap",
-        "gia lai", "ha giang", "ha nam", "ha tinh", "hai duong", "hau giang", "hoa binh", "hung yen",
-        "khanh hoa", "kien giang", "kon tum", "lai chau", "lam dong", "lang son", "lao cai",
-        "long an", "nam dinh", "nghe an", "ninh binh", "ninh thuan",
-        "phu tho", "phu yen", "quang binh", "quang nam", "quang ngai", "quang ninh", "quang tri",
-        "soc trang", "son la", "tay ninh", "thai binh", "thai nguyen", "thanh hoa",
-        "thua thien hue", "tien giang", "tra vinh", "tuyen quang",
-        "vinh long", "vinh phuc", "yen bai"
+
+    const mienNam = [
+        "ha giang", "cao bang", "bac kan", "lang son", "tuyen quang", "thai nguyen",
+        "phu tho", "bac giang", "quang ninh", "lao cai", "lai chau", "yen bai",
+        "dien bien", "son la", "hoa binh", "ha noi", "ha nam", "bac ninh",
+        "hai duong", "hai phong", "hung yen", "nam dinh", "ninh binh", "thai binh",
+        "vinh phuc", "thanh hoa", "nghe an", "ha tinh", "quang binh", "quang tri",
+        "quang nam", "quang ngai", "thua thien hue", "da nang", "binh dinh", "phu yen"
+    ];
+
+    const mekong = [
+        "can tho", "tien giang", "ben tre", "tra vinh", "vinh long", "an giang",
+        "dong thap", "kien giang", "hau giang", "soc trang", "bac lieu", "ca mau"
+    ];
+
+    const mienDong = [
+        "kon tum", "gia lai", "dak lak", "dak nong", "lam dong", "binh phuoc",
+        "tay ninh", "khanh hoa", "ninh thuan", "binh thuan"
     ];
 
     // --- HAMBURGER MENU STATE ---
@@ -862,29 +893,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const { v1, v2, v3, v4 } = inputs;
             const { cbm, kgDuongBo, kgVinEco, kgCpn, kgHoaToc } = calculatedOutputs;
             
-            return `📦 [${timestamp}] Kiện ${groupNumber}:\n` +
-                   `Dài: ${df(v1)}, Rộng: ${df(v2)}, Cao: ${df(v3)}, Số kiện: ${df(v4)}\n` +
-                   `✨ CBM = ${df(cbm)}\n` +
-                   `🚛 Kg (ĐƯỜNG BỘ) = ${df(kgDuongBo)}\n` +
-                   `🚐 Kg (VIN-ECO) = ${df(kgVinEco)}\n` +
-                   `✈️ Kg (CPN) = ${df(kgCpn)}\n` +
-                   `🚀 Kg (HỎA TỐC) = ${df(kgHoaToc)}`;
+            return `<i data-lucide="package" class="icon-inline"></i> [${timestamp}] Kiện ${groupNumber}:<br>` +
+                   `Dài: ${df(v1)}, Rộng: ${df(v2)}, Cao: ${df(v3)}, Số kiện: ${df(v4)}<br>` +
+                   `<i data-lucide="sparkles" class="icon-inline"></i> CBM = ${df(cbm)}<br>` +
+                   `<i data-lucide="truck" class="icon-inline"></i> Kg (ĐƯỜNG BỘ) = ${df(kgDuongBo)}<br>` +
+                   `<i data-lucide="bus" class="icon-inline"></i> Kg (VIN-ECO) = ${df(kgVinEco)}<br>` +
+                   `<i data-lucide="plane" class="icon-inline"></i> Kg (CPN) = ${df(kgCpn)}<br>` +
+                   `<i data-lucide="zap" class="icon-inline"></i> Kg (HỎA TỐC) = ${df(kgHoaToc)}`;
         } else if (entry.type === 'province') {
-            return `🏙️ [${entry.timestamp}] Kiểm tra tỉnh: ${entry.province} → ${entry.result}`;
+            const resultIcon = entry.result.includes('Bay') ? 'plane' : (entry.result.includes('Bộ') ? 'truck' : 'help-circle');
+            return `<i data-lucide="map-pin" class="icon-inline"></i> [${entry.timestamp}] Kiểm tra tỉnh: ${entry.province} → <i data-lucide="${resultIcon}" class="icon-inline"></i> ${entry.result.replace(/<i data-lucide="plane" class="icon-inline"></i>|<i data-lucide="truck" class="icon-inline"></i>|<i data-lucide="help-circle" class="icon-inline"></i>/, '').trim()}`;
         } else if (entry.type === 'shipping') {
             const { timestamp, data } = entry;
             const { tinh, huyen, vung, tuyen, trongLuong, danhSachDichVu } = data;
             
-            let result = `💰 [${timestamp}] Tính cước phí:\n`;
-            result += `📍 ${huyen}, ${tinh} (${vung} - ${tuyen})\n`;
-            result += `⚖️ Trọng lượng: ${trongLuong} kg\n`;
-            result += `\n📊 Bảng giá:\n`;
+            let result = `<i data-lucide="dollar-sign" class="icon-inline"></i> [${timestamp}] Tính cước phí:<br>`;
+            result += `<i data-lucide="map-pin" class="icon-inline"></i> ${huyen}, ${tinh} (${vung} - ${tuyen})<br>`;
+            result += `<i data-lucide="weight" class="icon-inline"></i> Trọng lượng: ${trongLuong} kg<br>`;
+            result += `<br><i data-lucide="list" class="icon-inline"></i> Bảng giá:<br>`;
             
             danhSachDichVu.forEach(dichVu => {
                 if (dichVu.disabled) {
-                    result += `${dichVu.icon} ${dichVu.ten}: Không áp dụng (${dichVu.lyDo})\n`;
+                    result += `${dichVu.icon} ${dichVu.ten}: Không áp dụng (${dichVu.lyDo})<br>`;
                 } else {
-                    result += `${dichVu.icon} ${dichVu.ten}: ${dichVu.tongCuoc.toLocaleString('vi-VN')} đ (${dichVu.thoiGian})\n`;
+                    result += `${dichVu.icon} ${dichVu.ten}: ${dichVu.tongCuoc.toLocaleString('vi-VN')} đ (${dichVu.thoiGian})<br>`;
                 }
             });
             
@@ -895,7 +927,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const renderHistory = () => {
         if (history.length === 0) {
-            historyListDiv.innerHTML = '<p>📋 LỊCH SỬ TÍNH TOÁN:\n\nChưa có dữ liệu tính toán nào.</p>';
+            historyListDiv.innerHTML = `<div class="empty-history"><i data-lucide="clipboard-list"></i> LỊCH SỬ TÍNH TOÁN:<br><br>Chưa có dữ liệu tính toán nào.</div>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             pageInfoSpan.textContent = 'Trang 1/1';
             prevPageBtn.disabled = true;
             nextPageBtn.disabled = true;
@@ -909,13 +942,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = Math.min(startIndex + itemsPerPage, history.length);
         
-        let html = `<div class="history-header">📋 LỊCH SỬ TÍNH TOÁN</div>`;
-        html += `<div class="history-stats">📊 Hiển thị ${startIndex + 1}-${endIndex} trên tổng ${history.length} mục</div>`;
+        let html = `<div class="history-header"><i data-lucide="clipboard-list"></i> LỊCH SỬ TÍNH TOÁN</div>`;
+        html += `<div class="history-stats"><i data-lucide="bar-chart-2"></i> Hiển thị ${startIndex + 1}-${endIndex} trên tổng ${history.length} mục</div>`;
         
         // Hiển thị các mục trong trang hiện tại
         for (let i = startIndex; i < endIndex; i++) {
             const formattedEntry = formatHistoryEntry(history[i]);
-            html += `<div class="history-item">${formattedEntry.replace(/\n/g, '<br>')}</div>`;
+            html += `<div class="history-item">${formattedEntry}</div>`;
         }
         
         historyListDiv.innerHTML = html;
@@ -984,17 +1017,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             groupHtml += `
                 <div class="group-item${isLast ? ' new-item' : ''}" data-group-index="${index}">
-                    <p class="group-title">☀️ Kiện ${group.groupNumber}:</p>
+                    <p class="group-title"><i data-lucide="package" class="icon-inline"></i> Kiện ${group.groupNumber}:</p>
                     <p>Dài: <span class="value">${df(v1)}</span></p>
                     <p>Rộng: <span class="value">${df(v2)}</span></p>
                     <p>Cao: <span class="value">${df(v3)}</span></p>
                     <p>Số kiện: <span class="value">${df(v4)}</span></p>
                     <hr>
-                    <p>✨ CBM kiện ${group.groupNumber} = ${df(cbm)}, Tổng: ${df(totalCbm)}, Số Kiện: ${df(totalPieces)}</p>
-                    <p>🚛 Kg kiện ${group.groupNumber} (ĐƯỜNG BỘ) = ${df(kgDuongBo)}, Tổng: ${df(totalKgDuongBo)}</p>
-                    <p>🚐 Kg kiện ${group.groupNumber} (VIN-ECO) = ${df(kgVinEco)}, Tổng: ${df(totalKgVinEco)}</p>
-                    <p>✈️ Kg kiện ${group.groupNumber} (CPN) = ${df(kgCpn)}, Tổng: ${df(totalKgCpn)}</p>
-                    <p>🚀 Kg kiện ${group.groupNumber} (HỎA TỐC) = ${df(kgHoaToc)}, Tổng: ${df(totalKgHoaToc)}</p>
+                    <p><i data-lucide="sparkles" class="icon-inline"></i> CBM kiện ${group.groupNumber} = ${df(cbm)}, Tổng: ${df(totalCbm)}, Số Kiện: ${df(totalPieces)}</p>
+                    <p><i data-lucide="truck" class="icon-inline"></i> Kg kiện ${group.groupNumber} (ĐƯỜNG BỘ) = ${df(kgDuongBo)}, Tổng: ${df(totalKgDuongBo)}</p>
+                    <p><i data-lucide="bus" class="icon-inline"></i> Kg kiện ${group.groupNumber} (VIN-ECO) = ${df(kgVinEco)}, Tổng: ${df(totalKgVinEco)}</p>
+                    <p><i data-lucide="plane" class="icon-inline"></i> Kg kiện ${group.groupNumber} (CPN) = ${df(kgCpn)}, Tổng: ${df(totalKgCpn)}</p>
+                    <p><i data-lucide="zap" class="icon-inline"></i> Kg kiện ${group.groupNumber} (HỎA TỐC) = ${df(kgHoaToc)}, Tổng: ${df(totalKgHoaToc)}</p>
                 </div>`;
         });
         
@@ -1004,10 +1037,10 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i=0; i < cbmCurrentIndex - 1; i++) {
                 currentInputHtml += `${labels[i]}: <span class="value">${df(cbmBuffer[i])}</span>, `;
             }
-            groupHtml += `<div class="group-item current-input"><strong>☀️ Kiện ${cbmCurrentGroup} (đang nhập):</strong><br>${currentInputHtml.slice(0, -2)}</div>`;
+            groupHtml += `<div class="group-item current-input"><strong><i data-lucide="edit-3" class="icon-inline"></i> Kiện ${cbmCurrentGroup} (đang nhập):</strong><br>${currentInputHtml.slice(0, -2)}</div>`;
         }
         
-        groupsDisplay.innerHTML = groupHtml || '<p class="empty-message">Chưa có lô hàng nào.</p>';
+        groupsDisplay.innerHTML = groupHtml || '<p class="empty-message"><i data-lucide="info"></i> Chưa có lô hàng nào.</p>';
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
         // Auto-scroll to show current input after every render (Mobile & PC)
@@ -1131,34 +1164,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PROVINCE CHECKER FUNCTIONS ---
     const removeAccents = (str) => {
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+        if (!str) return "";
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+            .replace(/đ/g, "d")
+            .replace("tp.", "tp")
+            .replace("tp ", "tp")
+            .replace("thanh pho ", "")
+            .replace("tinh ", "")
+            .trim();
     };
 
     const checkProvince = () => {
         const sanitizedInput = sanitizeInput(provinceInput.value);
-        const inputProvince = removeAccents(sanitizedInput.toLowerCase()).trim();
+        const inputProvince = removeAccents(sanitizedInput);
         const originalName = sanitizedInput.trim();
 
         if (inputProvince === "") {
             return;
         }
 
+        let foundIndex = -1;
+        for (let i = 0; i < danhSach63TinhKhongDau.length; i++) {
+            const tinhChuan = danhSach63TinhKhongDau[i];
+            if (inputProvince === tinhChuan || 
+                (inputProvince.length > 3 && tinhChuan.includes(inputProvince)) ||
+                (inputProvince.length > 3 && inputProvince.includes(tinhChuan))) {
+                foundIndex = i;
+                break;
+            }
+        }
+
         let resultText = '';
         let resultClass = '';
+        let trungTamText = '';
+        let resultIcon = 'help-circle';
 
-        // Kiểm tra xem tỉnh có trong danh sách 63 tỉnh không
-        if (!allProvinces.includes(inputProvince)) {
-            // Không có trong danh sách → Không tìm thấy
-            resultText = '❓ Không tìm thấy';
+        if (foundIndex === -1) {
+            resultText = 'Không rõ tỉnh thành';
+            resultIcon = 'help-circle';
             resultClass = '';
-        } else if (hangBayProvinces.includes(inputProvince)) {
-            // Có trong danh sách 32 tỉnh Hàng Bay
-            resultText = '✈️ Hàng Bay';
-            resultClass = 'hang-bay';
         } else {
-            // Có trong 63 tỉnh nhưng không phải Hàng Bay → Hàng Bộ
-            resultText = '🚛 Hàng Bộ';
-            resultClass = 'hang-bo';
+            const tinhChuanKhongDau = danhSach63TinhKhongDau[foundIndex];
+            
+            if (mienNam.includes(tinhChuanKhongDau)) {
+                trungTamText = ' - <span style="color:#B0B0B0">Trung Tâm Miền Nam</span>';
+            } else if (mekong.includes(tinhChuanKhongDau)) {
+                trungTamText = ' - <span style="color:#B0B0B0">Trung Tâm Mekong</span>';
+            } else if (mienDong.includes(tinhChuanKhongDau)) {
+                trungTamText = ' - <span style="color:#B0B0B0">Trung Tâm Miền Đông</span>';
+            }
+
+            if (danhSachDiBay.includes(tinhChuanKhongDau)) {
+                resultText = `Hàng Bay${trungTamText}`;
+                resultIcon = 'plane';
+                resultClass = 'hang-bay';
+            } else {
+                resultText = `Hàng Bộ${trungTamText}`;
+                resultIcon = 'truck';
+                resultClass = 'hang-bo';
+            }
         }
 
         // Get current time
@@ -1176,9 +1240,9 @@ document.addEventListener('DOMContentLoaded', () => {
         item.className = `province-item ${resultClass}`;
         item.innerHTML = `
             <span class="time">[${timeStr}]</span>
-            <span class="name">${originalName}</span>
+            <span class="name">${foundIndex !== -1 ? tenTinhCoDau[foundIndex] : originalName}</span>
             <span class="arrow">→</span>
-            <span class="result">${resultText}</span>
+            <span class="result"><i data-lucide="${resultIcon}" class="icon-inline"></i> ${resultText}</span>
         `;
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
@@ -1468,19 +1532,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Kiểm tra dữ liệu đầu vào
         if (!tinhDaChon) {
-            alert('⚠️ Vui lòng chọn Tỉnh/Thành phố!');
+            alert('<i data-lucide="alert-triangle" class="icon-inline"></i> Vui lòng chọn Tỉnh/Thành phố!');
             shippingTinhSelect.focus();
             return;
         }
         
         if (!huyenJson) {
-            alert('⚠️ Vui lòng chọn Quận/Huyện!');
+            alert('<i data-lucide="alert-triangle" class="icon-inline"></i> Vui lòng chọn Quận/Huyện!');
             shippingHuyenSelect.focus();
             return;
         }
         
         if (!kgInput || kgInput <= 0) {
-            alert('⚠️ Vui lòng nhập trọng lượng hợp lệ (> 0 kg)!');
+            alert('<i data-lucide="alert-triangle" class="icon-inline"></i> Vui lòng nhập trọng lượng hợp lệ (> 0 kg)!');
             shippingWeightInput.focus();
             return;
         }
@@ -1712,18 +1776,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Header thông tin chung
         html += `
             <div class="result-header">
-                <div class="result-title">💰 KẾT QUẢ TÍNH CƯỚC PHÍ</div>
+                <div class="result-title"><i data-lucide="dollar-sign" class="icon-inline"></i> KẾT QUẢ TÍNH CƯỚC PHÍ</div>
                 <div class="result-info">
                     <div class="info-item">
-                        <span class="info-label">📍 Điểm đến:</span>
+                        <span class="info-label"><i data-lucide="map-pin" class="icon-inline"></i> Điểm đến:</span>
                         <span class="info-value">${ketQua.huyen}, ${ketQua.tinh}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">🗺️ Vùng:</span>
+                        <span class="info-label"><i data-lucide="map" class="icon-inline"></i> Vùng:</span>
                         <span class="info-value">${ketQua.vung} - ${ketQua.tuyen}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">⚖️ Trọng lượng:</span>
+                        <span class="info-label"><i data-lucide="weight" class="icon-inline"></i> Trọng lượng:</span>
                         <span class="info-value">${ketQua.trongLuong} kg</span>
                     </div>
                 </div>
@@ -2017,13 +2081,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="service-body">
                         ${isDisabled ? `
                         <div class="service-disabled-notice">
-                            <div class="disabled-icon">🚫</div>
+                            <div class="disabled-icon"><i data-lucide="ban" class="icon-inline"></i></div>
                             <div class="disabled-text">Không áp dụng</div>
                             <div class="disabled-reason">${dichVu.lyDo}</div>
                         </div>
                         ` : `
                         <div class="price-breakdown">
-                            <div class="breakdown-title">💵 CHI TIẾT GIÁ:</div>
+                            <div class="breakdown-title"><i data-lucide="banknote" class="icon-inline"></i> CHI TIẾT GIÁ:</div>
                             <div class="breakdown-item">
                                 <span class="breakdown-label">• Giá cơ sở:</span>
                                 <span class="breakdown-value">${formatTien(dichVu.giaCoBan)}</span>
@@ -2044,12 +2108,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="service-time">
-                            <span class="time-icon">⏱️</span>
+                            <span class="time-icon"><i data-lucide="clock" class="icon-inline"></i></span>
                             <span class="time-text">Thời gian: ${dichVu.thoiGian}</span>
                         </div>
                         ${hasQuyTrinh ? `
                         <div class="process-toggle-hint">
-                            <span class="hint-icon">👆</span>
+                            <span class="hint-icon"><i data-lucide="mouse-pointer-2" class="icon-inline"></i></span>
                             <span class="hint-text">Nhấp vào đây để xem quy trình tính toán chi tiết</span>
                         </div>
                         ` : ''}
@@ -2057,7 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     ${hasQuyTrinh ? `
                     <div class="calculation-process-detail" style="display: none;">
-                        <div class="process-title">📋 QUY TRÌNH TÍNH TOÁN CHI TIẾT - ${dichVu.ten}</div>
+                        <div class="process-title"><i data-lucide="clipboard-list" class="icon-inline"></i> QUY TRÌNH TÍNH TOÁN CHI TIẾT - ${dichVu.ten}</div>
                         ${renderQuyTrinhTinhToan(dichVu, ketQua)}
                     </div>
                     ` : ''}
@@ -2070,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Bảng so sánh
         html += `
             <div class="comparison-section">
-                <div class="comparison-title">📊 BẢNG SO SÁNH DỊCH VỤ</div>
+                <div class="comparison-title"><i data-lucide="bar-chart-2" class="icon-inline"></i> BẢNG SO SÁNH DỊCH VỤ</div>
                 <div class="comparison-table">
                     <table>
                         <thead>
@@ -2155,7 +2219,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (shippingWeightInput) shippingWeightInput.value = '';
         if (shippingResultDiv) {
-            shippingResultDiv.innerHTML = '<div class="result-message">📦 Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.</div>';
+            shippingResultDiv.innerHTML = '<div class="result-message"><i data-lucide="package"></i> Vui lòng điền đầy đủ thông tin và nhấn "Tính Cước Phí" để xem kết quả.</div>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
         if (shippingTinhSelect) shippingTinhSelect.focus();
     };
@@ -2628,7 +2693,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="bbc-total-box">
-                    <div class="bbc-total-label">💰 TỔNG TIỀN CẦN THANH TOÁN</div>
+                    <div class="bbc-total-label"><i data-lucide="dollar-sign" class="icon-inline"></i> TỔNG TIỀN CẦN THANH TOÁN</div>
                     <div class="bbc-total-value">${formatTienBBC(tongTien)}</div>
                     <div class="bbc-total-note">= (${soKgQuyDoi.toLocaleString('vi-VN')} kg × ${BBC_DON_GIA.toLocaleString('vi-VN')}) × ${BBC_HE_SO_PHU_PHI} × ${BBC_HE_SO_VAT}</div>
                 </div>

@@ -1,9 +1,9 @@
 {
   "name": "web_vintranscbm",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bản web tĩnh của VinTransCBM với tính cước, bong bóng cá và kiểm tra tỉnh.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/shipping-core.test.js && node tests/province-checker.test.js"
   },
   "keywords": [],
   "author": "",

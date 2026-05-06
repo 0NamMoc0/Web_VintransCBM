@@ -1,158 +1,173 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- UTILS ---
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => document.querySelectorAll(selector);
-    const removeAccents = (str) => { if (!str) return ''; return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase().replace(/tp\./g, "tp").replace(/tp /g, "tp").replace(/thanh pho /g, "").replace(/tinh /g, "").trim(); };
-    const formatTien = (soTien) => { return Math.round(soTien).toLocaleString('vi-VN') + ' đ'; };
-    const formatSo = (so) => { return so.toLocaleString('vi-VN'); };
-    const sanitizeInput = (str) => { if (typeof str !== 'string') return ''; return str.replace(/[<>\"']/g, '').trim(); };
 
-    // --- DATA TỈNH THÀNH (100% Android) ---
-    const danhSach63TinhKhongDau = ["an giang", "ba ria vung tau", "bac giang", "bac kan", "bac lieu", "bac ninh", "ben tre", "binh dinh", "binh duong", "binh phuoc", "binh thuan", "ca mau", "can tho", "cao bang", "da nang", "dak lak", "dak nong", "dien bien", "dong nai", "dong thap", "gia lai", "ha giang", "ha nam", "ha noi", "ha tinh", "hai duong", "hai phong", "hau giang", "hoa binh", "hung yen", "khanh hoa", "kien giang", "kon tum", "lai chau", "lam dong", "lang son", "lao cai", "long an", "nam dinh", "nghe an", "ninh binh", "ninh thuan", "phu tho", "phu yen", "quang binh", "quang nam", "quang ngai", "quang ninh", "quang tri", "soc trang", "son la", "tay ninh", "thai binh", "thai nguyen", "thanh hoa", "thua thien hue", "tien giang", "tp ho chi minh", "tra vinh", "tuyen quang", "vinh long", "vinh phuc", "yen bai"];
-    const tenTinhCoDau = ["An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh", "Bến Tre", "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau", "Cần Thơ", "Cao Bằng", "Đà Nẵng", "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam", "Hà Nội", "Hà Tĩnh", "Hải Dương", "Hải Phòng", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa", "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn", "Lào Cai", "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang", "TP. Hồ Chí Minh", "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"];
-    const danhSachDiBay = ["ha noi", "son la", "quang binh", "cao bang", "quang tri", "thua thien hue", "da nang", "quang nam", "quang ngai", "ha giang", "bac kan", "tuyen quang", "lao cai", "dien bien", "lai chau", "thai binh", "ha nam", "nam dinh", "ninh binh", "thanh hoa", "yen bai", "hoa binh", "thai nguyen", "lang son", "quang ninh", "bac giang", "phu tho", "vinh phuc", "bac ninh", "hai duong", "hai phong", "hung yen", "nghe an", "ha tinh"];
-    const mienNam = ["ha giang", "cao bang", "bac kan", "lang son", "tuyen quang", "thai nguyen", "phu tho", "bac giang", "quang ninh", "lao cai", "lai chau", "yen bai", "dien bien", "son la", "hoa binh", "ha noi", "ha nam", "bac ninh", "hai duong", "hai phong", "hung yen", "nam dinh", "ninh binh", "thai binh", "vinh phuc", "thanh hoa", "nghe an", "ha tinh", "quang binh", "quang tri", "quang nam", "quang ngai", "thua thien hue", "da nang", "binh dinh", "phu yen"];
-    const mekong = ["can tho", "tien giang", "ben tre", "tra vinh", "vinh long", "an giang", "dong thap", "kien giang", "hau giang", "soc trang", "bac lieu", "ca mau"];
-    const mienDong = ["kon tum", "gia lai", "dak lak", "dak nong", "lam dong", "binh phuoc", "tay ninh", "khanh hoa", "ninh thuan", "binh thuan"];
+    const provinceData = window.VinTransCBMProvinceData;
+    const provinceChecker = window.VinTransCBMProvinceChecker;
+    const shippingCore = window.ShippingCore;
+    const ui = window.VinTransCBMUi;
+    const { tenTinhCoDau, duLieuTinh, duLieuHuyen } = provinceData;
 
-    // --- DATA SHIPPING (Đồng bộ 100% Android) ---
-    const duLieuTinh = { "TP.HCM": { vung: 0, ten: "TP. Hồ Chí Minh" }, "Bình Dương": { vung: 1, ten: "Bình Dương" }, "Đồng Nai": { vung: 1, ten: "Đồng Nai" }, "Long An": { vung: 1, ten: "Long An" }, "Bà Rịa - Vũng Tàu": { vung: 2, ten: "Bà Rịa - Vũng Tàu" }, "Bình Phước": { vung: 2, ten: "Bình Phước" }, "Tây Ninh": { vung: 2, ten: "Tây Ninh" }, "Bình Thuận": { vung: 2, ten: "Bình Thuận" }, "Tiền Giang": { vung: 2, ten: "Tiền Giang" }, "Bến Tre": { vung: 2, ten: "Bến Tre" }, "Vĩnh Long": { vung: 2, ten: "Vĩnh Long" }, "Cần Thơ": { vung: 2, ten: "Cần Thơ" }, "Đồng Tháp": { vung: 2, ten: "Đồng Tháp" }, "Trà Vinh": { vung: 2, ten: "Trà Vinh" }, "An Giang": { vung: 3, ten: "An Giang" }, "Kiên Giang": { vung: 3, ten: "Kiên Giang" }, "Hậu Giang": { vung: 3, ten: "Hậu Giang" }, "Cà Mau": { vung: 3, ten: "Cà Mau" }, "Sóc Trăng": { vung: 3, ten: "Sóc Trăng" }, "Bạc Liêu": { vung: 3, ten: "Bạc Liêu" }, "Ninh Thuận": { vung: 3, ten: "Ninh Thuận" }, "Khánh Hòa": { vung: 4, ten: "Khánh Hòa" }, "Bình Định": { vung: 4, ten: "Bình Định" }, "Phú Yên": { vung: 4, ten: "Phú Yên" }, "Lâm Đồng": { vung: 4, ten: "Lâm Đồng" }, "Đắk Nông": { vung: 4, ten: "Đắk Nông" }, "Đắk Lắk": { vung: 4, ten: "Đắk Lắk" }, "Kon Tum": { vung: 5, ten: "Kon Tum" }, "Gia Lai": { vung: 5, ten: "Gia Lai" }, "Huế": { vung: 5, ten: "Huế" }, "Quảng Ngãi": { vung: 5, ten: "Quảng Ngãi" }, "Đà Nẵng": { vung: 5, ten: "Đà Nẵng" }, "Quảng Nam": { vung: 5, ten: "Quảng Nam" }, "Nghệ An": { vung: 6, ten: "Nghệ An" }, "Hà Tĩnh": { vung: 6, ten: "Hà Tĩnh" }, "Quảng Bình": { vung: 6, ten: "Quảng Bình" }, "Quảng Trị": { vung: 6, ten: "Quảng Trị" }, "Hà Nội": { vung: 7, ten: "Hà Nội" }, "Bắc Ninh": { vung: 7, ten: "Bắc Ninh" }, "Vĩnh Phúc": { vung: 7, ten: "Vĩnh Phúc" }, "Thái Bình": { vung: 7, ten: "Thái Bình" }, "Hưng Yên": { vung: 7, ten: "Hưng Yên" }, "Ninh Bình": { vung: 7, ten: "Ninh Bình" }, "Hải Phòng": { vung: 7, ten: "Hải Phòng" }, "Hải Dương": { vung: 7, ten: "Hải Dương" }, "Hòa Bình": { vung: 7, ten: "Hòa Bình" }, "Nam Định": { vung: 7, ten: "Nam Định" }, "Thái Nguyên": { vung: 7, ten: "Thái Nguyên" }, "Bắc Giang": { vung: 7, ten: "Bắc Giang" }, "Hà Nam": { vung: 7, ten: "Hà Nam" }, "Thanh Hóa": { vung: 7, ten: "Thanh Hóa" }, "Quảng Ninh": { vung: 8, ten: "Quảng Ninh" }, "Bắc Kạn": { vung: 8, ten: "Bắc Kạn" }, "Lạng Sơn": { vung: 8, ten: "Lạng Sơn" }, "Cao Bằng": { vung: 8, ten: "Cao Bằng" }, "Điện Biên": { vung: 8, ten: "Điện Biên" }, "Sơn La": { vung: 8, ten: "Sơn La" }, "Yên Bái": { vung: 8, ten: "Yên Bái" }, "Lai Châu": { vung: 8, ten: "Lai Châu" }, "Tuyên Quang": { vung: 8, ten: "Tuyên Quang" }, "Hà Giang": { vung: 8, ten: "Hà Giang" }, "Lào Cai": { vung: 8, ten: "Lào Cai" }, "Phú Thọ": { vung: 8, ten: "Phú Thọ" } };
-    const duLieuHuyen = {
-        "TP.HCM": [{ ten: "Quận 1", loai: "noi" }, { ten: "Quận 2", loai: "noi" }, { ten: "Quận 3", loai: "noi" }, { ten: "Quận 4", loai: "noi" }, { ten: "Quận 5", loai: "noi" }, { ten: "Quận 6", loai: "noi" }, { ten: "Quận 7", loai: "noi" }, { ten: "Quận 8", loai: "noi" }, { ten: "Quận 9", loai: "noi" }, { ten: "Quận 10", loai: "noi" }, { ten: "Quận 11", loai: "noi" }, { ten: "Quận 12", loai: "noi" }, { ten: "Quận Bình Tân", loai: "noi" }, { ten: "Quận Bình Thạnh", loai: "noi" }, { ten: "Quận Gò Vấp", loai: "noi" }, { ten: "Quận Phú Nhuận", loai: "noi" }, { ten: "Quận Tân Bình", loai: "noi" }, { ten: "Quận Tân Phú", loai: "noi" }, { ten: "Quận Thủ Đức", loai: "noi" }, { ten: "Huyện Bình Chánh", loai: "noi" }, { ten: "Huyện Cần Giờ", loai: "ngoai" }, { ten: "Huyện Củ Chi", loai: "ngoai" }, { ten: "Huyện Hóc Môn", loai: "ngoai" }, { ten: "Huyện Nhà Bè", loai: "ngoai" }],
-        "Bắc Kạn": [{ ten: "TX Bắc Kạn", loai: "noi" }, { ten: "Huyện Ba Bể", loai: "ngoai" }, { ten: "Huyện Bạch Thông", loai: "ngoai" }, { ten: "Huyện Chợ Đồn", loai: "ngoai" }, { ten: "Huyện Chợ Mới", loai: "ngoai" }, { ten: "Huyện Na Rì", loai: "ngoai" }, { ten: "Huyện Ngân Sơn", loai: "ngoai" }, { ten: "Huyện Pác Nặm", loai: "ngoai" }],
-        "Bắc Giang": [{ ten: "TP Bắc Giang", loai: "noi" }, { ten: "Huyện Hiệp Hòa", loai: "ngoai" }, { ten: "Huyện Lạng Giang", loai: "ngoai" }, { ten: "Huyện Lục Nam", loai: "ngoai" }, { ten: "Huyện Lục Ngạn", loai: "ngoai" }, { ten: "Huyện Sơn Động", loai: "ngoai" }, { ten: "Huyện Tân Yên", loai: "ngoai" }, { ten: "Huyện Việt Yên", loai: "ngoai" }, { ten: "Huyện Yên Dũng", loai: "ngoai" }, { ten: "Huyện Yên Thế", loai: "ngoai" }],
-        "Cao Bằng": [{ ten: "TP Cao Bằng", loai: "noi" }, { ten: "Huyện Bảo Lạc", loai: "ngoai" }, { ten: "Huyện Bảo Lâm", loai: "ngoai" }, { ten: "Huyện Hạ Lang", loai: "ngoai" }, { ten: "Huyện Hà Quảng", loai: "ngoai" }, { ten: "Huyện Hòa An", loai: "ngoai" }, { ten: "Huyện Nguyên Bình", loai: "ngoai" }, { ten: "Huyện Phục Hòa", loai: "ngoai" }, { ten: "Huyện Quảng Uyên", loai: "ngoai" }, { ten: "Huyện Thạch An", loai: "ngoai" }, { ten: "Huyện Thông Nông", loai: "ngoai" }, { ten: "Huyện Trà Lĩnh", loai: "ngoai" }, { ten: "Huyện Trùng Khánh", loai: "ngoai" }],
-        "Hà Giang": [{ ten: "TP Hà Giang", loai: "noi" }, { ten: "Huyện Bắc Mê", loai: "ngoai" }, { ten: "Huyện Bắc Quang", loai: "ngoai" }, { ten: "Huyện Đồng Văn", loai: "ngoai" }, { ten: "Huyện Hoàng Su Phì", loai: "ngoai" }, { ten: "Huyện Mèo Vạc", loai: "ngoai" }, { ten: "Huyện Quản Bạ", loai: "ngoai" }, { ten: "Huyện Quang Bình", loai: "ngoai" }, { ten: "Huyện Vị Xuyên", loai: "ngoai" }, { ten: "Huyện Xín Mần", loai: "ngoai" }, { ten: "Huyện Yên Minh", loai: "ngoai" }],
-        "Lạng Sơn": [{ ten: "TP Lạng Sơn", loai: "noi" }, { ten: "Huyện Bắc Sơn", loai: "ngoai" }, { ten: "Huyện Bình Gia", loai: "ngoai" }, { ten: "Huyện Cao Lộc", loai: "ngoai" }, { ten: "Huyện Chi Lăng", loai: "ngoai" }, { ten: "Huyện Đình Lập", loai: "ngoai" }, { ten: "Huyện Hữu Lũng", loai: "ngoai" }, { ten: "Huyện Lộc Bình", loai: "ngoai" }, { ten: "Huyện Tràng Định", loai: "ngoai" }, { ten: "Huyện Văn Lãng", loai: "ngoai" }, { ten: "Huyện Văn Quan", loai: "ngoai" }],
-        "Thái Nguyên": [{ ten: "TP Thái Nguyên", loai: "noi" }, { ten: "TX Sông Công", loai: "ngoai" }, { ten: "Huyện Đại Từ", loai: "ngoai" }, { ten: "Huyện Định Hóa", loai: "ngoai" }, { ten: "Huyện Đồng Hỷ", loai: "ngoai" }, { ten: "Huyện Phổ Yên", loai: "ngoai" }, { ten: "Huyện Phú Bình", loai: "ngoai" }, { ten: "Huyện Phú Lương", loai: "ngoai" }, { ten: "Huyện Võ Nhai", loai: "ngoai" }],
-        "Bắc Ninh": [{ ten: "TP Bắc Ninh", loai: "noi" }, { ten: "TX Từ Sơn", loai: "noi" }, { ten: "Huyện Gia Bình", loai: "ngoai" }, { ten: "Huyện Lương Tài", loai: "ngoai" }, { ten: "Huyện Quế Võ", loai: "ngoai" }, { ten: "Huyện Thuận Thành", loai: "ngoai" }, { ten: "Huyện Tiên Du", loai: "ngoai" }, { ten: "Huyện Yên Phong", loai: "ngoai" }],
-        "Hà Nam": [{ ten: "TP Phủ Lý", loai: "noi" }, { ten: "Huyện Bình Lục", loai: "ngoai" }, { ten: "Huyện Duy Tiên", loai: "ngoai" }, { ten: "Huyện Kim Bảng", loai: "ngoai" }, { ten: "Huyện Lý Nhân", loai: "ngoai" }, { ten: "Huyện Thanh Liêm", loai: "ngoai" }],
-        "Hà Nội": [{ ten: "Quận Ba Đình", loai: "noi" }, { ten: "Quận Cầu Giấy", loai: "noi" }, { ten: "Quận Đống Đa", loai: "noi" }, { ten: "Quận Hà Đông", loai: "noi" }, { ten: "Quận Hai Bà Trưng", loai: "noi" }, { ten: "Quận Hoàn Kiếm", loai: "noi" }, { ten: "Quận Hoàng Mai", loai: "noi" }, { ten: "Quận Long Biên", loai: "noi" }, { ten: "Quận Tây Hồ", loai: "noi" }, { ten: "Quận Thanh Xuân", loai: "noi" }, { ten: "Quận Thanh Trì", loai: "noi" }, { ten: "Quận Từ Liêm Bắc", loai: "noi" }, { ten: "Quận Từ Liêm Nam", loai: "noi" }, { ten: "TX Sơn Tây", loai: "ngoai" }, { ten: "Huyện Ba Vì", loai: "ngoai" }, { ten: "Huyện Chương Mỹ", loai: "ngoai" }, { ten: "Huyện Đan Phượng", loai: "ngoai" }, { ten: "Huyện Đông Anh", loai: "ngoai" }, { ten: "Huyện Gia Lâm", loai: "ngoai" }, { ten: "Huyện Hoài Đức", loai: "ngoai" }, { ten: "Huyện Mê Linh", loai: "ngoai" }, { ten: "Huyện Mỹ Đức", loai: "ngoai" }, { ten: "Huyện Phú Xuyên", loai: "ngoai" }, { ten: "Huyện Phúc Thọ", loai: "ngoai" }, { ten: "Huyện Quốc Oai", loai: "ngoai" }, { ten: "Huyện Sóc Sơn", loai: "ngoai" }, { ten: "Huyện Thạch Thất", loai: "ngoai" }, { ten: "Huyện Thanh Oai", loai: "ngoai" }, { ten: "Huyện Thường Tín", loai: "ngoai" }, { ten: "Huyện Ứng Hòa", loai: "ngoai" }],
-        "Hải Dương": [{ ten: "TP Hải Dương", loai: "noi" }, { ten: "TX Chí Linh", loai: "ngoai" }, { ten: "Huyện Bình Giang", loai: "ngoai" }, { ten: "Huyện Cẩm Giàng", loai: "ngoai" }, { ten: "Huyện Gia Lộc", loai: "ngoai" }, { ten: "Huyện Kim Thành", loai: "ngoai" }, { ten: "Huyện Kinh Môn", loai: "ngoai" }, { ten: "Huyện Nam Sách", loai: "ngoai" }, { ten: "Huyện Ninh Giang", loai: "ngoai" }, { ten: "Huyện Thanh Hà", loai: "ngoai" }, { ten: "Huyện Thanh Miện", loai: "ngoai" }, { ten: "Huyện Tứ Kỳ", loai: "ngoai" }],
-        "Hải Phòng": [{ ten: "Quận Đồ Sơn", loai: "noi" }, { ten: "Quận Dương Kinh", loai: "noi" }, { ten: "Quận Hải An", loai: "noi" }, { ten: "Quận Hồng Bàng", loai: "noi" }, { ten: "Quận Kiến An", loai: "noi" }, { ten: "Quận Lê Chân", loai: "noi" }, { ten: "Quận Ngô Quyền", loai: "noi" }, { ten: "Huyện An Dương", loai: "ngoai" }, { ten: "Huyện An Lão", loai: "ngoai" }, { ten: "Huyện Bạch Long Vĩ", loai: "ngoai" }, { ten: "Huyện Cát Hải", loai: "ngoai" }, { ten: "Huyện Kiến Thụy", loai: "ngoai" }, { ten: "Huyện Thủy Nguyên", loai: "ngoai" }, { ten: "Huyện Tiên Lãng", loai: "ngoai" }, { ten: "Huyện Vĩnh Bảo", loai: "ngoai" }],
-        "Hòa Bình": [{ ten: "TP Hòa Bình", loai: "noi" }, { ten: "Huyện Cao Phong", loai: "ngoai" }, { ten: "Huyện Đà Bắc", loai: "ngoai" }, { ten: "Huyện Kim Bôi", loai: "ngoai" }, { ten: "Huyện Kỳ Sơn", loai: "ngoai" }, { ten: "Huyện Lạc Sơn", loai: "ngoai" }, { ten: "Huyện Lạc Thủy", loai: "ngoai" }, { ten: "Huyện Lương Sơn", loai: "ngoai" }, { ten: "Huyện Mai Châu", loai: "ngoai" }, { ten: "Huyện Tân Lạc", loai: "ngoai" }, { ten: "Huyện Yên Thủy", loai: "ngoai" }],
-        "Kon Tum": [{ ten: "TP Kon Tum", loai: "noi" }, { ten: "Huyện Đắk Glei", loai: "ngoai" }, { ten: "Huyện Đắk Hà", loai: "ngoai" }, { ten: "Huyện Đắk Tô", loai: "ngoai" }, { ten: "Huyện Kon Plông", loai: "ngoai" }, { ten: "Huyện Kon Rẫy", loai: "ngoai" }, { ten: "Huyện Ngọc Hồi", loai: "ngoai" }, { ten: "Huyện Sa Thầy", loai: "ngoai" }, { ten: "Huyện Tu Mơ Rông", loai: "ngoai" }],
-        "Quảng Nam": [{ ten: "TP Hội An", loai: "noi" }, { ten: "TP Tam Kỳ", loai: "noi" }, { ten: "Huyện Bắc Trà My", loai: "ngoai" }, { ten: "Huyện Đại Lộc", loai: "ngoai" }, { ten: "Huyện Điện Bàn", loai: "ngoai" }, { ten: "Huyện Đông Giang", loai: "ngoai" }, { ten: "Huyện Duy Xuyên", loai: "ngoai" }, { ten: "Huyện Hiệp Đức", loai: "ngoai" }, { ten: "Huyện Nam Giang", loai: "ngoai" }, { ten: "Huyện Nam Trà My", loai: "ngoai" }, { ten: "Huyện Nông Sơn", loai: "ngoai" }, { ten: "Huyện Núi Thành", loai: "ngoai" }, { ten: "Huyện Phú Ninh", loai: "ngoai" }, { ten: "Huyện Phước Sơn", loai: "ngoai" }, { ten: "Huyện Quế Sơn", loai: "ngoai" }, { ten: "Huyện Tây Giang", loai: "ngoai" }, { ten: "Huyện Thăng Bình", loai: "ngoai" }, { ten: "Huyện Tiên Phước", loai: "ngoai" }],
-        "Quảng Ngãi": [{ ten: "TP Quảng Ngãi", loai: "noi" }, { ten: "Huyện Ba Tơ", loai: "ngoai" }, { ten: "Huyện Bình Sơn", loai: "ngoai" }, { ten: "Huyện Đức Phổ", loai: "ngoai" }, { ten: "Huyện Lý Sơn", loai: "ngoai" }, { ten: "Huyện Minh Long", loai: "ngoai" }, { ten: "Huyện Mộ Đức", loai: "ngoai" }, { ten: "Huyện Nghĩa Hành", loai: "ngoai" }, { ten: "Huyện Sơn Hà", loai: "ngoai" }, { ten: "Huyện Sơn Tây", loai: "ngoai" }, { ten: "Huyện Sơn Tịnh", loai: "ngoai" }, { ten: "Huyện Tây Trà", loai: "ngoai" }, { ten: "Huyện Trà Bồng", loai: "ngoai" }, { ten: "Huyện Tư Nghĩa", loai: "ngoai" }],
-        "Quảng Trị": [{ ten: "TP Đông Hà", loai: "ngoai" }, { ten: "TX Quảng Trị", loai: "ngoai" }, { ten: "Huyện Triệu Phong", loai: "noi" }, { ten: "Huyện Cam Lộ", loai: "ngoai" }, { ten: "Huyện Cồn Cỏ", loai: "ngoai" }, { ten: "Huyện Đakrông", loai: "ngoai" }, { ten: "Huyện Gio Linh", loai: "ngoai" }, { ten: "Huyện Hải Lăng", loai: "ngoai" }, { ten: "Huyện Hướng Hóa", loai: "ngoai" }, { ten: "Huyện Vĩnh Linh", loai: "ngoai" }],
-        "Bình Định": [{ ten: "TP Quy Nhơn", loai: "noi" }, { ten: "Huyện Tuy Phước", loai: "noi" }, { ten: "Huyện An Lão", loai: "ngoai" }, { ten: "Huyện An Nhơn", loai: "ngoai" }, { ten: "Huyện Hoài Ân", loai: "ngoai" }, { ten: "Huyện Hoài Nhơn", loai: "ngoai" }, { ten: "Huyện Phù Cát", loai: "ngoai" }, { ten: "Huyện Phù Mỹ", loai: "ngoai" }, { ten: "Huyện Tây Sơn", loai: "ngoai" }, { ten: "Huyện Vân Canh", loai: "ngoai" }, { ten: "Huyện Vĩnh Thạnh", loai: "ngoai" }],
-        "Ninh Bình": [{ ten: "TP Ninh Bình", loai: "noi" }, { ten: "TX Tam Điệp", loai: "ngoai" }, { ten: "Huyện Gia Viễn", loai: "ngoai" }, { ten: "Huyện Hoa Lư", loai: "ngoai" }, { ten: "Huyện Kim Sơn", loai: "ngoai" }, { ten: "Huyện Nho Quan", loai: "ngoai" }, { ten: "Huyện Yên Khánh", loai: "ngoai" }, { ten: "Huyện Yên Mô", loai: "ngoai" }],
-        "Quảng Bình": [{ ten: "TP Đồng Hới", loai: "noi" }, { ten: "Huyện Bố Trạch", loai: "ngoai" }, { ten: "Huyện Lệ Thủy", loai: "ngoai" }, { ten: "Huyện Minh Hóa", loai: "ngoai" }, { ten: "Huyện Quảng Ninh", loai: "ngoai" }, { ten: "Huyện Quảng Trạch", loai: "ngoai" }, { ten: "Huyện Tuyên Hóa", loai: "ngoai" }],
-        "Thanh Hóa": [{ ten: "TP Thanh Hóa", loai: "noi" }, { ten: "TX Bỉm Sơn", loai: "ngoai" }, { ten: "TX Sầm Sơn", loai: "ngoai" }, { ten: "Huyện Bá Thước", loai: "ngoai" }, { ten: "Huyện Cẩm Thủy", loai: "ngoai" }, { ten: "Huyện Đông Sơn", loai: "ngoai" }, { ten: "Huyện Hà Trung", loai: "ngoai" }, { ten: "Huyện Hậu Lộc", loai: "ngoai" }, { ten: "Huyện Hoằng Hóa", loai: "ngoai" }, { ten: "Huyện Lang Chánh", loai: "ngoai" }, { ten: "Huyện Mường Lát", loai: "ngoai" }, { ten: "Huyện Nga Sơn", loai: "ngoai" }, { ten: "Huyện Ngọc Lặc", loai: "ngoai" }, { ten: "Huyện Như Thanh", loai: "ngoai" }, { ten: "Huyện Như Xuân", loai: "ngoai" }, { ten: "Huyện Nông Cống", loai: "ngoai" }, { ten: "Huyện Quan Hóa", loai: "ngoai" }, { ten: "Huyện Quan Sơn", loai: "ngoai" }, { ten: "Huyện Quảng Xương", loai: "ngoai" }, { ten: "Huyện Thạch Thành", loai: "ngoai" }, { ten: "Huyện Thiệu Hóa", loai: "ngoai" }, { ten: "Huyện Thọ Xuân", loai: "ngoai" }, { ten: "Huyện Thường Xuân", loai: "ngoai" }, { ten: "Huyện Tĩnh Gia", loai: "ngoai" }, { ten: "Huyện Triệu Sơn", loai: "ngoai" }, { ten: "Huyện Vĩnh Lộc", loai: "ngoai" }, { ten: "Huyện Yên Định", loai: "ngoai" }],
-        "Đà Nẵng": [{ ten: "Quận Cẩm Lệ", loai: "noi" }, { ten: "Quận Hải Châu", loai: "noi" }, { ten: "Quận Liên Chiểu", loai: "noi" }, { ten: "Quận Ngũ Hành Sơn", loai: "noi" }, { ten: "Quận Sơn Trà", loai: "noi" }, { ten: "Quận Thanh Khê", loai: "noi" }, { ten: "Huyện Hòa Vang", loai: "ngoai" }],
-        "Huế": [{ ten: "TP Huế", loai: "noi" }, { ten: "TX Hương Thủy", loai: "ngoai" }, { ten: "TX Hương Trà", loai: "ngoai" }, { ten: "Huyện A Lưới", loai: "ngoai" }, { ten: "Huyện Phong Điền", loai: "ngoai" }, { ten: "Huyện Phú Lộc", loai: "ngoai" }, { ten: "Huyện Phú Vang", loai: "ngoai" }, { ten: "Huyện Quảng Điền", loai: "ngoai" }],
-        "Phú Yên": [{ ten: "TP Tuy Hòa", loai: "noi" }, { ten: "TX Sông Cầu", loai: "ngoai" }, { ten: "Huyện Đồng Xuân", loai: "ngoai" }, { ten: "Huyện Đông Hòa", loai: "ngoai" }, { ten: "Huyện Phú Hòa", loai: "ngoai" }, { ten: "Huyện Sơn Hòa", loai: "ngoai" }, { ten: "Huyện Sông Hinh", loai: "ngoai" }, { ten: "Huyện Tây Hòa", loai: "ngoai" }, { ten: "Huyện Tuy An", loai: "ngoai" }],
-        "Bến Tre": [{ ten: "TP Bến Tre", loai: "noi" }, { ten: "Huyện Ba Tri", loai: "ngoai" }, { ten: "Huyện Bình Đại", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Chợ Lách", loai: "ngoai" }, { ten: "Huyện Giồng Trôm", loai: "ngoai" }, { ten: "Huyện Mỏ Cày Bắc", loai: "ngoai" }, { ten: "Huyện Mỏ Cày Nam", loai: "ngoai" }, { ten: "Huyện Thạnh Phú", loai: "ngoai" }],
-        "Bình Dương": [{ ten: "TP Thủ Dầu Một", loai: "noi" }, { ten: "TX Dĩ An", loai: "noi" }, { ten: "TX Thuận An", loai: "noi" }, { ten: "Huyện Bến Cát", loai: "ngoai" }, { ten: "Huyện Dầu Tiếng", loai: "ngoai" }, { ten: "Huyện Phú Giáo", loai: "ngoai" }, { ten: "Huyện Tân Uyên", loai: "ngoai" }],
-        "Bình Phước": [{ ten: "TX Đồng Xoài", loai: "noi" }, { ten: "TX Bình Long", loai: "ngoai" }, { ten: "TX Phước Long", loai: "ngoai" }, { ten: "Huyện Bù Đăng", loai: "ngoai" }, { ten: "Huyện Bù Đốp", loai: "ngoai" }, { ten: "Huyện Bù Gia Mập", loai: "ngoai" }, { ten: "Huyện Chơn Thành", loai: "ngoai" }, { ten: "Huyện Đồng Phú", loai: "ngoai" }, { ten: "Huyện Hớn Quản", loai: "ngoai" }, { ten: "Huyện Lộc Ninh", loai: "ngoai" }],
-        "Đắk Nông": [{ ten: "TX Gia Nghĩa", loai: "noi" }, { ten: "Huyện Cư Jút", loai: "ngoai" }, { ten: "Huyện Đắk Song", loai: "ngoai" }, { ten: "Huyện Đắk Glong", loai: "ngoai" }, { ten: "Huyện Đắk Mil", loai: "ngoai" }, { ten: "Huyện Đắk Rlấp", loai: "ngoai" }, { ten: "Huyện Krông Nô", loai: "ngoai" }, { ten: "Huyện Tuy Đức", loai: "ngoai" }],
-        "Đồng Nai": [{ ten: "TP Biên Hòa", loai: "noi" }, { ten: "Huyện Cẩm Mỹ", loai: "ngoai" }, { ten: "Huyện Định Quán", loai: "ngoai" }, { ten: "Huyện Long Khánh", loai: "ngoai" }, { ten: "Huyện Long Thành", loai: "ngoai" }, { ten: "Huyện Nhơn Trạch", loai: "ngoai" }, { ten: "Huyện Tân Phú", loai: "ngoai" }, { ten: "Huyện Thống Nhất", loai: "ngoai" }, { ten: "Huyện Trảng Bom", loai: "ngoai" }, { ten: "Huyện Vĩnh Cửu", loai: "ngoai" }, { ten: "Huyện Xuân Lộc", loai: "ngoai" }],
-        "Đồng Tháp": [{ ten: "TP Cao Lãnh", loai: "noi" }, { ten: "TX Hồng Ngự", loai: "ngoai" }, { ten: "TX Sa Đéc", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Hồng Ngự", loai: "ngoai" }, { ten: "Huyện Lai Vung", loai: "ngoai" }, { ten: "Huyện Lấp Vò", loai: "ngoai" }, { ten: "Huyện Tam Nông", loai: "ngoai" }, { ten: "Huyện Tân Hồng", loai: "ngoai" }, { ten: "Huyện Thanh Bình", loai: "ngoai" }, { ten: "Huyện Tháp Mười", loai: "ngoai" }],
-        "Hậu Giang": [{ ten: "TP Vị Thanh", loai: "noi" }, { ten: "TX Ngã Bảy", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Châu Thành A", loai: "ngoai" }, { ten: "Huyện Long Mỹ", loai: "ngoai" }, { ten: "Huyện Phụng Hiệp", loai: "ngoai" }, { ten: "Huyện Vị Thủy", loai: "ngoai" }],
-        "Kiên Giang": [{ ten: "TP Rạch Giá", loai: "noi" }, { ten: "TX Hà Tiên", loai: "ngoai" }, { ten: "Huyện An Biên", loai: "ngoai" }, { ten: "Huyện An Minh", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Giang Thành", loai: "ngoai" }, { ten: "Huyện Giồng Riềng", loai: "ngoai" }, { ten: "Huyện Gò Quao", loai: "ngoai" }, { ten: "Huyện Hòn Đất", loai: "ngoai" }, { ten: "Huyện Kiên Hải", loai: "ngoai" }, { ten: "Huyện Kiên Lương", loai: "ngoai" }, { ten: "Huyện Phú Quốc", loai: "ngoai" }, { ten: "Huyện Tân Hiệp", loai: "ngoai" }, { ten: "Huyện U Minh Thượng", loai: "ngoai" }, { ten: "Huyện Vĩnh Thuận", loai: "ngoai" }],
-        "Sóc Trăng": [{ ten: "TP Sóc Trăng", loai: "noi" }, { ten: "TX Vĩnh Châu", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Cù Lao Dung", loai: "ngoai" }, { ten: "Huyện Kế Sách", loai: "ngoai" }, { ten: "Huyện Long Phú", loai: "ngoai" }, { ten: "Huyện Mỹ Tú", loai: "ngoai" }, { ten: "Huyện Mỹ Xuyên", loai: "ngoai" }, { ten: "Huyện Ngã Năm", loai: "ngoai" }, { ten: "Huyện Thạnh Trị", loai: "ngoai" }, { ten: "Huyện Trần Đề", loai: "ngoai" }],
-        "Trà Vinh": [{ ten: "TP Trà Vinh", loai: "noi" }, { ten: "Huyện Càng Long", loai: "ngoai" }, { ten: "Huyện Cầu Kè", loai: "ngoai" }, { ten: "Huyện Cầu Ngang", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Duyên Hải", loai: "ngoai" }, { ten: "Huyện Tiểu Cần", loai: "ngoai" }, { ten: "Huyện Trà Cú", loai: "ngoai" }],
-        "Vĩnh Long": [{ ten: "TP Vĩnh Long", loai: "noi" }, { ten: "Huyện Bình Minh", loai: "ngoai" }, { ten: "Huyện Bình Tân", loai: "ngoai" }, { ten: "Huyện Long Hồ", loai: "ngoai" }, { ten: "Huyện Mang Thít", loai: "ngoai" }, { ten: "Huyện Tam Bình", loai: "ngoai" }, { ten: "Huyện Trà Ôn", loai: "ngoai" }, { ten: "Huyện Vũng Liêm", loai: "ngoai" }],
-        "Bình Thuận": [{ ten: "TP Phan Thiết", loai: "noi" }, { ten: "TX La Gi", loai: "noi" }, { ten: "Huyện Bác Ái", loai: "ngoai" }, { ten: "Huyện Đức Linh", loai: "ngoai" }, { ten: "Huyện Hàm Tân", loai: "ngoai" }, { ten: "Huyện Hàm Thuận Bắc", loai: "ngoai" }, { ten: "Huyện Hàm Thuận Nam", loai: "ngoai" }, { ten: "Huyện Phú Quý", loai: "ngoai" }, { ten: "Huyện Tánh Linh", loai: "ngoai" }, { ten: "Huyện Tuy Phong", loai: "ngoai" }],
-        "Long An": [{ ten: "Huyện Bến Lức", loai: "ngoai" }, { ten: "Huyện Cần Đước", loai: "ngoai" }, { ten: "Huyện Cần Giuộc", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Đức Hòa", loai: "ngoai" }, { ten: "Huyện Đức Huệ", loai: "ngoai" }],
-        "Bà Rịa - Vũng Tàu": [{ ten: "TP Vũng Tàu", loai: "noi" }, { ten: "TP Bà Rịa", loai: "noi" }, { ten: "Huyện Châu Đức", loai: "ngoai" }, { ten: "Huyện Côn Đảo", loai: "ngoai" }, { ten: "Huyện Đất Đỏ", loai: "ngoai" }, { ten: "Huyện Long Điền", loai: "ngoai" }, { ten: "Huyện Tân Thành", loai: "ngoai" }, { ten: "Huyện Xuyên Mộc", loai: "ngoai" }],
-        "Tây Ninh": [{ ten: "TP Tây Ninh", loai: "noi" }, { ten: "Huyện Bến Cầu", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Dương Minh Châu", loai: "ngoai" }, { ten: "Huyện Gò Dầu", loai: "ngoai" }, { ten: "Huyện Hòa Thành", loai: "ngoai" }, { ten: "Huyện Tân Biên", loai: "ngoai" }, { ten: "Huyện Tân Châu", loai: "ngoai" }, { ten: "Huyện Trảng Bàng", loai: "ngoai" }],
-        "Tiền Giang": [{ ten: "TP Mỹ Tho", loai: "noi" }, { ten: "TX Gò Công", loai: "noi" }, { ten: "Huyện Cai Lậy", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Chợ Gạo", loai: "ngoai" }, { ten: "Huyện Gò Công Đông", loai: "ngoai" }, { ten: "Huyện Gò Công Tây", loai: "ngoai" }, { ten: "Huyện Tân Phú Đông", loai: "ngoai" }, { ten: "Huyện Tân Phước", loai: "ngoai" }],
-        "Cần Thơ": [{ ten: "Quận Bình Thủy", loai: "noi" }, { ten: "Quận Cái Răng", loai: "noi" }, { ten: "Quận Ninh Kiều", loai: "noi" }, { ten: "Quận Ô Môn", loai: "noi" }, { ten: "Quận Thốt Nốt", loai: "noi" }, { ten: "Huyện Cờ Đỏ", loai: "ngoai" }, { ten: "Huyện Phong Điền", loai: "ngoai" }, { ten: "Huyện Thới Lai", loai: "ngoai" }, { ten: "Huyện Vĩnh Thạnh", loai: "ngoai" }],
-        "An Giang": [{ ten: "TP Long Xuyên", loai: "noi" }, { ten: "TP Châu Đốc", loai: "noi" }, { ten: "Huyện An Phú", loai: "ngoai" }, { ten: "Huyện Châu Phú", loai: "ngoai" }, { ten: "Huyện Châu Thành", loai: "ngoai" }, { ten: "Huyện Chợ Mới", loai: "ngoai" }, { ten: "Huyện Phú Tân", loai: "ngoai" }, { ten: "Huyện Thoại Sơn", loai: "ngoai" }, { ten: "Huyện Tịnh Biên", loai: "ngoai" }, { ten: "Huyện Tri Tôn", loai: "ngoai" }],
-        "Cà Mau": [{ ten: "TP Cà Mau", loai: "noi" }, { ten: "Huyện Cái Nước", loai: "ngoai" }, { ten: "Huyện Đầm Dơi", loai: "ngoai" }, { ten: "Huyện Năm Căn", loai: "ngoai" }, { ten: "Huyện Ngọc Hiển", loai: "ngoai" }, { ten: "Huyện Phú Tân", loai: "ngoai" }, { ten: "Huyện Thới Bình", loai: "ngoai" }, { ten: "Huyện Trần Văn Thời", loai: "ngoai" }, { ten: "Huyện U Minh", loai: "ngoai" }],
-        "Bạc Liêu": [{ ten: "TP Bạc Liêu", loai: "noi" }, { ten: "Huyện Đông Hải", loai: "ngoai" }, { ten: "Huyện Giá Rai", loai: "ngoai" }, { ten: "Huyện Hòa Bình", loai: "ngoai" }, { ten: "Huyện Hồng Dân", loai: "ngoai" }, { ten: "Huyện Phước Long", loai: "ngoai" }, { ten: "Huyện Vĩnh Lợi", loai: "ngoai" }],
-        "Ninh Thuận": [{ ten: "TP Phan Rang-Tháp Chàm", loai: "noi" }, { ten: "Huyện Bác Ái", loai: "ngoai" }, { ten: "Huyện Ninh Hải", loai: "ngoai" }, { ten: "Huyện Ninh Phước", loai: "ngoai" }, { ten: "Huyện Ninh Sơn", loai: "ngoai" }, { ten: "Huyện Thuận Bắc", loai: "ngoai" }, { ten: "Huyện Thuận Nam", loai: "ngoai" }],
-        "Khánh Hòa": [{ ten: "TP Nha Trang", loai: "noi" }, { ten: "TP Cam Ranh", loai: "noi" }, { ten: "Huyện Cam Lâm", loai: "ngoai" }, { ten: "Huyện Diên Khánh", loai: "ngoai" }, { ten: "Huyện Khánh Sơn", loai: "ngoai" }, { ten: "Huyện Khánh Vĩnh", loai: "ngoai" }, { ten: "Huyện Ninh Hòa", loai: "ngoai" }, { ten: "Huyện Trường Sa", loai: "ngoai" }, { ten: "Huyện Vạn Ninh", loai: "ngoai" }],
-        "Lâm Đồng": [{ ten: "TP Đà Lạt", loai: "noi" }, { ten: "TP Bảo Lộc", loai: "noi" }, { ten: "Huyện Bảo Lâm", loai: "ngoai" }, { ten: "Huyện Cát Tiên", loai: "ngoai" }, { ten: "Huyện Đạ Huoai", loai: "ngoai" }, { ten: "Huyện Đạ Tẻh", loai: "ngoai" }, { ten: "Huyện Đam Rông", loai: "ngoai" }, { ten: "Huyện Di Linh", loai: "ngoai" }, { ten: "Huyện Đơn Dương", loai: "ngoai" }, { ten: "Huyện Đức Trọng", loai: "ngoai" }, { ten: "Huyện Lạc Dương", loai: "ngoai" }, { ten: "Huyện Lâm Hà", loai: "ngoai" }],
-        "Đắk Lắk": [{ ten: "TP Buôn Ma Thuột", loai: "noi" }, { ten: "Huyện Buôn Đôn", loai: "ngoai" }, { ten: "Huyện Cư Kuin", loai: "ngoai" }, { ten: "Huyện Cư M'gar", loai: "ngoai" }, { ten: "Huyện Ea H'leo", loai: "ngoai" }, { ten: "Huyện Ea Kar", loai: "ngoai" }, { ten: "Huyện Ea Súp", loai: "ngoai" }, { ten: "Huyện Krông Ana", loai: "ngoai" }, { ten: "Huyện Krông Bông", loai: "ngoai" }, { ten: "Huyện Krông Búk", loai: "ngoai" }, { ten: "Huyện Krông Năng", loai: "ngoai" }, { ten: "Huyện Krông Pắc", loai: "ngoai" }, { ten: "Huyện Lắk", loai: "ngoai" }, { ten: "Huyện M'Đrắk", loai: "ngoai" }],
-        "Gia Lai": [{ ten: "TP Pleiku", loai: "noi" }, { ten: "TX An Khê", loai: "noi" }, { ten: "Huyện Chư Păh", loai: "ngoai" }, { ten: "Huyện Chư Prông", loai: "ngoai" }, { ten: "Huyện Chư Pưh", loai: "ngoai" }, { ten: "Huyện Chư Sê", loai: "ngoai" }, { ten: "Huyện Đăk Đoa", loai: "ngoai" }, { ten: "Huyện Đăk Pơ", loai: "ngoai" }, { ten: "Huyện Đức Cơ", loai: "ngoai" }, { ten: "Huyện Ia Grai", loai: "ngoai" }, { ten: "Huyện Ia Pa", loai: "ngoai" }, { ten: "Huyện Kbang", loai: "ngoai" }, { ten: "Huyện Kông Chro", loai: "ngoai" }, { ten: "Huyện Krông Pa", loai: "ngoai" }, { ten: "Huyện Mang Yang", loai: "ngoai" }, { ten: "Huyện Phú Thiện", loai: "ngoai" }],
-        "Nghệ An": [{ ten: "TP Vinh", loai: "noi" }, { ten: "TX Cửa Lò", loai: "noi" }, { ten: "TX Thái Hòa", loai: "ngoai" }, { ten: "Huyện Anh Sơn", loai: "ngoai" }, { ten: "Huyện Con Cuông", loai: "ngoai" }, { ten: "Huyện Diễn Châu", loai: "ngoai" }, { ten: "Huyện Đô Lương", loai: "ngoai" }, { ten: "Huyện Hưng Nguyên", loai: "ngoai" }, { ten: "Huyện Kỳ Sơn", loai: "ngoai" }, { ten: "Huyện Nam Đàn", loai: "ngoai" }, { ten: "Huyện Nghi Lộc", loai: "ngoai" }, { ten: "Huyện Nghĩa Đàn", loai: "ngoai" }, { ten: "Huyện Quế Phong", loai: "ngoai" }, { ten: "Huyện Quỳ Châu", loai: "ngoai" }, { ten: "Huyện Quỳ Hợp", loai: "ngoai" }, { ten: "Huyện Quỳnh Lưu", loai: "ngoai" }, { ten: "Huyện Tân Kỳ", loai: "ngoai" }, { ten: "Huyện Thanh Chương", loai: "ngoai" }, { ten: "Huyện Tương Dương", loai: "ngoai" }, { ten: "Huyện Yên Thành", loai: "ngoai" }],
-        "Hà Tĩnh": [{ ten: "TP Hà Tĩnh", loai: "noi" }, { ten: "TX Hồng Lĩnh", loai: "noi" }, { ten: "Huyện Cẩm Xuyên", loai: "ngoai" }, { ten: "Huyện Can Lộc", loai: "ngoai" }, { ten: "Huyện Đức Thọ", loai: "ngoai" }, { ten: "Huyện Hương Khê", loai: "ngoai" }, { ten: "Huyện Hương Sơn", loai: "ngoai" }, { ten: "Huyện Kỳ Anh", loai: "ngoai" }, { ten: "Huyện Lộc Hà", loai: "ngoai" }, { ten: "Huyện Nghi Xuân", loai: "ngoai" }, { ten: "Huyện Thạch Hà", loai: "ngoai" }, { ten: "Huyện Vũ Quang", loai: "ngoai" }],
-        "Quảng Ninh": [{ ten: "TP Hạ Long", loai: "noi" }, { ten: "TP Móng Cái", loai: "noi" }, { ten: "TP Cẩm Phả", loai: "noi" }, { ten: "TP Uông Bí", loai: "noi" }, { ten: "Huyện Bình Liêu", loai: "ngoai" }, { ten: "Huyện Ba Chẽ", loai: "ngoai" }, { ten: "Huyện Cô Tô", loai: "ngoai" }, { ten: "Huyện Đầm Hà", loai: "ngoai" }, { ten: "Huyện Đông Triều", loai: "ngoai" }, { ten: "Huyện Hải Hà", loai: "ngoai" }, { ten: "Huyện Hoành Bồ", loai: "ngoai" }, { ten: "Huyện Tiên Yên", loai: "ngoai" }, { ten: "Huyện Vân Đồn", loai: "ngoai" }],
-        "Điện Biên": [{ ten: "TP Điện Biên Phủ", loai: "noi" }, { ten: "Huyện Điện Biên", loai: "ngoai" }, { ten: "Huyện Điện Biên Đông", loai: "ngoai" }, { ten: "Huyện Mường Ảng", loai: "ngoai" }, { ten: "Huyện Mường Chà", loai: "ngoai" }, { ten: "Huyện Mường Lay", loai: "ngoai" }, { ten: "Huyện Mường Nhé", loai: "ngoai" }, { ten: "Huyện Nậm Pồ", loai: "ngoai" }, { ten: "Huyện Tủa Chùa", loai: "ngoai" }, { ten: "Huyện Tuần Giáo", loai: "ngoai" }],
-        "Sơn La": [{ ten: "TP Sơn La", loai: "noi" }, { ten: "Huyện Bắc Yên", loai: "ngoai" }, { ten: "Huyện Mai Sơn", loai: "ngoai" }, { ten: "Huyện Mộc Châu", loai: "ngoai" }, { ten: "Huyện Mường La", loai: "ngoai" }, { ten: "Huyện Phù Yên", loai: "ngoai" }, { ten: "Huyện Quỳnh Nhai", loai: "ngoai" }, { ten: "Huyện Sông Mã", loai: "ngoai" }, { ten: "Huyện Sốp Cộp", loai: "ngoai" }, { ten: "Huyện Thuận Châu", loai: "ngoai" }, { ten: "Huyện Vân Hồ", loai: "ngoai" }, { ten: "Huyện Yên Châu", loai: "ngoai" }],
-        "Yên Bái": [{ ten: "TP Yên Bái", loai: "noi" }, { ten: "Huyện Lục Yên", loai: "ngoai" }, { ten: "Huyện Mù Cang Chải", loai: "ngoai" }, { ten: "Huyện Trạm Tấu", loai: "ngoai" }, { ten: "Huyện Trấn Yên", loai: "ngoai" }, { ten: "Huyện Văn Chấn", loai: "ngoai" }, { ten: "Huyện Văn Yên", loai: "ngoai" }, { ten: "Huyện Yên Bình", loai: "ngoai" }],
-        "Lai Châu": [{ ten: "TP Lai Châu", loai: "noi" }, { ten: "Huyện Mường Tè", loai: "ngoai" }, { ten: "Huyện Nậm Nhùn", loai: "ngoai" }, { ten: "Huyện Phong Thổ", loai: "ngoai" }, { ten: "Huyện Sìn Hồ", loai: "ngoai" }, { ten: "Huyện Tam Đường", loai: "ngoai" }, { ten: "Huyện Tân Uyên", loai: "ngoai" }, { ten: "Huyện Than Uyên", loai: "ngoai" }],
-        "Tuyên Quang": [{ ten: "TP Tuyên Quang", loai: "noi" }, { ten: "Huyện Chiêm Hóa", loai: "ngoai" }, { ten: "Huyện Hàm Yên", loai: "ngoai" }, { ten: "Huyện Lâm Bình", loai: "ngoai" }, { ten: "Huyện Na Hang", loai: "ngoai" }, { ten: "Huyện Sơn Dương", loai: "ngoai" }, { ten: "Huyện Yên Sơn", loai: "ngoai" }],
-        "Lào Cai": [{ ten: "TP Lào Cai", loai: "noi" }, { ten: "Huyện Bắc Hà", loai: "ngoai" }, { ten: "Huyện Bảo Thắng", loai: "ngoai" }, { ten: "Huyện Bảo Yên", loai: "ngoai" }, { ten: "Huyện Bát Xát", loai: "ngoai" }, { ten: "Huyện Mường Khương", loai: "ngoai" }, { ten: "Huyện Sa Pa", loai: "ngoai" }, { ten: "Huyện Si Ma Cai", loai: "ngoai" }, { ten: "Huyện Văn Bàn", loai: "ngoai" }],
-        "Phú Thọ": [{ ten: "TP Việt Trì", loai: "noi" }, { ten: "Huyện Cẩm Khê", loai: "ngoai" }, { ten: "Huyện Đoan Hùng", loai: "ngoai" }, { ten: "Huyện Hạ Hòa", loai: "ngoai" }, { ten: "Huyện Lâm Thao", loai: "ngoai" }, { ten: "Huyện Phù Ninh", loai: "ngoai" }, { ten: "Huyện Tam Nông", loai: "ngoai" }, { ten: "Huyện Tân Sơn", loai: "ngoai" }, { ten: "Huyện Thanh Ba", loai: "ngoai" }, { ten: "Huyện Thanh Sơn", loai: "ngoai" }, { ten: "Huyện Thanh Thủy", loai: "ngoai" }, { ten: "Huyện Yên Lập", loai: "ngoai" }],
-        "Vĩnh Phúc": [{ ten: "TP Vĩnh Yên", loai: "noi" }, { ten: "TP Phúc Yên", loai: "noi" }, { ten: "Huyện Bình Xuyên", loai: "ngoai" }, { ten: "Huyện Lập Thạch", loai: "ngoai" }, { ten: "Huyện Sông Lô", loai: "ngoai" }, { ten: "Huyện Tam Dương", loai: "ngoai" }, { ten: "Huyện Tam Đảo", loai: "ngoai" }, { ten: "Huyện Vĩnh Tường", loai: "ngoai" }, { ten: "Huyện Yên Lạc", loai: "ngoai" }],
-        "Thái Bình": [{ ten: "TP Thái Bình", loai: "noi" }, { ten: "Huyện Đông Hưng", loai: "ngoai" }, { ten: "Huyện Hưng Hà", loai: "ngoai" }, { ten: "Huyện Kiến Xương", loai: "ngoai" }, { ten: "Huyện Quỳnh Phụ", loai: "ngoai" }, { ten: "Huyện Thái Thụy", loai: "ngoai" }, { ten: "Huyện Tiên Hải", loai: "ngoai" }, { ten: "Huyện Vũ Thư", loai: "ngoai" }],
-        "Hưng Yên": [{ ten: "TP Hưng Yên", loai: "noi" }, { ten: "Huyện Ân Thi", loai: "ngoai" }, { ten: "Huyện Khoái Châu", loai: "ngoai" }, { ten: "Huyện Kim Động", loai: "ngoai" }, { ten: "Huyện Mỹ Hào", loai: "ngoai" }, { ten: "Huyện Phù Cừ", loai: "ngoai" }, { ten: "Huyện Tiên Lữ", loai: "ngoai" }, { ten: "Huyện Văn Giang", loai: "ngoai" }, { ten: "Huyện Văn Lâm", loai: "ngoai" }, { ten: "Huyện Yên Mỹ", loai: "ngoai" }],
-        "Nam Định": [{ ten: "TP Nam Định", loai: "noi" }, { ten: "Huyện Giao Thủy", loai: "ngoai" }, { ten: "Huyện Hải Hậu", loai: "ngoai" }, { ten: "Huyện Mỹ Lộc", loai: "ngoai" }, { ten: "Huyện Nam Trực", loai: "ngoai" }, { ten: "Huyện Nghĩa Hưng", loai: "ngoai" }, { ten: "Huyện Trực Ninh", loai: "ngoai" }, { ten: "Huyện Vụ Bản", loai: "ngoai" }, { ten: "Huyện Xuân Trường", loai: "ngoai" }, { ten: "Huyện Ý Yên", loai: "ngoai" }]
+    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), themeToggle = $('#theme-toggle'), hamburgerMenu = $('#hamburger-menu'), slideMenu = $('#slide-menu'), menuOverlay = $('#menu-overlay'), closeMenuBtn = $('#close-menu'), slideMenuItems = $$('.slide-menu-item'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
+
+    const switchTab = (tabName) => {
+        tabContents.forEach(content => content.classList.remove('active'));
+        const selectedTab = $(`#${tabName}`);
+        if (selectedTab) selectedTab.classList.add('active');
+        sidebarNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
+        bottomNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
+        slideMenuItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
     };
 
-    const PRICE_TRUCK = { 10: [50000, 70000, 90000, 100000, 110000, 120000, 125000, 140000, 180000], 50: [2900, 3500, 4500, 4700, 4900, 5400, 5500, 5900, 9200], 100: [2700, 3400, 4200, 4500, 4700, 5200, 5200, 5700, 9000], 300: [2400, 3200, 3700, 4100, 4500, 5000, 5000, 5400, 8500], 500: [2200, 2600, 3200, 3900, 4300, 4500, 4700, 5000, 8300], 1000: [1700, 2400, 2800, 3700, 4000, 4200, 4300, 4700, 7500], 2000: [1200, 1900, 2500, 3400, 3800, 3900, 4100, 4600, 6000], max: [1000, 1700, 2000, 3000, 3600, 3600, 4000, 4300, 5700] };
-    const PRICE_ECO = { 10: [66000, 100000, 109000, 170000, 180000, 180000, 180000, 190000, 200000], 50: [3200, 4700, 7200, 7800, 8500, 10300, 16000, 17000, 19000], 100: [3100, 4300, 6900, 7500, 8200, 10000, 15000, 16000, 18000], 300: [3000, 3800, 5500, 6900, 7400, 8000, 14000, 15000, 16500], 500: [2500, 3500, 4900, 6500, 6500, 7100, 12500, 13500, 15000], 1000: [2100, 2900, 4000, 5600, 5900, 6500, 10000, 11000, 13000], 2000: [1500, 2100, 2800, 3800, 5500, 6100, 8500, 10000, 12000], max: [1200, 1900, 2200, 3300, 5000, 5600, 7500, 8000, 10500] };
-    const PRICE_EXPRESS = { "1": [24700, 40300, 45500, 48100, 52000, 57400, 61500, 63000, 73000], "2": [29000, 55900, 61100, 66300, 76700, 82600, 88500, 96000, 102000], "step": [2500, 3900, 5000, 8000, 10000, 12000, 12500, 13000, 14000] };
-    const PRICE_HOATOC = { "2": [50000, 89700, 91000, 93600, 100100, 120000, 120000, 153000, 170000], "step": [4000, 5000, 6000, 10450, 10450, 13500, 13700, 13750, 17000] };
-    const DELIVERY_TIMES = { "VIN-TRUCK": ["1-2 ngày", "1-2 ngày", "2-3 ngày", "3-3.5 ngày", "3-4.5 ngày", "4-5 ngày", "4-6 ngày", "4-6 ngày", "5-7 ngày"], "VIN-ECO": ["1-1.5 ngày", "1-1.5 ngày", "1-2 ngày", "2 ngày", "2-2.5 ngày", "2-2.5 ngày", "2-2.5 ngày", "2-3 ngày", "2-4 ngày"], "VIN-EXPRESS": ["24h", "24h", "24h", "36h", "36-48h", "36-48h", "36-48h", "36-48h", "72-80h"], "VIN-HOATOC": ["12-20h", "20h", "21h", "24h", "36h", "24h", "24h", "24h", "48-72h"] };
+    const toggleTheme = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('vinTransCBMTheme', newTheme);
+    };
 
-    // --- DOM ELEMENTS ---
-    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), provinceInput = $('#province-input'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), themeToggle = $('#theme-toggle'), hamburgerMenu = $('#hamburger-menu'), slideMenu = $('#slide-menu'), menuOverlay = $('#menu-overlay'), closeMenuBtn = $('#close-menu'), slideMenuItems = $$('.slide-menu-item'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result');
+    const loadSettings = () => {
+        const savedTheme = localStorage.getItem('vinTransCBMTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    };
 
-    // --- FUNCTIONS ---
-    const switchTab = (tabName) => { tabContents.forEach(content => content.classList.remove('active')); const selectedTab = $(`#${tabName}`); if (selectedTab) selectedTab.classList.add('active'); sidebarNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName)); bottomNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName)); slideMenuItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName)); };
-    const toggleTheme = () => { const currentTheme = document.documentElement.getAttribute('data-theme') || 'light'; const newTheme = currentTheme === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', newTheme); localStorage.setItem('vinTransCBMTheme', newTheme); };
-    const loadSettings = () => { const savedTheme = localStorage.getItem('vinTransCBMTheme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); };
+    const hienThiKetQuaTinh = (result) => {
+        const now = new Date(), timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), message = provinceResultDiv.querySelector('.province-message');
+        if (message) message.remove();
+        const item = document.createElement('div');
+        item.className = `province-item ${result.resultClass || ''}`;
+        item.innerHTML = `<span class="time">[${timeStr}]</span> <span class="name">${result.input}</span> <span class="arrow">→</span> <span class="result">${result.html}</span>`;
+        const header = provinceResultDiv.querySelector('.province-header');
+        provinceResultDiv.insertBefore(item, header.nextSibling);
+        provinceInput.value = '';
+        provinceResultDiv.scrollTop = 0;
+    };
 
     const checkProvince = () => {
-        const originalInput = sanitizeInput(provinceInput.value); if (!originalInput) return; const inputKhongDau = removeAccents(originalInput); let foundIndex = -1;
-        for (let i = 0; i < danhSach63TinhKhongDau.length; i++) { const tinhChuan = danhSach63TinhKhongDau[i]; if (inputKhongDau === tinhChuan || (inputKhongDau.length > 3 && tinhChuan.includes(inputKhongDau)) || (inputKhongDau.length > 3 && inputKhongDau.includes(tinhChuan))) { foundIndex = i; break; } }
-        if (foundIndex === -1) { hienThiKetQuaTinh("<font color='#CF6679'>Không rõ tỉnh thành</font>", originalInput); return; }
-        const tinhChuanKhongDau = danhSach63TinhKhongDau[foundIndex], tenHienThi = tenTinhCoDau[foundIndex]; let trungTam = "";
-        if (mienNam.includes(tinhChuanKhongDau)) trungTam = " - <font color='#B0B0B0'>Trung Tâm Miền Nam</font>"; else if (mekong.includes(tinhChuanKhongDau)) trungTam = " - <font color='#B0B0B0'>Trung Tâm Mekong</font>"; else if (mienDong.includes(tinhChuanKhongDau)) trungTam = " - <font color='#B0B0B0'>Trung Tâm Miền Đông</font>";
-        let ketQua = "", resultClass = "";
-        if (danhSachDiBay.includes(tinhChuanKhongDau)) { ketQua = `<b>${tenHienThi}</b>: <font color='#03DAC6'>Hàng Bay</font>${trungTam}`; resultClass = "hang-bay"; } else { ketQua = `<b>${tenHienThi}</b>: <font color='#FF9800'>Hàng Bộ</font>${trungTam}`; resultClass = "hang-bo"; }
-        hienThiKetQuaTinh(ketQua, originalInput, resultClass);
+        const result = provinceChecker.check(provinceInput.value, provinceData);
+        if (!result) return;
+        hienThiKetQuaTinh(result);
     };
 
-    const hienThiKetQuaTinh = (ketQua, inputGoc, resultClass) => { const now = new Date(), timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), message = provinceResultDiv.querySelector('.province-message'); if (message) message.remove(); const item = document.createElement('div'); item.className = `province-item ${resultClass || ''}`; item.innerHTML = `<span class="time">[${timeStr}]</span> <span class="name">${inputGoc}</span> <span class="arrow">→</span> <span class="result">${ketQua}</span>`; const header = provinceResultDiv.querySelector('.province-header'); provinceResultDiv.insertBefore(item, header.nextSibling); provinceInput.value = ''; provinceResultDiv.scrollTop = 0; };
+    const parseSelectedDistrict = () => {
+        try {
+            return JSON.parse(shippingHuyenSelect.value);
+        } catch (error) {
+            return null;
+        }
+    };
 
-    const calculateBasePrice = (table, weight, zone) => { const p10 = table[10][zone]; if (weight <= 10) return p10; const ew = weight - 10; let up = 0; if (ew <= 40) up = table[50][zone]; else if (ew <= 100) up = table[100][zone]; else if (ew <= 300) up = table[300][zone]; else if (ew <= 500) up = table[500][zone]; else if (ew <= 1000) up = table[1000][zone]; else if (ew <= 2000) up = table[2000][zone]; else up = table.max[zone]; return Math.round(p10 + ew * up); };
+    const tinhToanCuocPhi = (showAlert = true) => {
+        const provinceKey = shippingTinhSelect.value;
+        const district = parseSelectedDistrict();
+        const weight = parseFloat(shippingWeightInput.value);
 
-    const tinhToanCuocPhi = () => {
-        const prov = shippingTinhSelect.value, hJson = shippingHuyenSelect.value, weight = parseFloat(shippingWeightInput.value); if (!prov || !hJson || isNaN(weight) || weight <= 0) { alert('Vui lòng điền đầy đủ thông tin!'); return; }
-        const dist = JSON.parse(hJson), province = duLieuTinh[prov], zone = province.vung, isOuter = dist.loai === "ngoai";
-        let oc = 1.0; if (isOuter) { if (weight <= 100) oc = 1.3; else if (weight <= 200) oc = 1.2; else oc = 1.1; }
-        const resArr = [];
-        const bT = calculateBasePrice(PRICE_TRUCK, weight, zone), fvT = Math.round(bT * 1.3878), tT = Math.round(fvT * oc); resArr.push({ name: "VIN-TRUCK (Đường Bộ)", base: bT, fuel: fvT - bT, outer: tT - fvT, total: tT });
-        if (weight >= 30) { const bE = calculateBasePrice(PRICE_ECO, weight, zone), fvE = Math.round(bE * 1.3878), tE = Math.round(fvE * oc); resArr.push({ name: "VIN-ECO (Tiết Kiệm)", base: bE, fuel: fvE - bE, outer: tE - fvE, total: tE }); } else { resArr.push({ name: "VIN-ECO (Tiết Kiệm)", disabled: true, reason: "Yêu cầu tối thiểu 30kg" }); }
-        let bX; if (weight <= 1) bX = PRICE_EXPRESS["1"][zone]; else if (weight <= 2) bX = PRICE_EXPRESS["2"][zone]; else { bX = PRICE_EXPRESS["2"][zone]; bX += Math.ceil((weight - 2) / 0.5) * PRICE_EXPRESS["step"][zone]; }
-        const fvX = Math.round(bX * 1.3878), tX = Math.round(fvX * oc); resArr.push({ name: "VIN-EXPRESS (CPN)", base: bX, fuel: fvX - bX, outer: tX - fvX, total: tX });
-        let bH; if (weight <= 2) bH = PRICE_HOATOC["2"][zone]; else { bH = PRICE_HOATOC["2"][zone]; bH += Math.ceil((weight - 2) / 0.5) * PRICE_HOATOC["step"][zone]; }
-        const fvH = Math.round(bH * 1.3878), tH = Math.round(fvH * oc); resArr.push({ name: "VIN-HOATOC (Hỏa Tốc)", base: bH, fuel: fvH - bH, outer: tH - fvH, total: tH });
-        
-        let html = `<b>ĐẾN:</b> ${province.ten} - ${dist.ten}<br/>TRỌNG LƯỢNG: <font color='#48D1CC'><b>${formatSo(weight)} kg</b></font><br/><br/>`;
-        resArr.forEach(r => { html += `<b><font color='#FFFFFF'>${r.name}</font></b>:<br/>`; if (r.disabled) { html += `<i><font color='#FF4B55'>LƯU Ý: ${r.reason}</font></i><br/><br/>`; } else { html += `<font color='#909094'>- Cước chính: </font>${formatTien(r.base)}<br/><font color='#909094'>- Phụ phí (1.3878): </font>${formatTien(r.fuel)}<br/>`; if (r.outer > 0) html += `<font color='#909094'>- Phí ngoại tuyến: </font>${formatTien(r.outer)}<br/>`; html += `<font color='#48D1CC'><b>TỔNG CƯỚC: ${formatTien(r.total)}</b></font><br/><br/>`; } });
-        shippingResultDiv.innerHTML = html;
+        if (!provinceKey || !shippingHuyenSelect.value || !Number.isFinite(weight) || weight <= 0 || !shippingCore) {
+            if (showAlert) alert('Vui lòng chọn tỉnh, huyện và nhập trọng lượng hợp lệ!');
+            return false;
+        }
+
+        if (shippingCore.MAX_WEIGHT_KG && weight > shippingCore.MAX_WEIGHT_KG) {
+            if (showAlert) alert(`Trọng lượng không được vượt quá ${shippingCore.MAX_WEIGHT_KG}kg!`);
+            return false;
+        }
+
+        const province = duLieuTinh[provinceKey];
+        if (!province || !district || typeof district.ten !== 'string' || (district.loai !== 'noi' && district.loai !== 'ngoai')) {
+            if (showAlert) alert('Dữ liệu tuyến không hợp lệ!');
+            return false;
+        }
+
+        const isOuter = district.loai === 'ngoai';
+        const outerCoeff = shippingCore.calculateOuterCoefficient(isOuter, weight);
+        const results = shippingCore.calculateShipping(province.vung, isOuter, weight);
+        if (!results.length) {
+            if (showAlert) alert('Không thể tính cước với dữ liệu hiện tại!');
+            return false;
+        }
+
+        shippingResultDiv.innerHTML = ui.renderShippingResult({
+            provinceName: province.ten,
+            districtName: district.ten,
+            routeType: isOuter ? 'Ngoại tuyến' : 'Nội tuyến',
+            weight
+        }, results, outerCoeff);
+        return true;
+    };
+
+    const tryAutoCalculate = () => {
+        tinhToanCuocPhi(false);
     };
 
     const capNhatDropdownHuyen = () => {
-        const prov = shippingTinhSelect.value; shippingHuyenSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>'; if (!prov) { shippingHuyenSelect.disabled = true; return; }
-        shippingHuyenSelect.disabled = false; const list = duLieuHuyen[prov];
-        if (list && list.length > 0) { list.forEach(h => { const opt = document.createElement('option'); opt.value = JSON.stringify(h); opt.textContent = h.ten; shippingHuyenSelect.appendChild(opt); }); }
-        else { const def = [{ ten: "Nội Thành (Mặc định)", loai: "noi" }, { ten: "Ngoại Thành (Mặc định)", loai: "ngoai" }]; def.forEach(h => { const opt = document.createElement('option'); opt.value = JSON.stringify(h); opt.textContent = h.ten; shippingHuyenSelect.appendChild(opt); }); }
+        const provinceKey = shippingTinhSelect.value;
+        shippingHuyenSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+        if (!provinceKey) {
+            shippingHuyenSelect.disabled = true;
+            return;
+        }
+
+        shippingHuyenSelect.disabled = false;
+        const districts = duLieuHuyen[provinceKey] || [
+            { ten: 'Nội Thành (Mặc định)', loai: 'noi' },
+            { ten: 'Ngoại Thành (Mặc định)', loai: 'ngoai' }
+        ];
+        districts.forEach((district) => {
+            const option = document.createElement('option');
+            option.value = JSON.stringify(district);
+            option.textContent = district.ten;
+            shippingHuyenSelect.appendChild(option);
+        });
     };
 
     const tinhBongBongCa = () => {
-        const val = parseFloat($('#bbc-so-kien').value); if (isNaN(val) || val <= 0) return;
-        const kg = val * 16.4, p1 = kg * 31000, total = p1 * 1.3878;
-        let sb = "<b>LOẠI HÀNG:</b> Bong Bóng Cá<br/>"; sb += `SỐ KIỆN: <font color='#48D1CC'>${formatSo(val)}</font> (${formatSo(kg)} kg)<br/><br/>`;
-        sb += "<b>1. Cước chính (31.000 đ/kg):</b><br/>"; sb += `<font color='#909094'>${formatSo(kg)} kg × 31.000 = </font><b>${formatTien(p1)}</b><br/><br/>`;
-        sb += "<b>2. Phụ phí Nhiên liệu & VAT (× 1.3878):</b><br/>"; sb += `<font color='#909094'>${formatTien(p1)} × 1.3878 = </font><b>${formatTien(total)}</b><br/><br/>`;
-        sb += `<h2><font color='#FF4B55'>TỔNG: ${formatTien(total)}</font></h2>`; $('#bbc-result').innerHTML = sb;
+        const pieces = parseFloat(fishPiecesInput.value);
+        if (!Number.isFinite(pieces) || pieces <= 0 || pieces > 100000) return;
+        fishResultDiv.innerHTML = ui.renderFishResult(pieces);
     };
 
-    loadSettings(); const danhSachTinh = Object.keys(duLieuTinh).sort((a, b) => a.localeCompare(b, 'vi')); danhSachTinh.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = duLieuTinh[m].ten; shippingTinhSelect.appendChild(o); }); switchTab('shipping-calculator');
-    hamburgerMenu.addEventListener('click', () => { slideMenu.classList.add('open'); menuOverlay.classList.add('visible'); }); closeMenuBtn.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); }); menuOverlay.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); });
+    loadSettings();
+
+    Object.keys(duLieuTinh).sort((a, b) => a.localeCompare(b, 'vi')).forEach((provinceKey) => {
+        const option = document.createElement('option');
+        option.value = provinceKey;
+        option.textContent = duLieuTinh[provinceKey].ten;
+        shippingTinhSelect.appendChild(option);
+    });
+
+    tenTinhCoDau.forEach((provinceName) => {
+        const option = document.createElement('option');
+        option.value = provinceName;
+        provinceSuggestions.appendChild(option);
+    });
+
+    switchTab('shipping-calculator');
+
+    hamburgerMenu.addEventListener('click', () => { slideMenu.classList.add('open'); menuOverlay.classList.add('visible'); });
+    closeMenuBtn.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); });
+    menuOverlay.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); });
     slideMenuItems.forEach(item => item.addEventListener('click', () => { switchTab(item.dataset.tab); slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); }));
-    sidebarNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab))); bottomNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab))); themeToggle.addEventListener('click', toggleTheme);
-    provinceInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkProvince(); }); btnClearProvince.addEventListener('click', () => { provinceResultDiv.innerHTML = '<div class="province-header">KIỂM TRA TỈNH THÀNH</div><div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>'; });
-    shippingTinhSelect.addEventListener('change', capNhatDropdownHuyen); btnCalculateShipping.addEventListener('click', tinhToanCuocPhi); btnResetShipping.addEventListener('click', () => { shippingTinhSelect.value = ''; capNhatDropdownHuyen(); shippingWeightInput.value = ''; shippingResultDiv.innerHTML = 'Vui lòng điền đầy đủ thông tin...'; });
-    shippingWeightInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') tinhToanCuocPhi(); });
+    sidebarNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+    bottomNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+    themeToggle.addEventListener('click', toggleTheme);
+
+    provinceInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') checkProvince(); });
+    btnClearProvince.addEventListener('click', () => { provinceResultDiv.innerHTML = '<div class="province-header">KIỂM TRA TỈNH THÀNH</div><div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>'; });
+
+    shippingTinhSelect.addEventListener('change', () => { capNhatDropdownHuyen(); tryAutoCalculate(); });
+    shippingHuyenSelect.addEventListener('change', tryAutoCalculate);
+    shippingWeightInput.addEventListener('input', tryAutoCalculate);
+    shippingWeightInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') tinhToanCuocPhi(true); });
+    btnCalculateShipping.addEventListener('click', () => tinhToanCuocPhi(true));
+    btnResetShipping.addEventListener('click', () => {
+        shippingTinhSelect.value = '';
+        capNhatDropdownHuyen();
+        shippingWeightInput.value = '';
+        shippingResultDiv.innerHTML = ui.shippingEmptyMessage();
+    });
+
     $$('.sub-tab-btn').forEach(btn => { btn.addEventListener('click', () => { $$('.sub-tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); $$('.sub-tab-content').forEach(c => c.classList.remove('active')); $(`#sub-tab-${btn.dataset.subTab}`).classList.add('active'); }); });
-    $('#btn-tinh-bbc').addEventListener('click', tinhBongBongCa); $('#btn-reset-bbc').addEventListener('click', () => { $('#bbc-so-kien').value = ''; $('#bbc-result').innerHTML = 'Nhập số kiện và nhấn "TÍNH TIỀN"'; });
+    $('#btn-tinh-bbc').addEventListener('click', tinhBongBongCa);
+    $('#btn-reset-bbc').addEventListener('click', () => { fishPiecesInput.value = ''; fishResultDiv.innerHTML = 'Nhập số kiện và nhấn "TÍNH TIỀN"'; });
     if (typeof lucide !== 'undefined') lucide.createIcons();
 });

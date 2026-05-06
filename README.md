@@ -1,225 +1,119 @@
-# VinTransCBM - Web Version
+# VinTransCBM Web
 
-## Giới thiệu
+VinTransCBM Web là bản web tĩnh, chạy trực tiếp bằng HTML/CSS/JavaScript. Bản này chỉ giữ 3 tính năng cần dùng trên web:
 
-VinTransCBM là ứng dụng web tính toán CBM (Cubic Meter) và trọng lượng vận chuyển cho ngành logistics. Phiên bản web này đã được đồng bộ chức năng với Android app, bao gồm đầy đủ tính năng phân trang, tìm kiếm và quản lý lịch sử nâng cao.
+- Tính cước vận chuyển.
+- Tính tiền hàng Bong Bóng Cá.
+- Kiểm tra tỉnh đi hàng bay hay hàng bộ.
 
-## Tính năng chính
+## Cấu trúc
 
-### Tính Toán CBM
-- Nhập kích thước: Dài × Rộng × Cao × Số kiện
-- Tự động tính toán:
-  - CBM (Khối)
-  - Kg Đường Bộ (chia 4000)
-  - Kg VIN-ECO (giống Đường Bộ)
-  - Kg CPN (chia 6000)
-  - Kg Hỏa Tốc (giống CPN)
-- Hỗ trợ nhiều lô hàng (groups)
-- Quay lại từng bước hoặc xóa toàn bộ
-
-### Lịch Sử Nâng Cao (Giống Android App)
-- Phân trang: Hiển thị 25 mục/trang
-- Tìm kiếm theo ngày: Format dd/MM/yyyy
-- Xóa linh hoạt:
-  - Xóa tất cả
-  - Xóa theo tháng (chọn tháng cụ thể)
-- Format đẹp: Hiển thị đầy đủ thông tin từng nhóm
-- Thống kê: Hiển thị số mục và phạm vi trang hiện tại
-
-### Kiểm Tra Tỉnh
-- Nhập tên tỉnh để kiểm tra loại vận chuyển
-- Kết quả: Hàng Bay hoặc Hàng Bộ
-- Hỗ trợ 52 tỉnh thành Việt Nam
-- Tự động loại bỏ dấu khi tìm kiếm
-
-## Cách sử dụng
-
-### 1. Mở ứng dụng
-# Chỉ cần mở file index.html trong trình duyệt
-# Hoặc sử dụng Live Server
-
-### 2. Tab Tính Toán
-1. Nhập Dài → Enter
-2. Nhập Rộng → Enter
-3. Nhập Cao → Enter
-4. Nhập Số kiện → Enter
-5. Hệ thống tự động tính toán và lưu lịch sử
-
-Các nút điều khiển:
-- Quay Lại: Xóa giá trị vừa nhập
-- Biến Trước: Xóa toàn bộ biến đang nhập hoặc xóa lô hàng cuối
-- Xóa Tất Cả: Xóa toàn bộ lô hàng
-
-### 3. Tab Lịch Sử
-Tìm kiếm:
-- Nhập ngày theo format: 20/11/2025
-- Nhấn Enter để tìm
-- Hệ thống tự động chuyển đến trang chứa kết quả
-
-Phân trang:
-- Sử dụng nút ◀ Trước và Sau ▶
-- Xem thông tin trang hiện tại ở giữa
-
-Xóa lịch sử:
-1. Nhấn nút Xóa Lịch Sử
-2. Chọn phương thức:
-   - 1: Xóa tất cả
-   - 2: Xóa theo tháng (chọn tháng từ danh sách)
-   - 3: Hủy
-
-### 4. Tab Kiểm Tra Tỉnh
-1. Nhập tên tỉnh (có hoặc không dấu)
-2. Nhấn Enter
-3. Xem kết quả: Hàng Bay hoặc Hàng Bộ
-
-## Giao diện
-
-### Đặc điểm UI/UX
-- Mobile-first: Responsive trên mọi thiết bị
-- Modern Design: Gradient, shadows, animations
-- Dark Mode Ready: Màu tối, dễ nhìn
-- Smooth Animations: Fade in/out, slide transitions
-- Auto-hide Header: Menu tự ẩn sau 3s không hoạt động
-- Touch-friendly: Tối ưu cho mobile
-
-### Font & Colors
-- Font: Be Vietnam Pro (Google Fonts)
-- Primary: #1877f2 (Blue)
-- Success: #42b72a (Green)
-- Danger: #fa383e (Red)
-- Background: #f0f2f5 (Light Gray)
-
-## Lưu trữ dữ liệu
-
-- LocalStorage: vinTransCBMHistory, vinTransCBMGroups
-- Dữ liệu: JSON format với timestamp
-- Tự động lưu: Mỗi khi thêm hoặc xóa
-
-## Tương thích
-
-### Trình duyệt
-- Chrome/Edge (Desktop & Mobile)
-- Firefox
-- Safari (iOS & macOS)
-- Samsung Internet
-
-### Thiết bị
-- Desktop (Windows, macOS, Linux)
-- Mobile (Android, iOS)
-- Tablet
-
-## Công thức tính toán
-
-CBM = (Dài × Rộng × Cao × Số kiện) ÷ 3000 ÷ 333
-Kg Đường Bộ = (Dài × Rộng × Cao) ÷ 4000 × Số kiện
-Kg VIN-ECO = Kg Đường Bộ
-Kg CPN = (Dài × Rộng × Cao) ÷ 6000 × Số kiện
-Kg Hỏa Tốc = Kg CPN
-
-## Cấu trúc dự án
-
-web_vintranscbmv2/
-├── index.html          # Giao diện chính
-├── script.js           # Logic & tính toán
-├── style.css           # Styling & animations
-├── package.json        # NPM config (optional)
-├── README.md           # Tài liệu này
-└── VinTransCBM-3.0/    # Android app source
-
-## Thay đổi mới (v2.0)
-
-### Đã cập nhật
-1. Lịch sử phân trang - Giống Android app
-2. Tìm kiếm theo ngày - Nhanh chóng tìm lô hàng
-3. Xóa theo tháng - Quản lý linh hoạt
-4. Format lịch sử đẹp hơn - Hiển thị đầy đủ thông tin
-5. Responsive cải thiện - Mobile-friendly hơn
-6. UI/UX tối ưu - Hover effects, transitions
-
-### So sánh với Android
-| Tính năng | Web v2.0 | Android v3.0 |
-|-----------|----------|--------------|
-| Tính CBM | | |
-| Lịch sử phân trang | 25/trang | 25/trang |
-| Tìm kiếm ngày | | |
-| Xóa theo tháng | | |
-| Kiểm tra tỉnh | | |
-| Máy tính | | |
-| Kiểm tra tỉnh | ✅ | ✅ |
-| Máy tính | ❌ | ✅ |
-| Lưu file | LocalStorage | Downloads folder |
-
-## 🐛 Lưu ý
-
-### Làm việc Offline
-- ✅ Hoàn toàn offline, không cần internet
-- ✅ Dữ liệu lưu trên máy local
-
-### Xóa dữ liệu
-- Xóa LocalStorage: `localStorage.clear()`
-- Hoặc dùng DevTools → Application → LocalStorage
-
-### Backup dữ liệu
-```javascript
-// Export
-const backup = localStorage.getItem('vinTransCBMHistory');
-console.log(backup);
-
-// Import
-localStorage.setItem('vinTransCBMHistory', backup);
+```text
+Web_VintransCBM-main/
+├── index.html
+├── script.js
+├── style-new.css
+├── settings.css
+├── js/
+│   ├── lucide.js
+│   ├── province-data.js
+│   ├── province-checker.js
+│   ├── shipping-core.js
+│   └── ui.js
+├── tests/
+│   ├── shipping-core.test.js
+│   └── province-checker.test.js
+└── package.json
 ```
 
-## 👨‍💻 Phát triển
+## Tính Cước Vận Chuyển
 
-### Yêu cầu
-- Trình duyệt hiện đại (ES6+ support)
-- Không cần build tools
-- Không cần dependencies
+Người dùng chọn tỉnh, chọn quận/huyện, nhập trọng lượng. Web tự tính khi đủ dữ liệu; nút `TÍNH CƯỚC` vẫn giữ để tính lại thủ công.
 
-### Run
+Kết quả gồm 4 dịch vụ:
+
+- `VIN-TRUCK (Đường Bộ)`.
+- `VIN-ECO (Tiết Kiệm)`, chỉ áp dụng từ 30kg.
+- `VIN-EXPRESS (CPN)`.
+- `VIN-HOATOC (Hỏa Tốc)`.
+
+Kết quả có thẻ `Rẻ nhất` và `Nhanh nhất` ở đầu, sau đó mỗi dịch vụ hiển thị cước chính, phụ phí `1.3878`, phí ngoại tuyến nếu có và tổng cước.
+
+## Phụ Phí Ngoại Tuyến
+
+Nếu quận/huyện là ngoại tuyến:
+
+- Trọng lượng đến 100kg: nhân `1.3`.
+- Trọng lượng trên 100kg đến 200kg: nhân `1.2`.
+- Trọng lượng trên 200kg: nhân `1.1`.
+
+Nếu là nội tuyến, hệ số là `1.0`.
+
+## Bong Bóng Cá
+
+Công thức:
+
+```text
+Số kg = Số kiện x 16.4
+Cước chính = Số kg x 31.000
+Tổng = Cước chính x 1.3878
+```
+
+## Kiểm Tra Tỉnh
+
+Nhập tên tỉnh có dấu hoặc không dấu, có autocomplete gợi ý tỉnh, nhấn Enter. Web trả kết quả:
+
+- `Hàng Bay` nếu tỉnh thuộc danh sách bay.
+- `Hàng Bộ` nếu không thuộc danh sách bay.
+
+## Chạy Web
+
+Mở trực tiếp file:
+
+```text
+index.html
+```
+
+Không cần build, không cần internet để dùng logic tính toán. Font Google và icon đã có fallback; `js/lucide.js` được lưu local.
+
+## Test
+
+Chạy test lõi tính cước:
+
 ```bash
-# Mở trực tiếp
-open index.html
-
-# Hoặc dùng Live Server (VS Code)
-# Right-click → Open with Live Server
+npm test
 ```
 
-## 🔒 Bảo mật
+Bộ test hiện kiểm tra:
 
-### Security Features
-- ✅ **HTTPS Only**: Force HTTPS với HSTS
-- ✅ **Security Headers**: CSP, X-Frame-Options, etc.
-- ✅ **Input Sanitization**: Tất cả inputs được sanitize
-- ✅ **XSS Protection**: Content Security Policy active
-- ✅ **No Sensitive Data**: LocalStorage chỉ lưu calculations
-- ✅ **Private Repository**: Code không public
+- `VIN-TRUCK` ở mốc 10kg.
+- `VIN-ECO` tối thiểu 30kg.
+- Các mốc cân nặng dễ sai: `10`, `10.1`, `50`, `50.1`, `100`, `100.1`, `300`, `500`, `1000`, `2000`.
+- `VIN-EXPRESS`, `VIN-HOATOC` ở các mốc `1kg`, `2kg`, `2.5kg`.
+- Phụ phí ngoại tuyến ở mốc `100`, `100.1`, `200`, `200.1`.
+- Input xấu: `0`, số âm, `NaN`, `Infinity`, trọng lượng quá lớn.
+- Kiểm tra tỉnh có sanitize HTML/script.
 
-### Security Headers (Netlify)
-```
-X-Frame-Options: DENY
-Content-Security-Policy: default-src 'self'
-Strict-Transport-Security: max-age=63072000
-X-Content-Type-Options: nosniff
-Permissions-Policy: geolocation=(), camera=()
-```
+## Ghi Chú Đồng Bộ App
 
-### Best Practices
-- ❌ **Không nhập** thông tin nhạy cảm (passwords, credit cards)
-- ✅ **Sử dụng HTTPS** (tự động redirect)
-- ✅ **Clear cache** thường xuyên
-- ✅ **Update browser** lên phiên bản mới nhất
+Logic cước đã được tách vào `js/shipping-core.js` để dễ so sánh với app Android `VinTransCBM`. Khi cập nhật bảng giá trong app, cần cập nhật module này và chạy lại `npm test`.
 
-### Báo cáo lỗ hổng
-Xem [SECURITY.md](SECURITY.md) để biết cách báo cáo security issues.
+## Module Đã Tách
 
-## 📞 Hỗ trợ
+Các phần đã tách:
 
-- **Version**: 2.0.0
-- **Platform**: Web (HTML/CSS/JS)
-- **License**: Private
-- **Security Audit**: 2024-11-20
+- `js/province-data.js`: dữ liệu tỉnh, huyện, vùng giá.
+- `js/province-checker.js`: normalize, sanitize và kiểm tra tỉnh.
+- `js/shipping-core.js`: công thức cước duy nhất.
+- `js/ui.js`: render kết quả cước và Bong Bóng Cá.
 
----
+## Bảo Vệ Tránh Tính Sai Cước
 
-**🎉 Chúc bạn sử dụng VinTransCBM hiệu quả! 🚚📦**
+Cần giữ các lớp bảo vệ sau:
+
+- `js/shipping-core.js` là nguồn tính cước duy nhất; UI không tự tính lại công thức riêng.
+- Test bắt buộc cho các mốc nhạy cảm: `VIN-TRUCK`, `VIN-ECO` tối thiểu 30kg, hệ số ngoại tuyến `1.3`, `1.2`, `1.1`.
+- Kiểm tra dữ liệu đầu vào: tỉnh phải có vùng giá, huyện phải có loại `noi` hoặc `ngoai`, trọng lượng phải là số hữu hạn và lớn hơn 0.
+- Hiển thị rõ công thức thành phần: cước chính, phụ phí `1.3878`, phí ngoại tuyến và tổng cước để người dùng tự đối soát.
+- Khi cập nhật bảng giá, phải chạy `npm test` và so lại một vài case mẫu với app Android.
+- Không dùng `eval`, không nhận công thức từ người dùng, không lưu dữ liệu nhạy cảm trong localStorage.

@@ -95,7 +95,7 @@
                         </div>
                         <div id="shipping-result" class="shipping-result">
                             <div class="result-message">
-                                Vui lòng điền đầy đủ thông tin và nhấn "TÍNH CƯỚC" để xem kết quả.
+                                Vui lòng chọn tỉnh, huyện và nhập trọng lượng để xem kết quả.
                             </div>
                         </div>
                     </div>
@@ -128,7 +128,8 @@
             <div id="province-checker" class="tab-content">
                 <div class="province-container">
                     <div class="province-input-section">
-                        <input type="text" id="province-input" placeholder="Nhập tên tỉnh và Enter...">
+                        <input type="text" id="province-input" list="province-suggestions" placeholder="Nhập tên tỉnh và Enter...">
+                        <datalist id="province-suggestions"></datalist>
                         <button id="btn-clear-province" class="btn-secondary">XÓA KẾT QUẢ</button>
                     </div>
                     <div id="province-result" class="province-result">
@@ -152,6 +153,10 @@
         </nav>
     </div>
     <script src="js/lucide.js"></script>
+    <script src="js/province-data.js"></script>
+    <script src="js/province-checker.js"></script>
+    <script src="js/shipping-core.js"></script>
+    <script src="js/ui.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

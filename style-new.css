@@ -4271,6 +4271,18 @@ body,
         z-index: 80;
     }
 
+    .apk-download-fab {
+        top: calc(max(28px, env(safe-area-inset-top)) + 40px);
+        right: calc(max(24px, env(safe-area-inset-right)) + 3px);
+        bottom: auto;
+        z-index: 81;
+    }
+
+    .top-tab-nav.bottom-nav.menu-open ~ .apk-download-fab {
+        opacity: 0;
+        pointer-events: none;
+    }
+
     .top-tab-nav.bottom-nav .nav-menu-toggle {
         width: 34px;
         height: 34px;

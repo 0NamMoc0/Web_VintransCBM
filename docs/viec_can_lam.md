@@ -56,3 +56,9 @@
 - [x] Build lại APK WebView có icon launcher hoa hướng dương.
 - [x] Thay `downloads/VintransCBM.apk` bằng bản APK mới.
 - [x] Push lên GitHub Pages để nút tải nhận bản mới.
+
+## Task mới: chuyển nút tải APK xuống dưới nút 3 gạch
+
+- [x] Chỉnh vị trí nút tải trên mobile/WebView nằm ngay dưới nút menu 3 gạch.
+- [x] Ẩn nút tải khi menu đang mở để không đè danh sách tab.
+- [x] Đồng bộ web local và push GitHub Pages.

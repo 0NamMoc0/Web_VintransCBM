@@ -4321,8 +4321,8 @@ body,
 @media (max-width: 767px) {
     .top-tab-nav.bottom-nav {
         position: fixed !important;
-        top: max(28px, env(safe-area-inset-top));
-        right: 24px;
+        top: max(8px, env(safe-area-inset-top));
+        right: 18px;
         left: auto;
         bottom: auto;
         width: auto;
@@ -4340,8 +4340,8 @@ body,
     }
 
     .apk-download-fab {
-        top: calc(max(28px, env(safe-area-inset-top)) + 40px);
-        right: calc(max(24px, env(safe-area-inset-right)) + 3px);
+        top: calc(max(8px, env(safe-area-inset-top)) + 40px);
+        right: calc(max(18px, env(safe-area-inset-right)) + 3px);
         bottom: auto;
         z-index: 81;
     }
@@ -4408,6 +4408,17 @@ body,
     .main-content {
         padding-top: 12px !important;
     }
+
+    html:not([data-active-tab="cbm-calculator"]) .main-content {
+        padding-top: 54px !important;
+    }
+
+    html.android-webview .apk-download-fab,
+    html.ui-input-active .top-tab-nav.bottom-nav,
+    html.ui-input-active .apk-download-fab {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
 
 /* Keep the CBM input locked above the Android keyboard in WebView. */
@@ -4455,7 +4466,7 @@ body,
         position: fixed;
         top: calc(var(--cbm-viewport-top) + 8px);
         right: 28px;
-        bottom: calc(var(--cbm-keyboard-inset) + 108px);
+        bottom: calc(var(--cbm-keyboard-inset) + 146px);
         left: 28px;
         width: auto;
         min-height: 0 !important;
@@ -4467,7 +4478,7 @@ body,
     html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-actions {
         position: fixed;
         right: 28px;
-        bottom: calc(var(--cbm-keyboard-inset) + 58px);
+        bottom: calc(var(--cbm-keyboard-inset) + 96px);
         left: 28px;
         z-index: 70;
     }
@@ -4475,7 +4486,7 @@ body,
     html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-form {
         position: fixed;
         right: 28px;
-        bottom: calc(var(--cbm-keyboard-inset) + 6px);
+        bottom: calc(var(--cbm-keyboard-inset) + 44px);
         left: 28px;
         z-index: 70;
     }

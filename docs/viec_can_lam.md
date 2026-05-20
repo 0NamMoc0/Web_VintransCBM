@@ -84,3 +84,10 @@
 - [x] Sửa APK WebView dùng `stateHidden|adjustResize` và bỏ window fullscreen flag gây Android bỏ qua resize.
 - [x] Build lại `VinTransCBM-WebView-debug.apk` với icon hoa hướng dương và URL cố định.
 - [x] Thay `downloads/VintransCBM.apk` trên web tĩnh bằng bản APK mới.
+
+## Task mới: sửa lớp nổi trong app view
+
+- [x] Ẩn nút tải APK khi trang chạy trong APK WebView để không đè giao diện.
+- [x] Đẩy menu nổi lên sát góc trên hơn và chừa khoảng trên cho các tab không phải CBM.
+- [x] Ẩn menu/tải khi đang focus input/select.
+- [x] Nâng cụm nhập CBM cao hơn khi bàn phím mở trong WebView.

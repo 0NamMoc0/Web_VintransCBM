@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let cbmKeyboardFrame = 0;
     let largestViewportHeight = Math.max(window.innerHeight || 0, window.visualViewport?.height || 0);
     let shippingAutoCalculateFrame = 0;
+    const rootElement = document.documentElement;
+    const isVintransWebView = /\bVintransCBMWebView\b/.test(navigator.userAgent);
+    rootElement.classList.toggle('android-webview', isVintransWebView);
 
     const closeToolMenu = () => {
         if (!topTabNav || !navMenuToggle) return;
@@ -33,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const switchTab = (tabName) => {
+        rootElement.dataset.activeTab = tabName;
         tabContents.forEach(content => content.classList.remove('active'));
         const selectedTab = $(`#${tabName}`);
         if (selectedTab) selectedTab.classList.add('active');
@@ -98,10 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.matchMedia('(max-width: 767px)').matches;
         const shouldLockCbm = isMobile && document.activeElement === cbmInput;
 
-        document.documentElement.style.setProperty('--cbm-visual-height', `${Math.round(currentHeight)}px`);
-        document.documentElement.style.setProperty('--cbm-viewport-top', `${Math.round(viewportTop)}px`);
-        document.documentElement.style.setProperty('--cbm-keyboard-inset', `${Math.round(keyboardInset)}px`);
-        document.documentElement.classList.toggle('cbm-keyboard-open', shouldLockCbm);
+        rootElement.style.setProperty('--cbm-visual-height', `${Math.round(currentHeight)}px`);
+        rootElement.style.setProperty('--cbm-viewport-top', `${Math.round(viewportTop)}px`);
+        rootElement.style.setProperty('--cbm-keyboard-inset', `${Math.round(keyboardInset)}px`);
+        rootElement.classList.toggle('cbm-keyboard-open', shouldLockCbm);
 
         if (shouldLockCbm) {
             window.scrollTo(0, 0);
@@ -126,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const alignCbmResult = () => {
         if (!cbmResultDiv) return;
-        if (document.documentElement.classList.contains('cbm-keyboard-open') || document.activeElement === cbmInput) {
+        if (rootElement.classList.contains('cbm-keyboard-open') || document.activeElement === cbmInput) {
             cbmResultDiv.scrollTop = 0;
             return;
         }
@@ -321,6 +325,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     loadSettings();
+
+    document.addEventListener('focusin', (event) => {
+        const target = event.target;
+        const isInputControl = target?.matches?.('input, select, textarea');
+        rootElement.classList.toggle('ui-input-active', Boolean(isInputControl));
+    });
+    document.addEventListener('focusout', () => {
+        setTimeout(() => {
+            const active = document.activeElement;
+            rootElement.classList.toggle('ui-input-active', Boolean(active?.matches?.('input, select, textarea')));
+        }, 80);
+    });
 
     Object.keys(duLieuTinh).sort((a, b) => a.localeCompare(b, 'vi')).forEach((provinceKey) => {
         const option = document.createElement('option');

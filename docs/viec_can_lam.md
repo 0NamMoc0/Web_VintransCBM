@@ -50,3 +50,9 @@
 - [x] Đưa APK vào `downloads/VintransCBM.apk` trong web tĩnh.
 - [x] Thêm nút tải APK rất nhỏ ở góc dưới bên phải.
 - [x] Chạy test web tĩnh, kiểm tra href tải và push GitHub Pages.
+
+## Task mới: cập nhật APK WebView có icon hoa hướng dương
+
+- [x] Build lại APK WebView có icon launcher hoa hướng dương.
+- [x] Thay `downloads/VintransCBM.apk` bằng bản APK mới.
+- [x] Push lên GitHub Pages để nút tải nhận bản mới.

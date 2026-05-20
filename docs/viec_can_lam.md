@@ -70,3 +70,11 @@
 - [x] Giảm animation/scroll smooth trên mobile/WebView.
 - [x] Throttle tự tính cước theo frame khi nhập trọng lượng.
 - [x] Chạy test logic/syntax và publish GitHub Pages.
+
+## Task mới: khóa layout nhập CBM khi bàn phím Android mở
+
+- [x] So sánh ảnh app native và WebView: native giữ ô nhập sát trên bàn phím, WebView bị pan làm ô nhập tụt và kết quả bay lên.
+- [x] Thêm `interactive-widget=resizes-content` cho viewport để Chrome/WebView ưu tiên resize vùng nội dung.
+- [x] Dùng `visualViewport` khi ô CBM focus để khóa layout riêng cho màn CBM trên mobile.
+- [x] Giữ vùng kết quả, 3 nút và ô nhập theo thứ tự native; ẩn nút menu/tải APK khi đang nhập để không đè nội dung.
+- [x] Không đổi công thức CBM, công thức cước hoặc dữ liệu tính tiền.

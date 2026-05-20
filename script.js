@@ -9,13 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const ui = window.VinTransCBMUi;
     const { tenTinhCoDau, duLieuTinh, duLieuHuyen } = provinceData;
 
-    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), topTabNav = $('.top-tab-nav'), navMenuToggle = $('.nav-menu-toggle'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
+    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), topTabNav = $('.top-tab-nav'), navMenuToggle = $('.nav-menu-toggle'), mainContent = $('.main-content'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
     const cbmResultDiv = $('#cbm-result'), cbmEntryForm = $('#cbm-entry-form'), cbmInput = $('#cbm-input'), btnUndoCbm = $('#btn-undo-cbm'), btnClearCbmInput = $('#btn-clear-cbm-input'), btnResetCbm = $('#btn-reset-cbm');
     const cbmStepLabels = ['Dài', 'Rộng', 'Cao', 'Kiện'];
     let cbmGroups = [];
     let cbmNextId = 1;
     let cbmBuffer = [];
     let cbmEditingId = null;
+    let cbmKeyboardFrame = 0;
+    let largestViewportHeight = Math.max(window.innerHeight || 0, window.visualViewport?.height || 0);
     let shippingAutoCalculateFrame = 0;
 
     const closeToolMenu = () => {
@@ -82,6 +84,55 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmInput.dataset.step = currentLabel;
     };
 
+    const syncCbmKeyboardLayout = () => {
+        const viewport = window.visualViewport;
+        const currentHeight = viewport?.height || window.innerHeight || document.documentElement.clientHeight;
+        const viewportTop = viewport?.offsetTop || 0;
+        largestViewportHeight = Math.max(largestViewportHeight, window.innerHeight || 0, currentHeight);
+
+        const layoutHeight = window.innerHeight || largestViewportHeight;
+        const layoutResizedForKeyboard = layoutHeight <= currentHeight + 1;
+        const keyboardByVisualViewport = Math.max(0, layoutHeight - currentHeight - viewportTop);
+        const keyboardByBaseline = layoutResizedForKeyboard ? 0 : Math.max(0, largestViewportHeight - currentHeight - viewportTop);
+        const keyboardInset = Math.max(keyboardByVisualViewport, keyboardByBaseline);
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const shouldLockCbm = isMobile && document.activeElement === cbmInput;
+
+        document.documentElement.style.setProperty('--cbm-visual-height', `${Math.round(currentHeight)}px`);
+        document.documentElement.style.setProperty('--cbm-viewport-top', `${Math.round(viewportTop)}px`);
+        document.documentElement.style.setProperty('--cbm-keyboard-inset', `${Math.round(keyboardInset)}px`);
+        document.documentElement.classList.toggle('cbm-keyboard-open', shouldLockCbm);
+
+        if (shouldLockCbm) {
+            window.scrollTo(0, 0);
+            if (mainContent) mainContent.scrollTop = 0;
+            if (cbmResultDiv) cbmResultDiv.scrollTop = 0;
+        }
+    };
+
+    const scheduleCbmKeyboardLayout = () => {
+        if (cbmKeyboardFrame) cancelAnimationFrame(cbmKeyboardFrame);
+        cbmKeyboardFrame = requestAnimationFrame(() => {
+            cbmKeyboardFrame = 0;
+            syncCbmKeyboardLayout();
+        });
+    };
+
+    const syncCbmKeyboardSoon = () => {
+        scheduleCbmKeyboardLayout();
+        setTimeout(scheduleCbmKeyboardLayout, 80);
+        setTimeout(scheduleCbmKeyboardLayout, 240);
+    };
+
+    const alignCbmResult = () => {
+        if (!cbmResultDiv) return;
+        if (document.documentElement.classList.contains('cbm-keyboard-open') || document.activeElement === cbmInput) {
+            cbmResultDiv.scrollTop = 0;
+            return;
+        }
+        cbmResultDiv.scrollTop = cbmResultDiv.scrollHeight;
+    };
+
     const clearCbmInputs = (cancelEdit = true) => {
         if (cbmInput) cbmInput.value = '';
         cbmBuffer = [];
@@ -94,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totals = cbmCore.calculateTotals(cbmGroups);
         cbmResultDiv.innerHTML = ui.renderCbmResult(cbmGroups, totals, cbmBuffer);
         updateCbmInputState();
-        cbmResultDiv.scrollTop = cbmResultDiv.scrollHeight;
+        alignCbmResult();
     };
 
     const renumberCbmGroups = () => {
@@ -295,6 +346,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeToolMenu(); });
 
     cbmEntryForm.addEventListener('submit', (event) => { event.preventDefault(); submitCbmValue(); });
+    cbmInput.addEventListener('focus', syncCbmKeyboardSoon);
+    cbmInput.addEventListener('blur', () => setTimeout(scheduleCbmKeyboardLayout, 160));
+    window.addEventListener('resize', scheduleCbmKeyboardLayout);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', scheduleCbmKeyboardLayout);
+        window.visualViewport.addEventListener('scroll', scheduleCbmKeyboardLayout);
+    }
     btnUndoCbm.addEventListener('click', undoCbm);
     btnClearCbmInput.addEventListener('click', clearCbmCurrent);
     btnResetCbm.addEventListener('click', resetCbm);

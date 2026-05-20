@@ -43,6 +43,9 @@
     --font-size-base: 16px;
     --font-size-small: 14px;
     --font-size-large: 18px;
+    --cbm-visual-height: 100dvh;
+    --cbm-viewport-top: 0px;
+    --cbm-keyboard-inset: 0px;
 }
 
 /* Dark Theme */
@@ -4404,5 +4407,82 @@ body,
 
     .main-content {
         padding-top: 12px !important;
+    }
+}
+
+/* Keep the CBM input locked above the Android keyboard in WebView. */
+@media (max-width: 767px) {
+    html.cbm-keyboard-open,
+    html.cbm-keyboard-open body {
+        width: 100%;
+        height: var(--cbm-visual-height);
+        min-height: var(--cbm-visual-height);
+        overflow: hidden;
+    }
+
+    html.cbm-keyboard-open #app {
+        height: var(--cbm-visual-height);
+        min-height: var(--cbm-visual-height);
+        overflow: hidden;
+    }
+
+    html.cbm-keyboard-open .main-content {
+        position: fixed;
+        top: var(--cbm-viewport-top);
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: var(--cbm-visual-height) !important;
+        max-height: var(--cbm-visual-height) !important;
+        max-width: none;
+        margin: 0;
+        padding: 0 !important;
+        overflow: hidden;
+        z-index: 30;
+    }
+
+    html.cbm-keyboard-open #cbm-calculator.cbm-app-screen,
+    html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-container {
+        width: 100%;
+        max-width: none;
+        height: var(--cbm-visual-height) !important;
+        min-height: 0 !important;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-result {
+        position: fixed;
+        top: calc(var(--cbm-viewport-top) + 8px);
+        right: 28px;
+        bottom: calc(var(--cbm-keyboard-inset) + 108px);
+        left: 28px;
+        width: auto;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow-y: auto;
+        z-index: 60;
+    }
+
+    html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-actions {
+        position: fixed;
+        right: 28px;
+        bottom: calc(var(--cbm-keyboard-inset) + 58px);
+        left: 28px;
+        z-index: 70;
+    }
+
+    html.cbm-keyboard-open #cbm-calculator.cbm-app-screen .cbm-form {
+        position: fixed;
+        right: 28px;
+        bottom: calc(var(--cbm-keyboard-inset) + 6px);
+        left: 28px;
+        z-index: 70;
+    }
+
+    html.cbm-keyboard-open .top-tab-nav.bottom-nav,
+    html.cbm-keyboard-open .apk-download-fab {
+        opacity: 0;
+        pointer-events: none;
     }
 }

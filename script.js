@@ -4,11 +4,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const provinceData = window.VinTransCBMProvinceData;
     const provinceChecker = window.VinTransCBMProvinceChecker;
+    const cbmCore = window.CbmCore;
     const shippingCore = window.ShippingCore;
     const ui = window.VinTransCBMUi;
     const { tenTinhCoDau, duLieuTinh, duLieuHuyen } = provinceData;
 
-    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), themeToggle = $('#theme-toggle'), hamburgerMenu = $('#hamburger-menu'), slideMenu = $('#slide-menu'), menuOverlay = $('#menu-overlay'), closeMenuBtn = $('#close-menu'), slideMenuItems = $$('.slide-menu-item'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
+    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
+    const cbmResultDiv = $('#cbm-result'), cbmEntryForm = $('#cbm-entry-form'), cbmInput = $('#cbm-input'), btnUndoCbm = $('#btn-undo-cbm'), btnClearCbmInput = $('#btn-clear-cbm-input'), btnResetCbm = $('#btn-reset-cbm');
+    const cbmStepLabels = ['Dài', 'Rộng', 'Cao', 'Kiện'];
+    let cbmGroups = [];
+    let cbmNextId = 1;
+    let cbmBuffer = [];
+    let cbmEditingId = null;
 
     const switchTab = (tabName) => {
         tabContents.forEach(content => content.classList.remove('active'));
@@ -16,19 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedTab) selectedTab.classList.add('active');
         sidebarNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
         bottomNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
-        slideMenuItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
-    };
-
-    const toggleTheme = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('vinTransCBMTheme', newTheme);
     };
 
     const loadSettings = () => {
-        const savedTheme = localStorage.getItem('vinTransCBMTheme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('vinTransCBMTheme', 'dark');
     };
 
     const hienThiKetQuaTinh = (result) => {
@@ -57,6 +56,132 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const refreshIcons = () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    const updateCbmInputState = () => {
+        if (!cbmInput) return;
+        const currentLabel = cbmStepLabels[cbmBuffer.length] || cbmStepLabels[0];
+        cbmInput.placeholder = 'Nhập số đo';
+        cbmInput.setAttribute('aria-label', `Nhập ${currentLabel}`);
+        cbmInput.dataset.step = currentLabel;
+    };
+
+    const clearCbmInputs = (cancelEdit = true) => {
+        if (cbmInput) cbmInput.value = '';
+        cbmBuffer = [];
+        if (cancelEdit) cbmEditingId = null;
+        renderCbm();
+        if (cbmInput) cbmInput.focus();
+    };
+
+    const renderCbm = () => {
+        const totals = cbmCore.calculateTotals(cbmGroups);
+        cbmResultDiv.innerHTML = ui.renderCbmResult(cbmGroups, totals, cbmBuffer);
+        updateCbmInputState();
+        cbmResultDiv.scrollTop = cbmResultDiv.scrollHeight;
+    };
+
+    const renumberCbmGroups = () => {
+        cbmGroups = cbmGroups.map((group, index) => ({ ...group, groupNumber: index + 1 }));
+    };
+
+    const buildGroupFromBuffer = () => cbmCore.calculateGroup({
+        dai: cbmBuffer[0],
+        rong: cbmBuffer[1],
+        cao: cbmBuffer[2],
+        soKien: cbmBuffer[3]
+    });
+
+    const commitCbmBuffer = () => {
+        const existingIndex = cbmGroups.findIndex((group) => group.id === cbmEditingId);
+        const existing = existingIndex >= 0 ? cbmGroups[existingIndex] : null;
+        const id = existing?.id || String(cbmNextId++);
+        const groupNumber = existing?.groupNumber || cbmGroups.length + 1;
+        const group = buildGroupFromBuffer();
+
+        if (!group) return false;
+
+        const nextGroup = { ...group, id, groupNumber };
+        if (existingIndex >= 0) cbmGroups[existingIndex] = nextGroup;
+        else cbmGroups.push(nextGroup);
+
+        renumberCbmGroups();
+        cbmBuffer = [];
+        cbmEditingId = null;
+        renderCbm();
+        return true;
+    };
+
+    const submitCbmValue = () => {
+        if (!cbmInput) return;
+        const value = cbmCore.toNumber(cbmInput.value);
+        if (!cbmCore.isValidDimension(value)) {
+            cbmInput.value = '';
+            cbmInput.focus();
+            return;
+        }
+
+        cbmBuffer.push(value);
+        cbmInput.value = '';
+
+        if (cbmBuffer.length === 4) commitCbmBuffer();
+        else renderCbm();
+
+        cbmInput.focus();
+    };
+
+    const editCbmGroup = (id) => {
+        const group = cbmGroups.find((item) => item.id === id);
+        if (!group) return;
+        cbmEditingId = id;
+        cbmBuffer = [group.dai, group.rong, group.cao];
+        cbmInput.value = group.soKien;
+        renderCbm();
+        cbmInput.focus();
+    };
+
+    const undoCbm = () => {
+        if (cbmInput?.value.trim()) {
+            cbmInput.value = '';
+            cbmInput.focus();
+            return;
+        }
+        if (cbmBuffer.length > 0) {
+            cbmInput.value = cbmBuffer.pop();
+            renderCbm();
+            cbmInput.focus();
+            return;
+        }
+        const lastGroup = cbmGroups.pop();
+        if (lastGroup) {
+            cbmBuffer = [lastGroup.dai, lastGroup.rong, lastGroup.cao];
+            cbmEditingId = null;
+        }
+        renumberCbmGroups();
+        renderCbm();
+        cbmInput.focus();
+    };
+
+    const clearCbmCurrent = () => {
+        if (cbmInput?.value.trim() || cbmBuffer.length > 0 || cbmEditingId) {
+            clearCbmInputs();
+            return;
+        }
+        cbmGroups.pop();
+        renumberCbmGroups();
+        renderCbm();
+        cbmInput.focus();
+    };
+
+    const resetCbm = () => {
+        cbmGroups = [];
+        cbmNextId = 1;
+        cbmBuffer = [];
+        clearCbmInputs();
+    };
+
     const tinhToanCuocPhi = (showAlert = true) => {
         const provinceKey = shippingTinhSelect.value;
         const district = parseSelectedDistrict();
@@ -67,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        if (shippingCore.MAX_WEIGHT_KG && weight > shippingCore.MAX_WEIGHT_KG) {
+        if (Number.isFinite(shippingCore.MAX_WEIGHT_KG) && weight > shippingCore.MAX_WEIGHT_KG) {
             if (showAlert) alert(`Trọng lượng không được vượt quá ${shippingCore.MAX_WEIGHT_KG}kg!`);
             return false;
         }
@@ -122,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tinhBongBongCa = () => {
         const pieces = parseFloat(fishPiecesInput.value);
-        if (!Number.isFinite(pieces) || pieces <= 0 || pieces > 100000) return;
+        if (!Number.isFinite(pieces) || pieces <= 0) return;
         fishResultDiv.innerHTML = ui.renderFishResult(pieces);
     };
 
@@ -141,15 +266,20 @@ document.addEventListener('DOMContentLoaded', () => {
         provinceSuggestions.appendChild(option);
     });
 
-    switchTab('shipping-calculator');
+    switchTab('cbm-calculator');
+    renderCbm();
 
-    hamburgerMenu.addEventListener('click', () => { slideMenu.classList.add('open'); menuOverlay.classList.add('visible'); });
-    closeMenuBtn.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); });
-    menuOverlay.addEventListener('click', () => { slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); });
-    slideMenuItems.forEach(item => item.addEventListener('click', () => { switchTab(item.dataset.tab); slideMenu.classList.remove('open'); menuOverlay.classList.remove('visible'); }));
     sidebarNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
     bottomNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
-    themeToggle.addEventListener('click', toggleTheme);
+
+    cbmEntryForm.addEventListener('submit', (event) => { event.preventDefault(); submitCbmValue(); });
+    btnUndoCbm.addEventListener('click', undoCbm);
+    btnClearCbmInput.addEventListener('click', clearCbmCurrent);
+    btnResetCbm.addEventListener('click', resetCbm);
+    cbmResultDiv.addEventListener('click', (event) => {
+        const editButton = event.target.closest('[data-cbm-edit]');
+        if (editButton) editCbmGroup(editButton.dataset.cbmEdit);
+    });
 
     provinceInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') checkProvince(); });
     btnClearProvince.addEventListener('click', () => { provinceResultDiv.innerHTML = '<div class="province-header">KIỂM TRA TỈNH THÀNH</div><div class="province-message">Nhập tên tỉnh để kiểm tra loại vận chuyển.</div>'; });
@@ -169,5 +299,5 @@ document.addEventListener('DOMContentLoaded', () => {
     $$('.sub-tab-btn').forEach(btn => { btn.addEventListener('click', () => { $$('.sub-tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); $$('.sub-tab-content').forEach(c => c.classList.remove('active')); $(`#sub-tab-${btn.dataset.subTab}`).classList.add('active'); }); });
     $('#btn-tinh-bbc').addEventListener('click', tinhBongBongCa);
     $('#btn-reset-bbc').addEventListener('click', () => { fishPiecesInput.value = ''; fishResultDiv.innerHTML = 'Nhập số kiện và nhấn "TÍNH TIỀN"'; });
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    refreshIcons();
 });

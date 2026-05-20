@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,41 +9,17 @@
 </head>
 <body>
     <div id="app">
-        <!-- Mobile Hamburger Menu -->
-        <button id="hamburger-menu" class="hamburger-menu" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        
-        <!-- Theme Toggle Button -->
-        <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi giao diện">
-            <span class="theme-icon sun-icon"><i data-lucide="sun"></i></span>
-            <span class="theme-icon moon-icon"><i data-lucide="moon"></i></span>
-        </button>
-        
-        <!-- Mobile Slide Menu -->
-        <div id="slide-menu" class="slide-menu">
-            <div class="slide-menu-header">
-                <span class="menu-title">MENU</span>
-                <button id="close-menu" class="close-menu">&times;</button>
-            </div>
-            <nav class="slide-menu-nav">
-                <button class="slide-menu-item active" data-tab="shipping-calculator">
-                    <span class="menu-icon"><i data-lucide="package"></i></span>
-                    <span class="menu-text">TÍNH CƯỚC PHÍ</span>
-                </button>
-                <button class="slide-menu-item" data-tab="province-checker">
-                    <span class="menu-icon"><i data-lucide="map-pin"></i></span>
-                    <span class="menu-text">KIỂM TRA TỈNH</span>
-                </button>
-            </nav>
-        </div>
-        <div id="menu-overlay" class="menu-overlay"></div>
-        
         <!-- Desktop Sidebar Navigation -->
         <nav class="sidebar-nav">
-            <button class="nav-item active" data-tab="shipping-calculator">
+            <div class="nav-brand">
+                <span class="brand-mark">VT</span>
+                <span class="brand-text">Công cụ</span>
+            </div>
+            <button class="nav-item active" data-tab="cbm-calculator">
+                <span class="nav-icon"><i data-lucide="box"></i></span>
+                <span class="nav-text">TÍNH CBM</span>
+            </button>
+            <button class="nav-item" data-tab="shipping-calculator">
                 <span class="nav-icon"><i data-lucide="package"></i></span>
                 <span class="nav-text">TÍNH CƯỚC PHÍ</span>
             </button>
@@ -53,10 +29,55 @@
             </button>
         </nav>
 
+        <!-- Top Tab Navigation -->
+        <nav class="top-tab-nav bottom-nav" aria-label="Chọn công cụ">
+            <button class="bottom-nav-item active" data-tab="cbm-calculator" type="button">
+                <span class="bottom-nav-icon"><i data-lucide="box"></i></span>
+                <span class="bottom-nav-text">CBM</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="shipping-calculator" type="button">
+                <span class="bottom-nav-icon"><i data-lucide="package"></i></span>
+                <span class="bottom-nav-text">CƯỚC PHÍ</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="province-checker" type="button">
+                <span class="bottom-nav-icon"><i data-lucide="map-pin"></i></span>
+                <span class="bottom-nav-text">KIỂM TRA</span>
+            </button>
+        </nav>
+
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Tab Tính CBM -->
+            <div id="cbm-calculator" class="tab-content active cbm-app-screen">
+                <div class="cbm-container">
+                    <section id="cbm-result" class="cbm-result" aria-live="polite">
+                        <div class="cbm-empty">CBM 0 · Kiện 0</div>
+                    </section>
+                    <div class="cbm-actions" aria-label="Thao tác CBM">
+                        <button id="btn-undo-cbm" class="btn-secondary" type="button">LÙI LẠI</button>
+                        <button id="btn-clear-cbm-input" class="btn-secondary" type="button">XÓA</button>
+                        <button id="btn-reset-cbm" class="btn-danger" type="button">LÀM MỚI</button>
+                    </div>
+                    <section class="cbm-form" aria-label="Nhập số đo CBM">
+                        <form id="cbm-entry-form" class="cbm-entry-form" autocomplete="off">
+                            <input type="text" id="cbm-input" inputmode="decimal" enterkeyhint="done" placeholder="Nhập số đo" aria-label="Nhập số đo">
+                        </form>
+                    </section>
+                </div>
+            </div>
+
             <!-- Tab Tính Cước Phí -->
-            <div id="shipping-calculator" class="tab-content active">
+            <div id="shipping-calculator" class="tab-content">
+                <div class="workspace-header">
+                    <div>
+                        <h1>Cước vận chuyển</h1>
+                        <p>Tuyến / khối lượng / dịch vụ</p>
+                    </div>
+                    <div class="workspace-status">
+                        <span></span>
+                        Sẵn sàng
+                    </div>
+                </div>
                 <!-- Sub-tab navigation -->
                 <div class="sub-tab-nav">
                     <button class="sub-tab-btn active" data-sub-tab="cuoc-phi">
@@ -71,7 +92,8 @@
                 <div id="sub-tab-cuoc-phi" class="sub-tab-content active">
                     <div class="shipping-calculator-container">
                         <div class="shipping-form">
-                            <div class="form-header">TÍNH CƯỚC VẬN CHUYỂN</div>
+                            <div class="form-header">TUYẾN GIAO</div>
+                            <div class="form-state"><span></span>Đủ dữ liệu sẽ tự tính cước</div>
                             <div class="form-group">
                                 <label for="shipping-tinh-select">Tỉnh/Thành phố đến:</label>
                                 <select id="shipping-tinh-select">
@@ -89,8 +111,8 @@
                                 <input type="number" id="shipping-weight-input" placeholder="Nhập số kg..." min="0.1" step="0.1">
                             </div>
                             <div class="form-actions">
-                                <button id="btn-calculate-shipping" class="btn-primary">TÍNH CƯỚC</button>
-                                <button id="btn-reset-shipping" class="btn-secondary">XÓA FORM</button>
+                                <button id="btn-calculate-shipping" class="btn-primary"><i data-lucide="calculator"></i> TÍNH CƯỚC</button>
+                                <button id="btn-reset-shipping" class="btn-secondary"><i data-lucide="rotate-ccw"></i> XÓA FORM</button>
                             </div>
                         </div>
                         <div id="shipping-result" class="shipping-result">
@@ -111,8 +133,8 @@
                                 <input type="number" id="bbc-so-kien" placeholder="Nhập số kiện..." min="1" step="1">
                             </div>
                             <div class="bbc-form-actions">
-                                <button id="btn-tinh-bbc" class="btn-primary">TÍNH TIỀN</button>
-                                <button id="btn-reset-bbc" class="btn-secondary">XÓA</button>
+                                <button id="btn-tinh-bbc" class="btn-primary"><i data-lucide="calculator"></i> TÍNH TIỀN</button>
+                                <button id="btn-reset-bbc" class="btn-secondary"><i data-lucide="rotate-ccw"></i> XÓA</button>
                             </div>
                         </div>
                         <div id="bbc-result" class="bbc-result">
@@ -126,11 +148,17 @@
 
             <!-- Tab Kiểm Tra Tỉnh -->
             <div id="province-checker" class="tab-content">
+                <div class="workspace-header">
+                    <div>
+                        <h1>Kiểm tra tỉnh</h1>
+                        <p>Hàng bay / hàng bộ</p>
+                    </div>
+                </div>
                 <div class="province-container">
                     <div class="province-input-section">
                         <input type="text" id="province-input" list="province-suggestions" placeholder="Nhập tên tỉnh và Enter...">
                         <datalist id="province-suggestions"></datalist>
-                        <button id="btn-clear-province" class="btn-secondary">XÓA KẾT QUẢ</button>
+                        <button id="btn-clear-province" class="btn-secondary"><i data-lucide="trash-2"></i> XÓA KẾT QUẢ</button>
                     </div>
                     <div id="province-result" class="province-result">
                         <div class="province-header">KIỂM TRA TỈNH THÀNH</div>
@@ -140,22 +168,13 @@
             </div>
         </main>
 
-        <!-- Mobile Bottom Navigation -->
-        <nav class="bottom-nav">
-            <button class="bottom-nav-item active" data-tab="shipping-calculator">
-                <span class="bottom-nav-icon"><i data-lucide="package"></i></span>
-                <span class="bottom-nav-text">CƯỚC PHÍ</span>
-            </button>
-            <button class="bottom-nav-item" data-tab="province-checker">
-                <span class="bottom-nav-icon"><i data-lucide="map-pin"></i></span>
-                <span class="bottom-nav-text">KIỂM TRA</span>
-            </button>
-        </nav>
     </div>
     <script src="js/lucide.js"></script>
     <script src="js/province-data.js"></script>
     <script src="js/province-checker.js"></script>
+    <script src="js/cbm-core.js"></script>
     <script src="js/shipping-core.js"></script>
+    <script src="js/fish-core.js"></script>
     <script src="js/ui.js"></script>
     <script src="script.js"></script>
 </body>

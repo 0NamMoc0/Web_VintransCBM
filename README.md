@@ -1,7 +1,8 @@
 # VinTransCBM Web
 
-VinTransCBM Web là bản web tĩnh, chạy trực tiếp bằng HTML/CSS/JavaScript. Bản này chỉ giữ 3 tính năng cần dùng trên web:
+VinTransCBM Web là bản web tĩnh, chạy trực tiếp bằng HTML/CSS/JavaScript. Bản này giữ các tính năng chính cần dùng trên web:
 
+- Tính CBM, kg quy đổi và tổng số kiện theo app Android.
 - Tính cước vận chuyển.
 - Tính tiền hàng Bong Bóng Cá.
 - Kiểm tra tỉnh đi hàng bay hay hàng bộ.
@@ -15,16 +16,34 @@ Web_VintransCBM-main/
 ├── style-new.css
 ├── settings.css
 ├── js/
+│   ├── cbm-core.js
 │   ├── lucide.js
 │   ├── province-data.js
 │   ├── province-checker.js
 │   ├── shipping-core.js
 │   └── ui.js
 ├── tests/
+│   ├── cbm-core.test.js
 │   ├── shipping-core.test.js
 │   └── province-checker.test.js
 └── package.json
 ```
+
+## Tính CBM
+
+Logic CBM được đồng bộ từ `VinTransCBM/app/src/main/java/com/cbmvin/cbmapp/CbmCalculator.java`.
+
+Công thức:
+
+```text
+CBM = ((Dài x Rộng x Cao x Số kiện) / 3000) / 333
+Bộ = (Dài x Rộng x Cao / 4000) x Số kiện
+Vin-Eco = (Dài x Rộng x Cao / 4000) x Số kiện
+CPN = (Dài x Rộng x Cao / 6000) x Số kiện
+Hỏa Tốc = (Dài x Rộng x Cao / 6000) x Số kiện
+```
+
+Kết quả tổng giữ kiểu dọc như app: `CBM`, từng dòng kg, rồi `Tổng ... kiện`.
 
 ## Tính Cước Vận Chuyển
 
@@ -59,6 +78,8 @@ Cước chính = Số kg x 31.000
 Tổng = Cước chính x 1.3878
 ```
 
+Tiền hiển thị được làm tròn về VND sau khi tính cước chính và sau khi nhân phụ phí, đồng bộ với app Android.
+
 ## Kiểm Tra Tỉnh
 
 Nhập tên tỉnh có dấu hoặc không dấu, có autocomplete gợi ý tỉnh, nhấn Enter. Web trả kết quả:
@@ -91,8 +112,10 @@ Bộ test hiện kiểm tra:
 - Các mốc cân nặng dễ sai: `10`, `10.1`, `50`, `50.1`, `100`, `100.1`, `300`, `500`, `1000`, `2000`.
 - `VIN-EXPRESS`, `VIN-HOATOC` ở các mốc `1kg`, `2kg`, `2.5kg`.
 - Phụ phí ngoại tuyến ở mốc `100`, `100.1`, `200`, `200.1`.
-- Input xấu: `0`, số âm, `NaN`, `Infinity`, trọng lượng quá lớn.
+- Input xấu: `0`, số âm, `NaN`, `Infinity`.
 - Kiểm tra tỉnh có sanitize HTML/script.
+- Bong Bóng Cá: kg/kiện, cước chính, tổng sau phụ phí `1.3878`.
+- Parity app/web: đọc công thức, bảng giá, thời gian giao, tỉnh/huyện từ mã Java Android rồi so với web trên nhiều vùng và mốc cân.
 
 ## Ghi Chú Đồng Bộ App
 
@@ -104,6 +127,7 @@ Các phần đã tách:
 
 - `js/province-data.js`: dữ liệu tỉnh, huyện, vùng giá.
 - `js/province-checker.js`: normalize, sanitize và kiểm tra tỉnh.
+- `js/cbm-core.js`: công thức CBM/kg quy đổi đồng bộ app Android.
 - `js/shipping-core.js`: công thức cước duy nhất.
 - `js/ui.js`: render kết quả cước và Bong Bóng Cá.
 
@@ -116,4 +140,5 @@ Cần giữ các lớp bảo vệ sau:
 - Kiểm tra dữ liệu đầu vào: tỉnh phải có vùng giá, huyện phải có loại `noi` hoặc `ngoai`, trọng lượng phải là số hữu hạn và lớn hơn 0.
 - Hiển thị rõ công thức thành phần: cước chính, phụ phí `1.3878`, phí ngoại tuyến và tổng cước để người dùng tự đối soát.
 - Khi cập nhật bảng giá, phải chạy `npm test` và so lại một vài case mẫu với app Android.
+- Khi cập nhật công thức Bong Bóng Cá hoặc giới hạn trọng lượng, phải cập nhật đồng thời app Android và web, sau đó chạy parity test.
 - Không dùng `eval`, không nhận công thức từ người dùng, không lưu dữ liệu nhạy cảm trong localStorage.

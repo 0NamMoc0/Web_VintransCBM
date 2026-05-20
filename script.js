@@ -68,27 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmInput.dataset.step = currentLabel;
     };
 
-    const keepCbmInputVisible = () => {
-        if (!cbmInput) return;
-        [0, 180, 360].forEach((delay) => {
-            window.setTimeout(() => {
-                cbmInput.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
-            }, delay);
-        });
-    };
-
-    const focusCbmInput = () => {
-        if (!cbmInput) return;
-        cbmInput.focus();
-        keepCbmInputVisible();
-    };
-
     const clearCbmInputs = (cancelEdit = true) => {
         if (cbmInput) cbmInput.value = '';
         cbmBuffer = [];
         if (cancelEdit) cbmEditingId = null;
         renderCbm();
-        focusCbmInput();
+        if (cbmInput) cbmInput.focus();
     };
 
     const renderCbm = () => {
@@ -134,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const value = cbmCore.toNumber(cbmInput.value);
         if (!cbmCore.isValidDimension(value)) {
             cbmInput.value = '';
-            focusCbmInput();
+            cbmInput.focus();
             return;
         }
 
@@ -144,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cbmBuffer.length === 4) commitCbmBuffer();
         else renderCbm();
 
-        focusCbmInput();
+        cbmInput.focus();
     };
 
     const editCbmGroup = (id) => {
@@ -154,19 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmBuffer = [group.dai, group.rong, group.cao];
         cbmInput.value = group.soKien;
         renderCbm();
-        focusCbmInput();
+        cbmInput.focus();
     };
 
     const undoCbm = () => {
         if (cbmInput?.value.trim()) {
             cbmInput.value = '';
-            focusCbmInput();
+            cbmInput.focus();
             return;
         }
         if (cbmBuffer.length > 0) {
             cbmInput.value = cbmBuffer.pop();
             renderCbm();
-            focusCbmInput();
+            cbmInput.focus();
             return;
         }
         const lastGroup = cbmGroups.pop();
@@ -176,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renumberCbmGroups();
         renderCbm();
-        focusCbmInput();
+        cbmInput.focus();
     };
 
     const clearCbmCurrent = () => {
@@ -187,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cbmGroups.pop();
         renumberCbmGroups();
         renderCbm();
-        focusCbmInput();
+        cbmInput.focus();
     };
 
     const resetCbm = () => {
@@ -291,12 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnUndoCbm.addEventListener('click', undoCbm);
     btnClearCbmInput.addEventListener('click', clearCbmCurrent);
     btnResetCbm.addEventListener('click', resetCbm);
-    cbmInput.addEventListener('focus', keepCbmInputVisible);
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            if (document.activeElement === cbmInput) keepCbmInputVisible();
-        });
-    }
     cbmResultDiv.addEventListener('click', (event) => {
         const editButton = event.target.closest('[data-cbm-edit]');
         if (editButton) editCbmGroup(editButton.dataset.cbmEdit);

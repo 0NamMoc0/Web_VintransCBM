@@ -31,9 +31,8 @@
 - [x] Push bản web mới lên repo `0NamMoc0/Web_VintransCBM` để thay thế dự án cũ.
 - [x] Xác minh remote GitHub và URL GitHub Pages sau khi push.
 
-## Task mới: sửa layout CBM khi bàn phím mở
+## Task mới: quay về layout CBM ban đầu
 
-- [x] Tìm nguyên nhân vùng kết quả CBM bị kéo quá cao trong WebView mobile.
-- [x] Sửa CSS/layout để kết quả co theo nội dung, ô nhập và nút không bị ép sát bàn phím.
-- [x] Kiểm thử HTTP/CSS responsive, syntax JS và toàn bộ test logic.
-- [x] Publish bản sửa lên GitHub Pages nếu kiểm thử đạt.
+- [x] Hoàn tác phần sửa `keyboard fit` vừa thêm cho màn CBM WebView.
+- [x] Giữ nguyên logic tính CBM, tính cước và URL WebView cố định.
+- [x] Chạy lại test logic, syntax JS và publish lên GitHub Pages.

@@ -36,4 +36,4 @@
 - [x] Tìm nguyên nhân vùng kết quả CBM bị kéo quá cao trong WebView mobile.
 - [x] Sửa CSS/layout để kết quả co theo nội dung, ô nhập và nút không bị ép sát bàn phím.
 - [x] Kiểm thử HTTP/CSS responsive, syntax JS và toàn bộ test logic.
-- [ ] Publish bản sửa lên GitHub Pages nếu kiểm thử đạt.
+- [x] Publish bản sửa lên GitHub Pages nếu kiểm thử đạt.

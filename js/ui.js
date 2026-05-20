@@ -11,6 +11,10 @@ window.VinTransCBMUi = (() => {
         return '<div class="result-message">Vui lòng chọn tỉnh, huyện và nhập trọng lượng để xem kết quả.</div>';
     }
 
+    function fishEmptyMessage() {
+        return '<div class="bbc-result-empty">Nhập số kiện và nhấn "TÍNH TIỀN" để xem kết quả</div>';
+    }
+
     function cbmEmptyMessage() {
         return '<div class="cbm-empty">CBM 0 · Kiện 0</div>';
     }
@@ -111,5 +115,5 @@ window.VinTransCBMUi = (() => {
         return html;
     }
 
-    return { formatMoney, formatNumber, renderShippingResult, renderFishResult, renderCbmResult, cbmEmptyMessage, shippingEmptyMessage };
+    return { formatMoney, formatNumber, renderShippingResult, renderFishResult, renderCbmResult, cbmEmptyMessage, shippingEmptyMessage, fishEmptyMessage };
 })();

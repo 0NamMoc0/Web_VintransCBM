@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bản web tĩnh của VinTransCBM với tính cước, bong bóng cá và kiểm tra tỉnh.",
   "scripts": {
-    "test": "node tests/cbm-core.test.js && node tests/shipping-core.test.js && node tests/province-checker.test.js && node tests/fish-core.test.js && node tests/app-parity.test.js"
+    "test": "node tests/cbm-core.test.js && node tests/shipping-core.test.js && node tests/province-checker.test.js && node tests/fish-core.test.js && node tests/ui-render.test.js && node tests/app-parity.test.js"
   },
   "keywords": [],
   "author": "",

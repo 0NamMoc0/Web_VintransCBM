@@ -257,17 +257,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const weight = parseFloat(shippingWeightInput.value);
 
         if (!provinceKey || !shippingHuyenSelect.value || !Number.isFinite(weight) || weight <= 0 || !shippingCore) {
+            shippingResultDiv.innerHTML = ui.shippingEmptyMessage();
             if (showAlert) alert('Vui lòng chọn tỉnh, huyện và nhập trọng lượng hợp lệ!');
             return false;
         }
 
         if (Number.isFinite(shippingCore.MAX_WEIGHT_KG) && weight > shippingCore.MAX_WEIGHT_KG) {
+            shippingResultDiv.innerHTML = ui.shippingEmptyMessage();
             if (showAlert) alert(`Trọng lượng không được vượt quá ${shippingCore.MAX_WEIGHT_KG}kg!`);
             return false;
         }
 
         const province = duLieuTinh[provinceKey];
         if (!province || !district || typeof district.ten !== 'string' || (district.loai !== 'noi' && district.loai !== 'ngoai')) {
+            shippingResultDiv.innerHTML = ui.shippingEmptyMessage();
             if (showAlert) alert('Dữ liệu tuyến không hợp lệ!');
             return false;
         }
@@ -276,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const outerCoeff = shippingCore.calculateOuterCoefficient(isOuter, weight);
         const results = shippingCore.calculateShipping(province.vung, isOuter, weight);
         if (!results.length) {
+            shippingResultDiv.innerHTML = ui.shippingEmptyMessage();
             if (showAlert) alert('Không thể tính cước với dữ liệu hiện tại!');
             return false;
         }
@@ -320,7 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tinhBongBongCa = () => {
         const pieces = parseFloat(fishPiecesInput.value);
-        if (!Number.isFinite(pieces) || pieces <= 0) return;
         fishResultDiv.innerHTML = ui.renderFishResult(pieces);
     };
 
@@ -394,6 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $$('.sub-tab-btn').forEach(btn => { btn.addEventListener('click', () => { $$('.sub-tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); $$('.sub-tab-content').forEach(c => c.classList.remove('active')); $(`#sub-tab-${btn.dataset.subTab}`).classList.add('active'); }); });
     $('#btn-tinh-bbc').addEventListener('click', tinhBongBongCa);
-    $('#btn-reset-bbc').addEventListener('click', () => { fishPiecesInput.value = ''; fishResultDiv.innerHTML = 'Nhập số kiện và nhấn "TÍNH TIỀN"'; });
+    $('#btn-reset-bbc').addEventListener('click', () => { fishPiecesInput.value = ''; fishResultDiv.innerHTML = ui.fishEmptyMessage(); });
     refreshIcons();
 });

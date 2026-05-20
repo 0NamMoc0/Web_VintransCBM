@@ -91,3 +91,10 @@
 - [x] Đẩy menu nổi lên sát góc trên hơn và chừa khoảng trên cho các tab không phải CBM.
 - [x] Ẩn menu/tải khi đang focus input/select.
 - [x] Nâng cụm nhập CBM cao hơn khi bàn phím mở trong WebView.
+
+## Task mới: kiểm tra kỹ logic giao diện web
+
+- [x] Chạy lại test logic CBM, cước, tỉnh/huyện, Bong Bóng Cá và parity app.
+- [x] Kiểm tra syntax JS, tài nguyên HTML, tab/sub-tab, icon và CSS mobile/WebView.
+- [x] Sửa lỗi kết quả cước cũ còn hiển thị khi người dùng xóa/sửa dữ liệu không hợp lệ.
+- [x] Sửa trạng thái rỗng Bong Bóng Cá sau khi bấm XÓA để giữ đúng style.

@@ -28,5 +28,5 @@
 - [x] Kiểm tra lần cuối logic CBM, cước, Bong Bóng Cá, tỉnh/huyện bằng test web và parity test với app Android.
 - [x] Kiểm tra syntax các file JS lõi và smoke web tĩnh trên cổng hiện tại.
 - [x] Chuẩn bị cây git sạch, không đưa `logs/`, runtime hoặc file tạm lên GitHub.
-- [ ] Push bản web mới lên repo `0NamMoc0/Web_VintransCBM` để thay thế dự án cũ.
-- [ ] Xác minh remote GitHub và URL GitHub Pages sau khi push.
+- [x] Push bản web mới lên repo `0NamMoc0/Web_VintransCBM` để thay thế dự án cũ.
+- [x] Xác minh remote GitHub và URL GitHub Pages sau khi push.

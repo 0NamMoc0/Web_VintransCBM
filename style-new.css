@@ -4027,6 +4027,38 @@ body,
     stroke-width: 2.8;
 }
 
+.apk-download-fab {
+    position: fixed;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(168, 178, 190, 0.16);
+    border-radius: 7px;
+    background: rgba(24, 27, 32, 0.72);
+    color: #A8B2BE;
+    opacity: 0.55;
+    z-index: 95;
+    transition: opacity 120ms ease, color 120ms ease, border-color 120ms ease, transform 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.apk-download-fab:active {
+    opacity: 0.9;
+    color: #4DD0C8;
+    border-color: rgba(77, 208, 200, 0.32);
+    transform: scale(0.94);
+}
+
+.apk-download-fab i[data-lucide] {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.4;
+}
+
 .main-content {
     display: flex;
     flex-direction: column;

@@ -43,3 +43,10 @@
 - [x] Giữ chuyển tab qua menu nhỏ để vẫn vào được `CBM`, `CƯỚC PHÍ`, `KIỂM TRA`.
 - [x] Giữ vùng kết quả CBM cao, nút thao tác và ô nhập theo bố cục app native.
 - [x] Chạy test logic, syntax, HTTP smoke và publish lên GitHub Pages.
+
+## Task mới: thêm APK WebView tải về
+
+- [x] Build APK WebView với tên app `VintransCBM`.
+- [x] Đưa APK vào `downloads/VintransCBM.apk` trong web tĩnh.
+- [x] Thêm nút tải APK rất nhỏ ở góc dưới bên phải.
+- [x] Chạy test web tĩnh, kiểm tra href tải và push GitHub Pages.

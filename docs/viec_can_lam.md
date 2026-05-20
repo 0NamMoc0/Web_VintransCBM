@@ -30,3 +30,10 @@
 - [x] Chuẩn bị cây git sạch, không đưa `logs/`, runtime hoặc file tạm lên GitHub.
 - [x] Push bản web mới lên repo `0NamMoc0/Web_VintransCBM` để thay thế dự án cũ.
 - [x] Xác minh remote GitHub và URL GitHub Pages sau khi push.
+
+## Task mới: sửa layout CBM khi bàn phím mở
+
+- [x] Tìm nguyên nhân vùng kết quả CBM bị kéo quá cao trong WebView mobile.
+- [x] Sửa CSS/layout để kết quả co theo nội dung, ô nhập và nút không bị ép sát bàn phím.
+- [x] Kiểm thử HTTP/CSS responsive, syntax JS và toàn bộ test logic.
+- [ ] Publish bản sửa lên GitHub Pages nếu kiểm thử đạt.

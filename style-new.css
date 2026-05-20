@@ -4206,3 +4206,42 @@ body,
         gap: 8px;
     }
 }
+
+/* CBM WebView keyboard fit */
+@media (max-width: 767px) {
+    #cbm-calculator.cbm-app-screen {
+        height: auto;
+    }
+
+    #cbm-calculator.cbm-app-screen .cbm-container {
+        height: auto;
+        flex: 0 0 auto;
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    #cbm-calculator.cbm-app-screen .cbm-result {
+        flex: 0 1 auto;
+        min-height: 96px;
+        max-height: min(42dvh, 340px);
+        overscroll-behavior: contain;
+    }
+
+    #cbm-calculator.cbm-app-screen .cbm-empty {
+        min-height: 68px;
+        align-items: center;
+    }
+
+    #cbm-calculator.cbm-app-screen .cbm-form,
+    #cbm-calculator.cbm-app-screen #cbm-input {
+        scroll-margin-bottom: 52dvh;
+    }
+
+    #cbm-calculator.cbm-app-screen #cbm-input {
+        font-size: 16px;
+    }
+
+    #cbm-calculator.cbm-app-screen:focus-within .cbm-result {
+        min-height: 72px;
+        max-height: min(24dvh, 190px);
+    }
+}

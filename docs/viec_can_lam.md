@@ -42,4 +42,4 @@
 - [x] Ẩn thanh tab lớn trên mobile/WebView, thay bằng menu nhỏ góc phải như app native.
 - [x] Giữ chuyển tab qua menu nhỏ để vẫn vào được `CBM`, `CƯỚC PHÍ`, `KIỂM TRA`.
 - [x] Giữ vùng kết quả CBM cao, nút thao tác và ô nhập theo bố cục app native.
-- [ ] Chạy test logic, syntax, HTTP smoke và publish lên GitHub Pages.
+- [x] Chạy test logic, syntax, HTTP smoke và publish lên GitHub Pages.

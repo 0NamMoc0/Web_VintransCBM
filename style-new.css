@@ -4027,6 +4027,37 @@ body,
     stroke-width: 2.8;
 }
 
+.lucide {
+    width: 1em;
+    height: 1em;
+    display: block;
+    flex: 0 0 auto;
+    stroke: currentColor;
+}
+
+.nav-icon .lucide,
+.menu-icon .lucide,
+.bottom-nav-icon .lucide {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.2;
+}
+
+.nav-menu-toggle .lucide {
+    width: 26px;
+    height: 26px;
+    stroke-width: 2.8;
+}
+
+.sub-tab-btn .lucide,
+.form-actions button .lucide,
+.bbc-form-actions button .lucide,
+#btn-clear-province .lucide {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.2;
+}
+
 .apk-download-fab {
     position: fixed;
     right: max(8px, env(safe-area-inset-right));
@@ -4089,6 +4120,40 @@ body,
 @keyframes appTabFade {
     from { opacity: 0.35; }
     to { opacity: 1; }
+}
+
+/* Mobile/WebView performance polish */
+@media (max-width: 767px) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .tab-content.active {
+        animation: none;
+    }
+
+    .main-content,
+    #cbm-calculator.cbm-app-screen .cbm-result {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .top-tab-nav.bottom-nav,
+    .top-tab-nav.bottom-nav.menu-open,
+    .apk-download-fab {
+        contain: layout paint;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 .shipping-calculator-container,

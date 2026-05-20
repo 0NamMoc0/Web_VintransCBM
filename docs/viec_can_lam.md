@@ -62,3 +62,11 @@
 - [x] Chỉnh vị trí nút tải trên mobile/WebView nằm ngay dưới nút menu 3 gạch.
 - [x] Ẩn nút tải khi menu đang mở để không đè danh sách tab.
 - [x] Đồng bộ web local và push GitHub Pages.
+
+## Task mới: làm web mượt hơn trên WebView/mobile
+
+- [x] Tìm nguyên nhân gây cảm giác khựng: bundle icon lớn, animation/transition mobile, tự tính cước khi gõ.
+- [x] Thay `js/lucide.js` bằng renderer icon nhỏ chỉ chứa icon đang dùng.
+- [x] Giảm animation/scroll smooth trên mobile/WebView.
+- [x] Throttle tự tính cước theo frame khi nhập trọng lượng.
+- [x] Chạy test logic/syntax và publish GitHub Pages.

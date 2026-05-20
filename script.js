@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cbmNextId = 1;
     let cbmBuffer = [];
     let cbmEditingId = null;
+    let shippingAutoCalculateFrame = 0;
 
     const closeToolMenu = () => {
         if (!topTabNav || !navMenuToggle) return;
@@ -234,7 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const tryAutoCalculate = () => {
-        tinhToanCuocPhi(false);
+        if (shippingAutoCalculateFrame) cancelAnimationFrame(shippingAutoCalculateFrame);
+        shippingAutoCalculateFrame = requestAnimationFrame(() => {
+            shippingAutoCalculateFrame = 0;
+            tinhToanCuocPhi(false);
+        });
     };
 
     const capNhatDropdownHuyen = () => {

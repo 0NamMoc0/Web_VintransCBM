@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ui = window.VinTransCBMUi;
     const { tenTinhCoDau, duLieuTinh, duLieuHuyen } = provinceData;
 
-    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
+    const sidebarNavItems = $$('.nav-item'), bottomNavItems = $$('.bottom-nav-item'), tabContents = $$('.tab-content'), topTabNav = $('.top-tab-nav'), navMenuToggle = $('.nav-menu-toggle'), provinceInput = $('#province-input'), provinceSuggestions = $('#province-suggestions'), provinceResultDiv = $('#province-result'), btnClearProvince = $('#btn-clear-province'), shippingTinhSelect = $('#shipping-tinh-select'), shippingHuyenSelect = $('#shipping-huyen-select'), shippingWeightInput = $('#shipping-weight-input'), btnCalculateShipping = $('#btn-calculate-shipping'), btnResetShipping = $('#btn-reset-shipping'), shippingResultDiv = $('#shipping-result'), fishPiecesInput = $('#bbc-so-kien'), fishResultDiv = $('#bbc-result');
     const cbmResultDiv = $('#cbm-result'), cbmEntryForm = $('#cbm-entry-form'), cbmInput = $('#cbm-input'), btnUndoCbm = $('#btn-undo-cbm'), btnClearCbmInput = $('#btn-clear-cbm-input'), btnResetCbm = $('#btn-reset-cbm');
     const cbmStepLabels = ['Dài', 'Rộng', 'Cao', 'Kiện'];
     let cbmGroups = [];
@@ -17,12 +17,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let cbmBuffer = [];
     let cbmEditingId = null;
 
+    const closeToolMenu = () => {
+        if (!topTabNav || !navMenuToggle) return;
+        topTabNav.classList.remove('menu-open');
+        navMenuToggle.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleToolMenu = () => {
+        if (!topTabNav || !navMenuToggle) return;
+        const isOpen = topTabNav.classList.toggle('menu-open');
+        navMenuToggle.setAttribute('aria-expanded', String(isOpen));
+    };
+
     const switchTab = (tabName) => {
         tabContents.forEach(content => content.classList.remove('active'));
         const selectedTab = $(`#${tabName}`);
         if (selectedTab) selectedTab.classList.add('active');
         sidebarNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
         bottomNavItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
+        closeToolMenu();
     };
 
     const loadSettings = () => {
@@ -271,6 +284,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sidebarNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
     bottomNavItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+    if (navMenuToggle) navMenuToggle.addEventListener('click', (event) => { event.stopPropagation(); toggleToolMenu(); });
+    if (topTabNav) topTabNav.addEventListener('click', (event) => event.stopPropagation());
+    document.addEventListener('click', closeToolMenu);
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeToolMenu(); });
 
     cbmEntryForm.addEventListener('submit', (event) => { event.preventDefault(); submitCbmValue(); });
     btnUndoCbm.addEventListener('click', undoCbm);

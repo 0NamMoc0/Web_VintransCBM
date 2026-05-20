@@ -36,3 +36,10 @@
 - [x] Hoàn tác phần sửa `keyboard fit` vừa thêm cho màn CBM WebView.
 - [x] Giữ nguyên logic tính CBM, tính cước và URL WebView cố định.
 - [x] Chạy lại test logic, syntax JS và publish lên GitHub Pages.
+
+## Task mới: làm màn CBM giống app native trong ảnh mẫu
+
+- [x] Ẩn thanh tab lớn trên mobile/WebView, thay bằng menu nhỏ góc phải như app native.
+- [x] Giữ chuyển tab qua menu nhỏ để vẫn vào được `CBM`, `CƯỚC PHÍ`, `KIỂM TRA`.
+- [x] Giữ vùng kết quả CBM cao, nút thao tác và ô nhập theo bố cục app native.
+- [ ] Chạy test logic, syntax, HTTP smoke và publish lên GitHub Pages.

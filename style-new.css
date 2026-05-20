@@ -4017,6 +4017,16 @@ body,
     stroke-width: 2.2;
 }
 
+.nav-menu-toggle {
+    display: none;
+}
+
+.nav-menu-toggle i[data-lucide] {
+    width: 26px;
+    height: 26px;
+    stroke-width: 2.8;
+}
+
 .main-content {
     display: flex;
     flex-direction: column;
@@ -4204,5 +4214,86 @@ body,
     .shipping-calculator-container,
     .province-container {
         gap: 8px;
+    }
+}
+
+/* Native app-like mobile menu */
+@media (max-width: 767px) {
+    .top-tab-nav.bottom-nav {
+        position: fixed !important;
+        top: max(28px, env(safe-area-inset-top));
+        right: 24px;
+        left: auto;
+        bottom: auto;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        display: block !important;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        box-shadow: none;
+        pointer-events: none;
+        z-index: 80;
+    }
+
+    .top-tab-nav.bottom-nav .nav-menu-toggle {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #A8B2BE;
+        pointer-events: auto;
+    }
+
+    .top-tab-nav.bottom-nav .nav-menu-toggle:active {
+        transform: scale(0.96);
+        color: #4DD0C8;
+    }
+
+    .top-tab-nav.bottom-nav:not(.menu-open) .bottom-nav-item {
+        display: none;
+    }
+
+    .top-tab-nav.bottom-nav.menu-open {
+        width: min(220px, calc(100% - 32px));
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 5px;
+        padding: 6px;
+        border: 1px solid rgba(168, 178, 190, 0.16);
+        background: rgba(24, 27, 32, 0.98);
+        pointer-events: auto;
+    }
+
+    .top-tab-nav.bottom-nav.menu-open .nav-menu-toggle {
+        justify-self: end;
+        margin-bottom: 2px;
+    }
+
+    .top-tab-nav.bottom-nav.menu-open .bottom-nav-item {
+        width: 100%;
+        min-height: 40px;
+        display: flex;
+        justify-content: flex-start;
+        padding: 0 10px;
+        gap: 8px;
+    }
+
+    .top-tab-nav.bottom-nav.menu-open .bottom-nav-icon i[data-lucide] {
+        width: 17px;
+        height: 17px;
+    }
+
+    .main-content {
+        padding-top: 12px !important;
     }
 }

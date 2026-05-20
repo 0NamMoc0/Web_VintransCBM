@@ -78,3 +78,9 @@
 - [x] Dùng `visualViewport` khi ô CBM focus để khóa layout riêng cho màn CBM trên mobile.
 - [x] Giữ vùng kết quả, 3 nút và ô nhập theo thứ tự native; ẩn nút menu/tải APK khi đang nhập để không đè nội dung.
 - [x] Không đổi công thức CBM, công thức cước hoặc dữ liệu tính tiền.
+
+## Task mới: cập nhật APK WebView tương thích bàn phím
+
+- [x] Sửa APK WebView dùng `stateHidden|adjustResize` và bỏ window fullscreen flag gây Android bỏ qua resize.
+- [x] Build lại `VinTransCBM-WebView-debug.apk` với icon hoa hướng dương và URL cố định.
+- [x] Thay `downloads/VintransCBM.apk` trên web tĩnh bằng bản APK mới.
